@@ -120,6 +120,26 @@ buildRequestable opts@InteropOptions{..} ir =
 
 
 
+buildRespondable :: InteropOptions -> InternalRep -> Maybe String
+buildRespondable opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR base _ _ -> Just $ tplRespondable opts base
+    DataRecIR base _ _    -> Just $ tplRespondable opts base
+    DataNormalIR base _   -> Just $ tplRespondable opts base
+    _ -> Nothing
+
+
+
+buildIsForeign :: InteropOptions -> InternalRep -> Maybe String
+buildIsForeign opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR base _ _ -> Just $ tplIsForeign opts base
+    DataRecIR base _ _    -> Just $ tplIsForeign opts base
+    DataNormalIR base _   -> Just $ tplIsForeign opts base
+    _ -> Nothing
+
+
+
 buildShow :: InteropOptions -> InternalRep -> Maybe String
 buildShow opts@InteropOptions{..} ir =
   case ir of
@@ -143,8 +163,8 @@ runMk opts@InteropOptions{..} ir mk =
     MkEncodeJson        -> buildEncodeJson opts ir
     MkDecodeJson        -> buildDecodeJson opts ir
     MkRequestable       -> buildRequestable opts ir
-    MkRespondable       -> Nothing
-    MkIsForeign         -> Nothing
+    MkRespondable       -> buildRespondable opts ir
+    MkIsForeign         -> buildIsForeign opts ir
     MkShow              -> buildShow opts ir
 
 
