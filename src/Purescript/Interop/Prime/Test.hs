@@ -44,7 +44,7 @@ data FunkyRecord
 
 
 
-mkExports defaultOptions (Just ("module Interop where", "-- footer", "/tmp/Interop.purs")) defaultPurescriptMkGs
+mkExports defaultOptionsPurescript (Just ("module Interop where", "-- footer", "/tmp/Interop.purs")) defaultPurescriptMkGs
   [
     (''Session, defaultPurescriptMks),
     (''SumType, defaultPurescriptMks),
@@ -57,7 +57,7 @@ mkExports defaultOptions (Just ("module Interop where", "-- footer", "/tmp/Inter
 
 
 
-mkExports defaultOptionsClean (Just ("module Interop.Clean where", "-- footer", "/tmp/Interop.Clean.purs")) defaultPurescriptMkGs
+mkExports defaultOptionsCleanPurescript (Just ("module Interop.Clean where", "-- footer", "/tmp/Interop.Clean.purs")) defaultPurescriptMkGs
   [
     (''Session, defaultPurescriptMks),
     (''SumType, defaultPurescriptMks),
@@ -70,7 +70,7 @@ mkExports defaultOptionsClean (Just ("module Interop.Clean where", "-- footer", 
 
 
 
-mkExports defaultOptionsClean (Just ("module Interop where", "-- footer", "/tmp/Interop.hs")) defaultHaskellMkGs
+mkExports defaultOptionsCleanHaskell (Just ("module Interop where", "-- footer", "/tmp/Interop.hs")) defaultHaskellMkGs
   [
     (''Session, defaultHaskellMks),
     (''SumType, defaultHaskellMks),

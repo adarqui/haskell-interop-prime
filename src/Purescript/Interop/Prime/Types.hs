@@ -5,6 +5,7 @@
 {-# OPTIONS -ddump-splices #-}
 
 module Purescript.Interop.Prime.Types (
+  Lang (..),
   Mk (..),
   MkG (..),
   InteropOptions (..),
@@ -15,6 +16,13 @@ module Purescript.Interop.Prime.Types (
 
 
 import qualified Data.Map as M
+
+
+
+data Lang
+  = LangPurescript
+  | LangHaskell
+  deriving (Show)
 
 
 
@@ -53,7 +61,8 @@ data InteropOptions = InteropOptions {
   jsonTagNameTransform :: StringTransformFn,
   spacingNL :: Int,
   spacingIndent :: Int,
-  typeMap :: M.Map String String
+  typeMap :: M.Map String String,
+  lang :: Lang
 }
 
 

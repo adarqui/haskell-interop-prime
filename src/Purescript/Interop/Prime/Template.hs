@@ -14,7 +14,8 @@ module Purescript.Interop.Prime.Template (
   tplToJSON_SumType,
   tplFromJSON_SumType,
   tplPurescriptImports,
-  tplHaskellImports
+  tplHaskellImports,
+  tplJObject
 ) where
 
 
@@ -90,7 +91,7 @@ tplUnwrap InteropOptions{..} base constr =
 
 tplToJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplToJSON_Record InteropOptions{..} base constr fields =
-     printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
+     instance_decl
   ++ spaces si1 ++ printf "toJSON (%s v) = object $\n" constr
   ++ spaces si2 ++ printf "[ \"tag\" .= \"%s\"\n" base
   ++ (concat $ map (\(n,_) -> spaces si2 ++ printf ", \"%s\" .= v.%s\n" (jsonNameTransform base n) (fieldNameTransform base n)) fields)
@@ -98,29 +99,45 @@ tplToJSON_Record InteropOptions{..} base constr fields =
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
-
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
+      LangHaskell    -> printf "instance ToJSON %s where\n" base
 
 
 tplFromJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplFromJSON_Record InteropOptions{..} base constr fields =
-     printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ printf "parseJSON (JObject o) = do\n"
+     instance_decl
+  ++ spaces si1 ++ printf "parseJSON (%s o) = do\n" (tplJObject lang)
   ++ (concat $ map (\(n,_) -> spaces si2 ++ printf "%s <- o .: \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields)
   ++ spaces si2 ++ printf "return $ %s {\n" constr
-  ++ (concat $ intersperse ",\n" $ map (\(n,_) -> spaces si3 ++ printf "%s : %s" (fieldNameTransform base n) (fieldNameTransform base n)) fields)
-  ++ "\n" ++ spaces si1 ++ "}\n"
+  ++ (concat $ intersperse ",\n" $ map (\(n,_) -> spaces si3 ++ printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields)
+  ++ "\n" ++ spaces si2 ++ "}\n"
   ++ spaces spacingIndent ++ printf "parseJSON x = fail $ \"Could not parse object: \" ++ show x\n"
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
   si3 = spacingIndent*3
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
+      LangHaskell    -> printf "instance FromJSON %s where\n" base
+  eql =
+    case lang of
+      LangPurescript -> ":"
+      LangHaskell    -> "="
 
 
 
 tplToJSON_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplToJSON_SumType opts@InteropOptions{..} base fields =
-     printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
+     instance_decl
   ++ (concat $ map (\(f,vars) -> tplToJSON_SumType_Field opts f vars) fields)
+  where
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
+      LangHaskell    -> printf "instance FromJSON %s where\n" base
 
 
 
@@ -142,8 +159,8 @@ tplToJSON_SumType_Field InteropOptions{..} field vars =
 
 tplFromJSON_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplFromJSON_SumType opts@InteropOptions{..} base fields =
-     printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "parseJSON (JObject o) = do\n"
+     instance_decl
+  ++ spaces si1 ++ printf "parseJSON (%s o) = do\n" (tplJObject lang)
   ++ spaces si2 ++ "tag <- o .: \"tag\"\n"
   ++ spaces si2 ++ "case tag of\n"
   ++ (concat $ map (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields)
@@ -151,6 +168,10 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
+      LangHaskell    -> printf "instance FromJSON %s where\n" base
 
 
 
@@ -200,3 +221,9 @@ tplHaskellImports s = (intercalate "\n"
   , ""
   , ""
   ]) ++ s
+
+
+
+tplJObject :: Lang -> String
+tplJObject LangPurescript = "JOBject"
+tplJObject LangHaskell    = "Object"

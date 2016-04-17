@@ -2,11 +2,15 @@
 
 module Purescript.Interop.Prime.Options (
   defaultOptions,
+  defaultOptionsHaskell,
+  defaultOptionsPurescript,
   defaultFieldNameTransform,
   defaultJsonNameTransform,
   defaultJsonTagNameTransform,
 
   defaultOptionsClean,
+  defaultOptionsCleanHaskell,
+  defaultOptionsCleanPurescript,
   defaultFieldNameTransformClean,
   defaultJsonNameTransformClean,
   defaultJsonTagNameTransformClean,
@@ -32,14 +36,21 @@ import           Purescript.Interop.Prime.Types
 
 
 
-defaultOptions :: InteropOptions
-defaultOptions = InteropOptions {
+defaultOptionsPurescript :: InteropOptions
+defaultOptionsPurescript = defaultOptions LangPurescript
+
+defaultOptionsHaskell :: InteropOptions
+defaultOptionsHaskell = defaultOptions LangHaskell
+
+defaultOptions :: Lang -> InteropOptions
+defaultOptions lang = InteropOptions {
   fieldNameTransform = defaultFieldNameTransform,
   jsonNameTransform = defaultJsonNameTransform,
   jsonTagNameTransform = defaultJsonTagNameTransform,
   typeMap = defaultTypeMap,
   spacingNL = 2,
-  spacingIndent = 2
+  spacingIndent = 2,
+  lang = lang
 }
 
 defaultFieldNameTransform :: StringTransformFn
@@ -54,15 +65,21 @@ defaultJsonTagNameTransform _ s = s
 
 
 
+defaultOptionsCleanPurescript :: InteropOptions
+defaultOptionsCleanPurescript = defaultOptionsClean LangPurescript
 
-defaultOptionsClean :: InteropOptions
-defaultOptionsClean = InteropOptions {
+defaultOptionsCleanHaskell :: InteropOptions
+defaultOptionsCleanHaskell = defaultOptionsClean LangHaskell
+
+defaultOptionsClean :: Lang -> InteropOptions
+defaultOptionsClean lang = InteropOptions {
   fieldNameTransform = defaultFieldNameTransformClean,
   jsonNameTransform = defaultJsonNameTransformClean,
   jsonTagNameTransform = defaultJsonTagNameTransformClean,
   typeMap = defaultTypeMap,
   spacingNL = 2,
-  spacingIndent = 2
+  spacingIndent = 2,
+  lang = lang
 }
 
 defaultFieldNameTransformClean :: StringTransformFn
