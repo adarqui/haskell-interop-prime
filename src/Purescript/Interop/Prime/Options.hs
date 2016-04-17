@@ -134,6 +134,7 @@ defaultPurescriptMks =
   , MkRequestable
   , MkRespondable
   , MkIsForeign
+  , MkShow
   , MkNone
   ]
 

@@ -17,6 +17,7 @@ module Purescript.Interop.Prime.Template (
   tplDecodeJson_Record,
   tplEncodeJson_SumType,
   tplDecodeJson_SumType,
+  tplShow_SumType,
   tplPurescriptImports,
   tplHaskellImports,
   tplJObject
@@ -296,6 +297,32 @@ tplDecodeJson_SumType_Field InteropOptions{..} field vars =
   where
   si1 = spacingIndent*4
   si2 = spacingIndent*5
+  vars' = vars_x $ length vars
+
+
+
+tplShow_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplShow_SumType opts@InteropOptions{..} base fields =
+     instance_decl
+  ++ (concat $ map (\(f,vars) -> tplShow_SumType_Field opts f vars) fields)
+  where
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sShow :: Show %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplShow_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplShow_SumType_Field InteropOptions{..} field vars =
+ (if null vars
+    then
+      spaces si1 ++ printf "show (%s) = \"%s\"" field field
+    else
+      spaces si1 ++ printf "show (%s %s) = \"%s: \" ++ " field (intercalate " " vars') field ++ (concat $ intersperse " ++ \" \" ++ " $ map  (printf "show %s") vars'))
+  ++ "\n"
+  where
+  si1 = spacingIndent
   vars' = vars_x $ length vars
 
 

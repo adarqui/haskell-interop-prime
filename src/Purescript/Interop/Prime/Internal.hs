@@ -110,6 +110,16 @@ buildDecodeJson opts@InteropOptions{..} ir =
 
 
 
+buildShow :: InteropOptions -> InternalRep -> Maybe String
+buildShow opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR _ _ _ -> Nothing
+    DataRecIR _ _ _ -> Nothing
+    DataNormalIR base fields -> Just $ tplShow_SumType opts base fields
+    _ -> Nothing
+
+
+
 runMk :: InteropOptions -> InternalRep -> Mk -> Maybe String
 runMk opts@InteropOptions{..} ir mk =
   case mk of
@@ -121,6 +131,7 @@ runMk opts@InteropOptions{..} ir mk =
     MkFromJSON          -> buildFromJSON opts ir
     MkEncodeJson        -> buildEncodeJson opts ir
     MkDecodeJson        -> buildDecodeJson opts ir
+    MkShow              -> buildShow opts ir
     _                   -> Nothing
 
 
