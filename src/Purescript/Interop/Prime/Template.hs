@@ -15,6 +15,8 @@ module Purescript.Interop.Prime.Template (
   tplFromJSON_SumType,
   tplEncodeJson_Record,
   tplDecodeJson_Record,
+  tplEncodeJson_SumType,
+  tplDecodeJson_SumType,
   tplPurescriptImports,
   tplHaskellImports,
   tplJObject
@@ -166,7 +168,7 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
   ++ spaces si2 ++ "tag <- o .: \"tag\"\n"
   ++ spaces si2 ++ "case tag of\n"
   ++ (concat $ map (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields)
-  ++ spaces spacingIndent ++ printf "parseJSON x = fail $ \"Could not parse object: \" ++ show x\n"
+  ++ spaces si1 ++ printf "parseJSON x = fail $ \"Could not parse object: \" ++ show x\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -230,6 +232,71 @@ tplDecodeJson_Record InteropOptions{..} base constr fields =
     case lang of
       LangPurescript -> printf "instance %sDecodeJson :: DecodeJson %s where\n" (firstToLower base) base
       LangHaskell    -> haskellNotSupported
+
+
+
+tplEncodeJson_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplEncodeJson_SumType opts@InteropOptions{..} base fields =
+     instance_decl
+  ++ (concat $ map (\(f,vars) -> tplEncodeJson_SumType_Field opts f vars) fields)
+  where
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sEncodeJson :: EncodeJson %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplEncodeJson_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplEncodeJson_SumType_Field InteropOptions{..} field vars =
+     spaces si1 ++ printf "encodeJson (%s %s) =\n" field (intercalate " " vars')
+  ++ spaces si3 ++ printf " \"tag\" := \"%s\"\n" field
+  ++
+     (if null vars
+        then spaces si2 ++ printf "~> \"contents\" := ([] :: Array String)\n"
+        else spaces si2 ++ printf "~> \"contents\" := " ++ wrapContent vars (intercalate ", " (map ("encodeJson " ++) vars')) ++ "\n")
+  ++ spaces si2 ++ "~> jsonEmptyObject\n"
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
+  vars' = vars_x $ length vars
+
+
+
+tplDecodeJson_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplDecodeJson_SumType opts@InteropOptions{..} base fields =
+     instance_decl
+  ++ spaces si1 ++ "decodeJson json = do\n"
+  ++ spaces si2 ++ "obj <- decodeJson json\n"
+  ++ spaces si2 ++ "tag <- obj .? \"tag\"\n"
+  ++ spaces si2 ++ "case tag of\n"
+  ++ (concat $ map (\(f,vars) -> tplDecodeJson_SumType_Field opts f vars) fields)
+  ++ spaces si1 ++ printf "decodeJson x = fail $ \"Could not parse object: \" ++ show x\n"
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sDecodeJson :: DecodeJson %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplDecodeJson_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplDecodeJson_SumType_Field InteropOptions{..} field vars =
+     spaces si1 ++ printf "\"%s\" -> do\n" field
+  ++
+     (if null vars
+       then spaces si2 ++ printf "return $ %s\n" field
+       else
+            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- obj .? \"contents\"\n"
+         ++ spaces si2 ++ printf "%s <$> %s" field (intercalate " <*> " (map ("decodeJson " ++) vars') ++ "\n"))
+  ++ "\n"
+  where
+  si1 = spacingIndent*4
+  si2 = spacingIndent*5
+  vars' = vars_x $ length vars
 
 
 

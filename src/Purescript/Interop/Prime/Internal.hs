@@ -95,7 +95,7 @@ buildEncodeJson opts@InteropOptions{..} ir =
   case ir of
     NewtypeRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
     DataRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
-    DataNormalIR _ _ -> Nothing -- Just $ tplEncodeJson_SumType opts base fields
+    DataNormalIR base fields -> Just $ tplEncodeJson_SumType opts base fields
     _ -> Nothing
 
 
@@ -105,7 +105,7 @@ buildDecodeJson opts@InteropOptions{..} ir =
   case ir of
     NewtypeRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
     DataRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
-    DataNormalIR _ _ -> Nothing -- Just $ tplDecodeJson_SumType opts base fields
+    DataNormalIR base fields -> Just $ tplDecodeJson_SumType opts base fields
     _ -> Nothing
 
 
