@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# OPTIONS -ddump-splices #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE RecordWildCards    #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# OPTIONS -ddump-splices      #-}
 
 module Purescript.Interop.Prime.Types (
   Lang (..),
@@ -57,13 +57,14 @@ type StringTransformFn = String -> String -> String
 
 
 data InteropOptions = InteropOptions {
-  fieldNameTransform :: StringTransformFn,
-  jsonNameTransform :: StringTransformFn,
+  fieldNameTransform   :: StringTransformFn,
+  jsonNameTransform    :: StringTransformFn,
   jsonTagNameTransform :: StringTransformFn,
-  spacingNL :: Int,
-  spacingIndent :: Int,
-  typeMap :: M.Map String String,
-  lang :: Lang
+  spacingNL            :: Int,
+  spacingIndent        :: Int,
+  typeMap              :: M.Map String String,
+  lang                 :: Lang,
+  psDataToNewtype      :: Bool
 }
 
 

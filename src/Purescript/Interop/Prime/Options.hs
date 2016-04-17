@@ -50,7 +50,8 @@ defaultOptions lang = InteropOptions {
   typeMap = defaultTypeMap,
   spacingNL = 2,
   spacingIndent = 2,
-  lang = lang
+  lang = lang,
+  psDataToNewtype = True
 }
 
 defaultFieldNameTransform :: StringTransformFn
@@ -79,7 +80,8 @@ defaultOptionsClean lang = InteropOptions {
   typeMap = defaultTypeMap,
   spacingNL = 2,
   spacingIndent = 2,
-  lang = lang
+  lang = lang,
+  psDataToNewtype = True
 }
 
 defaultFieldNameTransformClean :: StringTransformFn

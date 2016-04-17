@@ -53,7 +53,10 @@ tplNewtypeRecord = tplRecord "newtype"
 
 
 tplDataRecord :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplDataRecord = tplRecord "data"
+tplDataRecord opts@InteropOptions{..} =
+  if psDataToNewtype
+    then tplRecord "newtype" opts
+    else tplRecord "data" opts
 
 
 
