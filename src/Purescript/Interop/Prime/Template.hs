@@ -17,6 +17,7 @@ module Purescript.Interop.Prime.Template (
   tplDecodeJson_Record,
   tplEncodeJson_SumType,
   tplDecodeJson_SumType,
+  tplRequestable,
   tplShow_SumType,
   tplPurescriptImports,
   tplHaskellImports,
@@ -111,6 +112,7 @@ tplToJSON_Record InteropOptions{..} base constr fields =
     case lang of
       LangPurescript -> printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
       LangHaskell    -> printf "instance ToJSON %s where\n" base
+
 
 
 tplFromJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
@@ -304,6 +306,18 @@ tplDecodeJson_SumType_Field InteropOptions{..} field vars =
 
 
 
+tplRequestable :: InteropOptions -> String -> String
+tplRequestable InteropOptions{..} base =
+     printf "instance %sRequestable :: Requestable %s where\n" (firstToLower base) base
+  ++ spaces si1 ++ "toRequest s =\n"
+  ++ spaces si2 ++ "let str = printJson (encodeJson s) :: String\n"
+  ++ spaces si2 ++ "in toRequest str\n"
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+
+
+
 tplShow_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplShow_SumType opts@InteropOptions{..} base fields =
      instance_decl
@@ -334,6 +348,7 @@ tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
+  , "import Network.HTTP.Affjax.Request"
   , "import Data.Argonaut.Combinators"
   , "import Data.Argonaut.Core"
   , "import Data.Argonaut.Encode"

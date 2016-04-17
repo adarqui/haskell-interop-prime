@@ -110,6 +110,16 @@ buildDecodeJson opts@InteropOptions{..} ir =
 
 
 
+buildRequestable :: InteropOptions -> InternalRep -> Maybe String
+buildRequestable opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR base _ _ -> Just $ tplRequestable opts base
+    DataRecIR base _ _    -> Just $ tplRequestable opts base
+    DataNormalIR base _   -> Just $ tplRequestable opts base
+    _ -> Nothing
+
+
+
 buildShow :: InteropOptions -> InternalRep -> Maybe String
 buildShow opts@InteropOptions{..} ir =
   case ir of
@@ -125,14 +135,17 @@ runMk opts@InteropOptions{..} ir mk =
   case mk of
     MkType              -> buildType opts ir
     MkLens              -> buildLens opts ir
+    MkLensFields        -> Nothing
     MkMk                -> buildMk opts ir
     MkUnwrap            -> buildUnwrap opts ir
     MkToJSON            -> buildToJSON opts ir
     MkFromJSON          -> buildFromJSON opts ir
     MkEncodeJson        -> buildEncodeJson opts ir
     MkDecodeJson        -> buildDecodeJson opts ir
+    MkRequestable       -> buildRequestable opts ir
+    MkRespondable       -> Nothing
+    MkIsForeign         -> Nothing
     MkShow              -> buildShow opts ir
-    _                   -> Nothing
 
 
 

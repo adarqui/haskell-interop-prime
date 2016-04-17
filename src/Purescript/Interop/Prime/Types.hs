@@ -40,7 +40,6 @@ data Mk
   | MkRespondable
   | MkIsForeign
   | MkShow
-  | MkNone
   deriving (Show)
 
 
