@@ -90,6 +90,26 @@ buildFromJSON opts@InteropOptions{..} ir =
 
 
 
+buildEncodeJson :: InteropOptions -> InternalRep -> Maybe String
+buildEncodeJson opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
+    DataRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
+    DataNormalIR _ _ -> Nothing -- Just $ tplEncodeJson_SumType opts base fields
+    _ -> Nothing
+
+
+
+buildDecodeJson :: InteropOptions -> InternalRep -> Maybe String
+buildDecodeJson opts@InteropOptions{..} ir =
+  case ir of
+    NewtypeRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
+    DataRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
+    DataNormalIR _ _ -> Nothing -- Just $ tplDecodeJson_SumType opts base fields
+    _ -> Nothing
+
+
+
 runMk :: InteropOptions -> InternalRep -> Mk -> Maybe String
 runMk opts@InteropOptions{..} ir mk =
   case mk of
@@ -99,6 +119,8 @@ runMk opts@InteropOptions{..} ir mk =
     MkUnwrap            -> buildUnwrap opts ir
     MkToJSON            -> buildToJSON opts ir
     MkFromJSON          -> buildFromJSON opts ir
+    MkEncodeJson        -> buildEncodeJson opts ir
+    MkDecodeJson        -> buildDecodeJson opts ir
     _                   -> Nothing
 
 

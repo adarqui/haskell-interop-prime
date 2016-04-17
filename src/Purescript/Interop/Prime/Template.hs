@@ -13,6 +13,8 @@ module Purescript.Interop.Prime.Template (
   tplFromJSON_Record,
   tplToJSON_SumType,
   tplFromJSON_SumType,
+  tplEncodeJson_Record,
+  tplDecodeJson_Record,
   tplPurescriptImports,
   tplHaskellImports,
   tplJObject
@@ -120,7 +122,7 @@ tplFromJSON_Record InteropOptions{..} base constr fields =
   si3 = spacingIndent*3
   instance_decl =
     case lang of
-      LangPurescript -> printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
+      LangPurescript -> printf "instance %sFromJSON :: FromJSON %s where\n" (firstToLower base) base
       LangHaskell    -> printf "instance FromJSON %s where\n" base
   eql =
     case lang of
@@ -136,8 +138,8 @@ tplToJSON_SumType opts@InteropOptions{..} base fields =
   where
   instance_decl =
     case lang of
-      LangPurescript -> printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
-      LangHaskell    -> printf "instance FromJSON %s where\n" base
+      LangPurescript -> printf "instance %sToJSON :: ToJSON %s where\n" (firstToLower base) base
+      LangHaskell    -> printf "instance ToJSON %s where\n" base
 
 
 
@@ -170,7 +172,7 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
   si2 = spacingIndent*2
   instance_decl =
     case lang of
-      LangPurescript -> printf "instance %sFromJson :: FromJSON %s where\n" (firstToLower base) base
+      LangPurescript -> printf "instance %sFromJSON :: FromJSON %s where\n" (firstToLower base) base
       LangHaskell    -> printf "instance FromJSON %s where\n" base
 
 
@@ -193,10 +195,53 @@ tplFromJSON_SumType_Field InteropOptions{..} field vars =
 
 
 
+tplEncodeJson_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplEncodeJson_Record InteropOptions{..} base constr fields =
+     instance_decl
+  ++ spaces si1 ++ printf "encodeJson (%s o) =\n" constr
+  ++ spaces si3 ++ printf " \"tag\" := \"%s\"\n" base
+  ++ (concat $ map (\(n,_) -> spaces si2 ++ printf "~> \"%s\" := o.%s\n" (jsonNameTransform base n) (fieldNameTransform base n)) fields)
+  ++ spaces si2 ++ "~> jsonEmptyObject\n"
+  where
+  si1 = spacingIndent*1
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sEncodeJson :: EncodeJson %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplDecodeJson_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplDecodeJson_Record InteropOptions{..} base constr fields =
+     instance_decl
+  ++ spaces si1 ++ "decodeJson o = do\n"
+  ++ spaces si2 ++ "obj <- decodeJson o\n"
+  ++ (concat $ map (\(n,_) -> spaces si2 ++ printf "%s <- obj .? \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields)
+  ++ spaces si2 ++ printf "pure $ %s {\n" constr
+  ++ (concat $ intersperse ",\n" $ map (\(n,_) -> spaces si3 ++ (fieldNameTransform base n)) fields)
+  ++ "\n" ++ spaces si2 ++ "}\n"
+  where
+  si1 = spacingIndent*1
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sDecodeJson :: DecodeJson %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
 tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
+  , "import Data.Argonaut.Combinators"
+  , "import Data.Argonaut.Core"
+  , "import Data.Argonaut.Encode"
+  , "import Data.Argonaut.Decode"
+  , "import Data.Argonaut.Printer"
   , "import Data.JSON"
   , "import Data.Either"
   , "import Data.Maybe"
@@ -225,5 +270,5 @@ tplHaskellImports s = (intercalate "\n"
 
 
 tplJObject :: Lang -> String
-tplJObject LangPurescript = "JOBject"
+tplJObject LangPurescript = "JObject"
 tplJObject LangHaskell    = "Object"

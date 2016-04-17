@@ -3,7 +3,9 @@ module Purescript.Interop.Prime.Misc (
   newlines,
   spaces,
   vars_x,
-  wrapContent
+  wrapContent,
+  haskellNotSupported,
+  purescriptNotSupported
 ) where
 
 
@@ -35,3 +37,13 @@ vars_x n = map (("x" ++) . show) [0..n - 1]
 wrapContent :: [a] -> String -> String
 wrapContent vars str | length vars == 1 = str
                      | otherwise        = "[" ++ str ++ "]"
+
+
+
+haskellNotSupported :: String
+haskellNotSupported = error "Haskell not supported."
+
+
+
+purescriptNotSupported :: String
+purescriptNotSupported = error "Purescript not supported."
