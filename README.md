@@ -12,4 +12,8 @@
 
 ## Examples
 
-<TODO>
+Example:
+- https://github.com/adarqui/purescript-interop-prime/blob/master/src/Purescript/Interop/Prime/Test.hs
+
+Examples of generated code:
+- https://github.com/adarqui/purescript-interop-prime/tree/master/gen
