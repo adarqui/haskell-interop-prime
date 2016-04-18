@@ -44,39 +44,36 @@ data FunkyRecord
 
 
 
-mkExports defaultOptionsPurescript (Just ("module Interop where", "-- footer", "/tmp/Interop.purs")) defaultPurescriptMkGs
+mkExports
+  (Options
+    (defaultOptionsPurescript "/tmp/Interop.purs")
+    (defaultPurescriptMkGs "module Interop where")
+    (defaultOptionsHaskell "/tmp/Interop.hs")
+    (defaultHaskellMkGs "module Interop where"))
   [
-    (''Session, defaultPurescriptMks),
-    (''SumType, defaultPurescriptMks),
-    (''BigRecord, defaultPurescriptMks),
-    (''DateMaybe, defaultPurescriptMks),
-    (''Text, defaultPurescriptMks),
-    (''TextMaybe, defaultPurescriptMks),
-    (''FunkyRecord, defaultPurescriptMks)
+    (''Session,     defaultPurescriptMks, defaultHaskellMks),
+    (''SumType,     defaultPurescriptMks, defaultHaskellMks),
+    (''BigRecord,   defaultPurescriptMks, defaultHaskellMks),
+    (''DateMaybe,   defaultPurescriptMks, defaultHaskellMks),
+    (''Text,        defaultPurescriptMks, defaultHaskellMks),
+    (''TextMaybe,   defaultPurescriptMks, defaultHaskellMks),
+    (''FunkyRecord, defaultPurescriptMks, defaultHaskellMks)
   ]
 
 
 
-mkExports defaultOptionsCleanPurescript (Just ("module Interop.Clean where", "-- footer", "/tmp/Interop.Clean.purs")) defaultPurescriptMkGs
+mkExports
+  (Options
+    (defaultOptionsCleanPurescript "/tmp/Interop.Clean.purs")
+    (defaultPurescriptMkGs "module Interop.Clean where")
+    (defaultOptionsCleanHaskell "/tmp/Interop.Clean.hs")
+    (defaultHaskellMkGs "module Interop.Clean where"))
   [
-    (''Session, defaultPurescriptMks),
-    (''SumType, defaultPurescriptMks),
-    (''BigRecord, defaultPurescriptMks),
-    (''DateMaybe, defaultPurescriptMks),
-    (''Text, defaultPurescriptMks),
-    (''TextMaybe, defaultPurescriptMks),
-    (''FunkyRecord, defaultPurescriptMks)
-  ]
-
-
-
-mkExports defaultOptionsCleanHaskell (Just ("module Interop where", "-- footer", "/tmp/Interop.hs")) defaultHaskellMkGs
-  [
-    (''Session, defaultHaskellMks),
-    (''SumType, defaultHaskellMks),
-    (''BigRecord, defaultHaskellMks),
-    (''DateMaybe, defaultHaskellMks),
-    (''Text, defaultHaskellMks),
-    (''TextMaybe, defaultHaskellMks),
-    (''FunkyRecord, defaultHaskellMks)
+    (''Session,     defaultPurescriptMks, defaultHaskellMks),
+    (''SumType,     defaultPurescriptMks, defaultHaskellMks),
+    (''BigRecord,   defaultPurescriptMks, defaultHaskellMks),
+    (''DateMaybe,   defaultPurescriptMks, defaultHaskellMks),
+    (''Text,        defaultPurescriptMks, defaultHaskellMks),
+    (''TextMaybe,   defaultPurescriptMks, defaultHaskellMks),
+    (''FunkyRecord, defaultPurescriptMks, defaultHaskellMks)
   ]

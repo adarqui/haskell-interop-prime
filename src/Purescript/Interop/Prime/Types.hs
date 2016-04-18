@@ -5,17 +5,22 @@
 {-# OPTIONS -ddump-splices      #-}
 
 module Purescript.Interop.Prime.Types (
+  ExportT,
   Lang (..),
   Mk (..),
   MkG (..),
+  Options (..),
   InteropOptions (..),
   InternalRep (..),
+  InteropReader (..),
   StringTransformFn,
 ) where
 
 
 
 import qualified Data.Map as M
+import Control.Monad.Trans.RWS
+import Language.Haskell.TH
 
 
 
@@ -47,6 +52,8 @@ data Mk
 data MkG
   = MkGPurescriptImports
   | MkGHaskellImports
+  | MkGHeader String
+  | MkGFooter String
   deriving (Show)
 
 
@@ -63,7 +70,17 @@ data InteropOptions = InteropOptions {
   spacingIndent        :: Int,
   typeMap              :: M.Map String String,
   lang                 :: Lang,
-  psDataToNewtype      :: Bool
+  psDataToNewtype      :: Bool,
+  filePath             :: FilePath
+}
+
+
+
+data Options = Options {
+  psInterop :: InteropOptions,
+  psMkGs    :: [MkG],
+  hsInterop :: InteropOptions,
+  hsMkGs    :: [MkG]
 }
 
 
@@ -76,3 +93,15 @@ data InternalRep
   | TypeIR String String
   | EmptyIR
   deriving (Show)
+
+
+
+data InteropReader = InteropReader {
+  isInterop :: InteropOptions,
+  isFields :: [String]
+}
+
+
+
+-- newtype RWST r w s m a
+type ExportT = RWS InteropReader () ()

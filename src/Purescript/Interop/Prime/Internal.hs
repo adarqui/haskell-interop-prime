@@ -21,6 +21,7 @@ import           Language.Haskell.TH.Syntax
 import           Purescript.Interop.Prime.Misc
 import           Purescript.Interop.Prime.Template
 import           Purescript.Interop.Prime.Types
+import Control.Monad.Trans.RWS
 
 
 
@@ -174,74 +175,116 @@ runMkG InteropOptions{..} mkg s =
   case mkg of
     MkGPurescriptImports -> Just $ tplPurescriptImports s
     MkGHaskellImports    -> Just $ tplHaskellImports s
+    MkGHeader header     -> Just $ tplHeader header s
+    MkGFooter footer     -> Just $ tplFooter footer s
 
 
 
 -- | This is the meat and potatoes. It exports types to a files
 --
-mkExports :: InteropOptions -> Maybe (String, String, FilePath) -> [MkG] -> [(Name, [Mk])] -> Q [Dec]
-mkExports opts@InteropOptions{..} out mkgs ts = do
-  exports <- forM ts $ \(t, mks) -> do
-    TyConI dec <- reify t
-    let ir = parseInternalRep dec
-    return $ concat $ intersperse (newlines spacingNL) $ catMaybes $ map (runMk opts ir) mks
+mkExports :: Options -> [(Name, [Mk], [Mk])] -> Q [Dec]
+mkExports opts@Options{..} nmm = do
+
+  ir_ps <- forM nmm $ (\(t, psMks, hsMks) -> do
+      TyConI dec <- reify t
+      return (buildInternalRep psInterop dec, psMks)
+    )
+
+  ir_hs <- forM nmm $ (\(t, psMks, hsMks) -> do
+      TyConI dec <- reify t
+      return $ (buildInternalRep hsInterop dec, hsMks)
+    )
 
   let
-    exports'  =
-      foldl'
-        (\acc mkg -> let m = runMkG opts mkg acc in if m == Nothing then acc else fromJust m)
-        (intercalate "\n" exports)
-        mkgs
-    handleAll :: SomeException -> IO ()
-    handleAll _ = return ()
+    ps_fields = buildFields psInterop $ map fst ir_ps
+    (ps, _) = evalRWS (mkExports' psInterop psMkGs ir_ps) (InteropReader psInterop ps_fields) ()
+    (hs, _) = evalRWS (mkExports' hsInterop hsMkGs ir_hs) (InteropReader hsInterop []) ()
 
-  case out of
-    Just (header, footer, path) -> runIO $ handle handleAll $ writeFile path (header ++ "\n\n" ++ exports' ++ "\n\n" ++ footer)
-    Nothing -> return ()
+  runIO $ persistInterop psInterop ps
+  runIO $ persistInterop hsInterop hs
 
   return []
 
-    where
 
-    parseInternalRep (NewtypeD _ n _ con _) = mkConNewtypeIR (nameBase n) con
-    parseInternalRep (DataD _ n _ cons _) =
-      case (head cons) of
-        (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
-        (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
-        _              -> EmptyIR
-    parseInternalRep (TySynD n _ t) = TypeIR (nameBase n) (mkTypeIR t)
-    parseInternalRep _ = EmptyIR
 
-    mkConNewtypeIR nb (RecC n vars) = NewtypeRecIR nb (nameBase n) (map (mkVarIR nb) vars)
-    mkConNewtypeIR _ (NormalC n vars) = NewtypeNormalIR (nameBase n) (intercalate " " (map mkVarIR' vars))
-    mkConNewtypeIR _ _ = EmptyIR
+-- | Builds everything out, from the mk's to the mkg's
+-- and leaves us with a string representation of a module.
+--
+mkExports' :: InteropOptions -> [MkG] -> [(InternalRep, [Mk])] -> ExportT String
+mkExports' opts@InteropOptions{..} mkgs xs =
 
---      mkConDataIR nb (RecC n vars) = DataRecIR nb (nameBase n) (map (mkVarIR nb) vars)
---      mkConDataIR _ (NormalC n vars) = EmptyIR -- DataNormalIR (nameBase n) (intercalate " " (map mkVarIR' vars))
---      mkConDataIR _ _ = EmptyIR
+  return last_pass
 
-    mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars) -- DataNormalIR (nameBase n) (intercalate " " (map mkVarIR' vars))
-    mkConDataIR' _ _ = ("",[])
+  where
+  mks         = map (\(ir,mks) -> map (\mk -> runMk opts ir mk) mks) xs
+  first_pass  = concat $ intersperse (newlines spacingNL) $ catMaybes $ concat mks
+  last_pass   =
+    foldl'
+      (\acc mkg -> let m = runMkG opts mkg acc in if m == Nothing then acc else fromJust m)
+      first_pass
+      mkgs
 
-    mkVarIR nb (n, _, t) = (fieldNameTransform nb (nameBase n), mkTypeIR t)
-    mkVarIR' (_, t) = mkTypeIR t
 
-    mkTypeIR (ConT n) =
-      case M.lookup (nameBase n) typeMap of
-        Nothing -> nameBase n
-        Just t  -> t
-    mkTypeIR (VarT a) =
-      let
-        v = takeWhile (/= '_') $ nameBase a
-      in case M.lookup v typeMap of
-        Nothing -> v
-        Just t  -> t
-    mkTypeIR (AppT f x) = "(" ++ mkTypeIR f ++ " " ++ mkTypeIR x ++ ")"
-    mkTypeIR (TupleT 0) = "Unit "
-    mkTypeIR (TupleT 2) = "Tuple "
-    mkTypeIR (TupleT n) = "Tuple" ++ show n ++ " "
-    mkTypeIR ListT = "Array "
-    mkTypeIR x     = show x
 
---      mkTyVarIR (PlainTV n) = nameBase n
---      mkTyVarIR (KindedTV n _) = nameBase n
+-- | Build the internel representation
+--
+buildInternalRep :: InteropOptions -> Dec -> InternalRep
+buildInternalRep opts@InteropOptions{..} dec =
+
+  parseInternalRep dec
+
+  where
+
+  parseInternalRep (NewtypeD _ n _ con _) = mkConNewtypeIR (nameBase n) con
+  parseInternalRep (DataD _ n _ cons _) =
+    case (head cons) of
+      (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
+      (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
+      _              -> EmptyIR
+  parseInternalRep (TySynD n _ t) = TypeIR (nameBase n) (mkTypeIR t)
+  parseInternalRep _ = EmptyIR
+
+  mkConNewtypeIR nb (RecC n vars) = NewtypeRecIR nb (nameBase n) (map (mkVarIR nb) vars)
+  mkConNewtypeIR _ (NormalC n vars) = NewtypeNormalIR (nameBase n) (intercalate " " (map mkVarIR' vars))
+  mkConNewtypeIR _ _ = EmptyIR
+
+  mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars)
+  mkConDataIR' _ _ = ("",[])
+
+  mkVarIR nb (n, _, t) = (fieldNameTransform nb (nameBase n), mkTypeIR t)
+  mkVarIR' (_, t) = mkTypeIR t
+
+  mkTypeIR (ConT n) =
+    case M.lookup (nameBase n) typeMap of
+      Nothing -> nameBase n
+      Just t  -> t
+  mkTypeIR (VarT a) =
+    let
+      v = takeWhile (/= '_') $ nameBase a
+    in case M.lookup v typeMap of
+      Nothing -> v
+      Just t  -> t
+  mkTypeIR (AppT f x) = "(" ++ mkTypeIR f ++ " " ++ mkTypeIR x ++ ")"
+  mkTypeIR (TupleT 0) = "Unit "
+  mkTypeIR (TupleT 2) = "Tuple "
+  mkTypeIR (TupleT n) = "Tuple" ++ show n ++ " "
+  mkTypeIR ListT = "Array "
+  mkTypeIR x     = show x
+
+
+
+
+buildFields :: InteropOptions -> [InternalRep] -> [String]
+buildFields opts@InteropOptions{..} ir =
+  concat $ map go ir
+  where
+  go (NewtypeRecIR _ _ fields) = map fst fields
+  go (DataRecIR _ _ fields)    = map fst fields
+  go _                         = []
+
+
+
+persistInterop :: InteropOptions -> String -> IO ()
+persistInterop opts@InteropOptions{..} s = do
+
+  writeFile filePath s

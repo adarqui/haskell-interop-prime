@@ -36,22 +36,29 @@ import           Purescript.Interop.Prime.Types
 
 
 
-defaultOptionsPurescript :: InteropOptions
+langToMap :: Lang -> M.Map String String
+langToMap LangHaskell    = M.empty
+langToMap LangPurescript = defaultTypeMap
+
+
+
+defaultOptionsPurescript :: FilePath -> InteropOptions
 defaultOptionsPurescript = defaultOptions LangPurescript
 
-defaultOptionsHaskell :: InteropOptions
+defaultOptionsHaskell :: FilePath -> InteropOptions
 defaultOptionsHaskell = defaultOptions LangHaskell
 
-defaultOptions :: Lang -> InteropOptions
-defaultOptions lang = InteropOptions {
+defaultOptions :: Lang -> FilePath -> InteropOptions
+defaultOptions lang path = InteropOptions {
   fieldNameTransform = defaultFieldNameTransform,
   jsonNameTransform = defaultJsonNameTransform,
   jsonTagNameTransform = defaultJsonTagNameTransform,
-  typeMap = defaultTypeMap,
+  typeMap = langToMap lang,
   spacingNL = 2,
   spacingIndent = 2,
   lang = lang,
-  psDataToNewtype = True
+  psDataToNewtype = True,
+  filePath = path
 }
 
 defaultFieldNameTransform :: StringTransformFn
@@ -66,22 +73,23 @@ defaultJsonTagNameTransform _ s = s
 
 
 
-defaultOptionsCleanPurescript :: InteropOptions
+defaultOptionsCleanPurescript :: FilePath -> InteropOptions
 defaultOptionsCleanPurescript = defaultOptionsClean LangPurescript
 
-defaultOptionsCleanHaskell :: InteropOptions
+defaultOptionsCleanHaskell :: FilePath -> InteropOptions
 defaultOptionsCleanHaskell = defaultOptionsClean LangHaskell
 
-defaultOptionsClean :: Lang -> InteropOptions
-defaultOptionsClean lang = InteropOptions {
+defaultOptionsClean :: Lang -> FilePath -> InteropOptions
+defaultOptionsClean lang path = InteropOptions {
   fieldNameTransform = defaultFieldNameTransformClean,
   jsonNameTransform = defaultJsonNameTransformClean,
   jsonTagNameTransform = defaultJsonTagNameTransformClean,
-  typeMap = defaultTypeMap,
+  typeMap = langToMap lang,
   spacingNL = 2,
   spacingIndent = 2,
   lang = lang,
-  psDataToNewtype = True
+  psDataToNewtype = True,
+  filePath = path
 }
 
 defaultFieldNameTransformClean :: StringTransformFn
@@ -123,8 +131,7 @@ defaultTypeMap =
 
 defaultPurescriptMks :: [Mk]
 defaultPurescriptMks =
-  [
-    MkType
+  [ MkType
   , MkLens
   , MkMk
   , MkUnwrap
@@ -141,21 +148,26 @@ defaultPurescriptMks =
 
 
 
-defaultPurescriptMkGs :: [MkG]
-defaultPurescriptMkGs =
-  [ MkGPurescriptImports ]
+defaultPurescriptMkGs :: String -> [MkG]
+defaultPurescriptMkGs header =
+  [ MkGPurescriptImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
 
 
 
 defaultHaskellMks :: [Mk]
 defaultHaskellMks =
-  [
-    MkToJSON
+  [ MkToJSON
   , MkFromJSON
   ]
 
 
 
-defaultHaskellMkGs :: [MkG]
-defaultHaskellMkGs =
-  [ MkGHaskellImports ]
+defaultHaskellMkGs :: String -> [MkG]
+defaultHaskellMkGs header =
+  [ MkGHaskellImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]

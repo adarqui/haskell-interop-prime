@@ -23,6 +23,8 @@ module Purescript.Interop.Prime.Template (
   tplShow_SumType,
   tplPurescriptImports,
   tplHaskellImports,
+  tplHeader,
+  tplFooter,
   tplJObject
 ) where
 
@@ -406,6 +408,16 @@ tplHaskellImports s = (intercalate "\n"
   , ""
   , ""
   ]) ++ s
+
+
+
+tplHeader :: String -> String -> String
+tplHeader header s = header ++ "\n" ++ s
+
+
+
+tplFooter :: String -> String -> String
+tplFooter footer s = s ++ "\n" ++ footer
 
 
 
