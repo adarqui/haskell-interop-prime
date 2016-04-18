@@ -120,6 +120,7 @@ defaultTypeMap :: M.Map String String
 defaultTypeMap =
   M.fromList
     [ ("Integer", "Int")
+    , ("Int64", "Int") -- TODO FIXME: Should use purescript-big-integers
     , ("Double", "Number")
     , ("Float", "Number")
     , ("Bool", "Boolean")
@@ -128,6 +129,7 @@ defaultTypeMap =
     , ("()", "Unit")
     , ("Text", "String")
     , ("ByteString", "String")
+    , ("UTCTime", "Date")
     ]
 
 
