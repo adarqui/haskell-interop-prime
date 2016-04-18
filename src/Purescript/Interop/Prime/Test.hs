@@ -27,7 +27,11 @@ data BigRecord = BigRecord {
   bigRecordInteger      :: Integer,
   bigRecordMaybeInteger :: Maybe Integer,
   bigRecordString       :: String,
-  bigRecordSumType      :: SumType
+  bigRecordSumType      :: SumType,
+  bigRecordData         :: String,
+  bigRecordClass        :: String,
+  bigRecordLet          :: String,
+  bigRecordModule       :: String
 }
 
 newtype DateMaybe = DateMaybe (Maybe String)

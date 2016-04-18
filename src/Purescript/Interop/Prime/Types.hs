@@ -69,6 +69,7 @@ data InteropOptions = InteropOptions {
   spacingNL            :: Int,
   spacingIndent        :: Int,
   typeMap              :: M.Map String String,
+  reservedMap          :: M.Map String String,
   lang                 :: Lang,
   psDataToNewtype      :: Bool,
   filePath             :: FilePath

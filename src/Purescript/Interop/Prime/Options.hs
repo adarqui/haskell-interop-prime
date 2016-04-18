@@ -16,6 +16,7 @@ module Purescript.Interop.Prime.Options (
   defaultJsonTagNameTransformClean,
 
   defaultTypeMap,
+  defaultReservedMap,
 
   defaultPurescriptMks,
   defaultPurescriptMkGs,
@@ -54,6 +55,7 @@ defaultOptions lang path = InteropOptions {
   jsonNameTransform = defaultJsonNameTransform,
   jsonTagNameTransform = defaultJsonTagNameTransform,
   typeMap = langToMap lang,
+  reservedMap = defaultReservedMap,
   spacingNL = 2,
   spacingIndent = 2,
   lang = lang,
@@ -85,6 +87,7 @@ defaultOptionsClean lang path = InteropOptions {
   jsonNameTransform = defaultJsonNameTransformClean,
   jsonTagNameTransform = defaultJsonTagNameTransformClean,
   typeMap = langToMap lang,
+  reservedMap = defaultReservedMap,
   spacingNL = 2,
   spacingIndent = 2,
   lang = lang,
@@ -115,17 +118,29 @@ defaultJsonTagNameTransformClean _ s = s
 
 defaultTypeMap :: M.Map String String
 defaultTypeMap =
-  M.fromList [
-    ("Integer", "Int"),
-    ("Double", "Number"),
-    ("Float", "Number"),
-    ("Bool", "Boolean"),
-    ("Set", "Array"),
-    ("List", "Array"),
-    ("()", "Unit"),
-    ("Text", "String"),
-    ("ByteString", "String")
-  ]
+  M.fromList
+    [ ("Integer", "Int")
+    , ("Double", "Number")
+    , ("Float", "Number")
+    , ("Bool", "Boolean")
+    , ("Set", "Array")
+    , ("List", "Array")
+    , ("()", "Unit")
+    , ("Text", "String")
+    , ("ByteString", "String")
+    ]
+
+
+
+defaultReservedMap :: M.Map String String
+defaultReservedMap =
+  M.fromList
+    [ ("data", "data'")
+    , ("type", "type'")
+    , ("class", "class'")
+    , ("module", "module'")
+    , ("let", "let'")
+    ]
 
 
 

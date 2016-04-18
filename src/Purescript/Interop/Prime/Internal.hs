@@ -278,7 +278,7 @@ mkExports' InteropOptions{..} mkgs xs = do
 -- | Build the internel representation
 --
 buildInternalRep :: InteropOptions -> Dec -> InternalRep
-buildInternalRep InteropOptions{..} dec =
+buildInternalRep opts@InteropOptions{..} dec =
 
   parseInternalRep dec
 
@@ -300,7 +300,8 @@ buildInternalRep InteropOptions{..} dec =
   mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars)
   mkConDataIR' _ _ = ("",[])
 
-  mkVarIR nb (n, _, t) = (fieldNameTransform nb (nameBase n), mkTypeIR t)
+  mkVarIR nb (n, _, t) = (buildField opts nb (nameBase n), mkTypeIR t)
+
   mkVarIR' (_, t) = mkTypeIR t
 
   mkTypeIR (ConT n) =
@@ -324,12 +325,22 @@ buildInternalRep InteropOptions{..} dec =
 
 
 buildFields :: InteropOptions -> [InternalRep] -> [String]
-buildFields InteropOptions{..} ir =
+buildFields opts@InteropOptions{..} ir =
   concat $ nub $ sort $ map go ir
   where
-  go (NewtypeRecIR _ _ fields) = map fst fields
-  go (DataRecIR _ _ fields)    = map fst fields
-  go _                         = []
+  go (NewtypeRecIR _ constr fields) = map (\(field,_) -> buildField opts constr field) fields
+  go (DataRecIR _ constr fields)    = map (\(field,_) -> buildField opts constr field) fields
+  go _                              = []
+
+
+
+buildField :: InteropOptions -> String -> String -> String
+buildField InteropOptions{..} base field =
+  case M.lookup name reservedMap of
+    Nothing  -> name
+    Just new -> new
+  where
+  name  = fieldNameTransform base field
 
 
 
