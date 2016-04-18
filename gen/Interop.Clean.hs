@@ -1,4 +1,4 @@
-module Interop where
+module Interop.Clean where
 
 
 import Data.Aeson
@@ -6,13 +6,13 @@ import Data.Aeson
 instance ToJSON Session where
   toJSON (Session v) = object $
     [ "tag" .= "Session"
-    , "unSession" .= v.unSession
+    , "un_session" .= v.unSession
     ]
 
 
 instance FromJSON Session where
   parseJSON (Object o) = do
-    unSession <- o .: "unSession"
+    unSession <- o .: "un_session"
     return $ Session {
       unSession = unSession
     }
@@ -95,33 +95,33 @@ instance FromJSON SumType where
 instance ToJSON BigRecord where
   toJSON (BigRecord v) = object $
     [ "tag" .= "BigRecord"
-    , "bigRecordBool" .= v.bigRecordBool
-    , "bigRecordInt" .= v.bigRecordInt
-    , "bigRecordMaybeInt" .= v.bigRecordMaybeInt
-    , "bigRecordInteger" .= v.bigRecordInteger
-    , "bigRecordMaybeInteger" .= v.bigRecordMaybeInteger
-    , "bigRecordString" .= v.bigRecordString
-    , "bigRecordSumType" .= v.bigRecordSumType
+    , "bool" .= v.bool
+    , "int" .= v.int
+    , "maybe_int" .= v.maybeInt
+    , "integer" .= v.integer
+    , "maybe_integer" .= v.maybeInteger
+    , "string" .= v.string
+    , "sum_type" .= v.sumType
     ]
 
 
 instance FromJSON BigRecord where
   parseJSON (Object o) = do
-    bigRecordBool <- o .: "bigRecordBool"
-    bigRecordInt <- o .: "bigRecordInt"
-    bigRecordMaybeInt <- o .: "bigRecordMaybeInt"
-    bigRecordInteger <- o .: "bigRecordInteger"
-    bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
-    bigRecordString <- o .: "bigRecordString"
-    bigRecordSumType <- o .: "bigRecordSumType"
+    bool <- o .: "bool"
+    int <- o .: "int"
+    maybeInt <- o .: "maybe_int"
+    integer <- o .: "integer"
+    maybeInteger <- o .: "maybe_integer"
+    string <- o .: "string"
+    sumType <- o .: "sum_type"
     return $ BigRecord {
-      bigRecordBool = bigRecordBool,
-      bigRecordInt = bigRecordInt,
-      bigRecordMaybeInt = bigRecordMaybeInt,
-      bigRecordInteger = bigRecordInteger,
-      bigRecordMaybeInteger = bigRecordMaybeInteger,
-      bigRecordString = bigRecordString,
-      bigRecordSumType = bigRecordSumType
+      bool = bool,
+      int = int,
+      maybeInt = maybeInt,
+      integer = integer,
+      maybeInteger = maybeInteger,
+      string = string,
+      sumType = sumType
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 

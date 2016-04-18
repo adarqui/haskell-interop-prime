@@ -1,22 +1,24 @@
 module Interop where
 
 
-
-import Network.HTTP.Affjax.Request
+import Control.Monad.Aff
 import Data.Argonaut.Combinators
 import Data.Argonaut.Core
-import Data.Argonaut.Encode
 import Data.Argonaut.Decode
+import Data.Argonaut.Encode
 import Data.Argonaut.Printer
-import Data.JSON
 import Data.Either
-import Data.Maybe
+import Data.Foreign (readString)
+import Data.Foreign.Class
+import Data.JSON
 import Data.List (List ())
-import Data.Tuple
+import Data.Maybe
 import Data.Set (Set ())
+import Data.Tuple
+import Network.HTTP.Affjax.Request
+import Network.HTTP.Affjax.Response
 import Optic.Lens
 import Optic.Core
-import Control.Monad.Aff
 import Prelude
 
 newtype Session = Session {
@@ -80,13 +82,14 @@ instance sessionRespondable :: Respondable Session where
     Tuple Nothing JSONResponse
   fromResponse f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 instance sessionIsForeign :: IsForeign Session where
   read f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
+
 
 data SumType
   = A 
@@ -258,13 +261,13 @@ instance sumTypeRespondable :: Respondable SumType where
     Tuple Nothing JSONResponse
   fromResponse f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 instance sumTypeIsForeign :: IsForeign SumType where
   read f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 instance sumTypeShow :: Show SumType where
@@ -276,6 +279,7 @@ instance sumTypeShow :: Show SumType where
   show (F x0) = "F: " ++ show x0
   show (G x0) = "G: " ++ show x0
   show (H x0 x1 x2 x3) = "H: " ++ show x0 ++ " " ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3
+
 
 newtype BigRecord = BigRecord {
   bigRecordBool :: Boolean,
@@ -386,18 +390,20 @@ instance bigRecordRespondable :: Respondable BigRecord where
     Tuple Nothing JSONResponse
   fromResponse f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 instance bigRecordIsForeign :: IsForeign BigRecord where
   read f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 type Text = String
 
+
 type TextMaybe = (Maybe String)
+
 
 newtype FunkyRecord = Boom1 {
   boom1 :: Boolean
@@ -460,13 +466,48 @@ instance funkyRecordRespondable :: Respondable FunkyRecord where
     Tuple Nothing JSONResponse
   fromResponse f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
 
 instance funkyRecordIsForeign :: IsForeign FunkyRecord where
   read f = case readString f of
     Right s -> readJSON s
-    err     -> err
+    Left er -> Left er
 
+
+bigRecordBool_ :: forall b a r. Lens { bigRecordBool :: a | r } { bigRecordBool :: b | r } a b
+bigRecordBool_ f o = o { bigRecordBool = _ } <$> f o.bigRecordBool
+
+
+bigRecordInt_ :: forall b a r. Lens { bigRecordInt :: a | r } { bigRecordInt :: b | r } a b
+bigRecordInt_ f o = o { bigRecordInt = _ } <$> f o.bigRecordInt
+
+
+bigRecordMaybeInt_ :: forall b a r. Lens { bigRecordMaybeInt :: a | r } { bigRecordMaybeInt :: b | r } a b
+bigRecordMaybeInt_ f o = o { bigRecordMaybeInt = _ } <$> f o.bigRecordMaybeInt
+
+
+bigRecordInteger_ :: forall b a r. Lens { bigRecordInteger :: a | r } { bigRecordInteger :: b | r } a b
+bigRecordInteger_ f o = o { bigRecordInteger = _ } <$> f o.bigRecordInteger
+
+
+bigRecordMaybeInteger_ :: forall b a r. Lens { bigRecordMaybeInteger :: a | r } { bigRecordMaybeInteger :: b | r } a b
+bigRecordMaybeInteger_ f o = o { bigRecordMaybeInteger = _ } <$> f o.bigRecordMaybeInteger
+
+
+bigRecordString_ :: forall b a r. Lens { bigRecordString :: a | r } { bigRecordString :: b | r } a b
+bigRecordString_ f o = o { bigRecordString = _ } <$> f o.bigRecordString
+
+
+bigRecordSumType_ :: forall b a r. Lens { bigRecordSumType :: a | r } { bigRecordSumType :: b | r } a b
+bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
+
+
+boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
+boom1_ f o = o { boom1 = _ } <$> f o.boom1
+
+
+unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
+unSession_ f o = o { unSession = _ } <$> f o.unSession
 
 -- footer
