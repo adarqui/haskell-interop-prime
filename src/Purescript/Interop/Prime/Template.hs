@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE RecordWildCards      #-}
 
 module Purescript.Interop.Prime.Template (
   tplType,
@@ -35,6 +36,10 @@ import           Data.List
 import           Purescript.Interop.Prime.Misc
 import           Purescript.Interop.Prime.Types
 import           Text.Printf
+
+
+
+default (String)
 
 
 

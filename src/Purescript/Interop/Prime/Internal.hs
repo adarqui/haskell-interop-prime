@@ -1,7 +1,8 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings  #-}
-{-# LANGUAGE RecordWildCards    #-}
-{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE DeriveDataTypeable   #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE RecordWildCards      #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# OPTIONS -ddump-splices #-}
 {-# OPTIONS -fno-warn-orphans #-}
 
@@ -21,6 +22,10 @@ import           Language.Haskell.TH.Syntax
 import           Purescript.Interop.Prime.Misc
 import           Purescript.Interop.Prime.Template
 import           Purescript.Interop.Prime.Types
+
+
+
+default (String)
 
 
 
