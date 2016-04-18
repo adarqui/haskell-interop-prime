@@ -4,6 +4,7 @@ module Purescript.Interop.Prime.Misc (
   spaces,
   vars_x,
   wrapContent,
+  intercalateMap,
   haskellNotSupported,
   purescriptNotSupported
 ) where
@@ -11,6 +12,7 @@ module Purescript.Interop.Prime.Misc (
 
 
 import           Data.Char
+import           Data.List
 
 
 
@@ -37,6 +39,11 @@ vars_x n = map (("x" ++) . show) [0..n - 1]
 wrapContent :: [a] -> String -> String
 wrapContent vars str | length vars == 1 = str
                      | otherwise        = "[" ++ str ++ "]"
+
+
+
+intercalateMap :: [b] -> (a -> [b]) -> [a] -> [b]
+intercalateMap t f xs = intercalate t $ map f xs
 
 
 

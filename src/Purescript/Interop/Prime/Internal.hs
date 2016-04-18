@@ -265,7 +265,7 @@ mkExports' InteropOptions{..} mkgs xs = do
         Nothing -> return acc
         Just r' -> return r'
     )
-    (concat $ intersperse (newlines spacingNL) $ catMaybes $ concat mks)
+    (intercalate (newlines spacingNL) $ catMaybes $ concat mks)
     mkgs
 
 
