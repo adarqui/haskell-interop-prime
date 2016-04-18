@@ -11,8 +11,8 @@ module Purescript.Interop.Prime.Internal (
 
 
 
-import           Control.Exception
 import           Control.Monad
+import           Control.Monad.Trans.RWS
 import           Data.List
 import qualified Data.Map                          as M
 import           Data.Maybe
@@ -21,7 +21,6 @@ import           Language.Haskell.TH.Syntax
 import           Purescript.Interop.Prime.Misc
 import           Purescript.Interop.Prime.Template
 import           Purescript.Interop.Prime.Types
-import Control.Monad.Trans.RWS
 
 
 
@@ -33,172 +32,207 @@ instance Lift Type where
 
 
 
-buildType :: InteropOptions -> InternalRep -> Maybe String
-buildType opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord opts base constr fields
-    DataRecIR base constr fields -> Just $ tplDataRecord opts base constr fields
-    DataNormalIR base fields -> Just $ tplDataNormal opts base fields
-    TypeIR base type_ -> Just $ tplType opts base type_
-    _ -> Nothing
+opts_ir :: ExportT (InteropOptions, InternalRep)
+opts_ir = do
+  opts <- asks irInterop
+  ir   <- gets isRep
+  return (opts, ir)
 
 
 
-buildLens :: InteropOptions -> InternalRep -> Maybe String
-buildLens opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplLensP opts base constr fields
-    DataRecIR base constr fields -> Just $ tplLensP opts base constr fields
-    _ -> Nothing
+buildType :: ExportT (Maybe String)
+buildType = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplDataRecord opts base constr fields
+      DataNormalIR base fields        -> Just $ tplDataNormal opts base fields
+      TypeIR base type_               -> Just $ tplType opts base type_
+      _                               -> Nothing
 
 
 
-buildMk :: InteropOptions -> InternalRep -> Maybe String
-buildMk opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplMk opts base constr fields
-    DataRecIR base constr fields -> Just $ tplMk opts base constr fields
-    _ -> Nothing
+buildLens :: ExportT (Maybe String)
+buildLens = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplLensP opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplLensP opts base constr fields
+      _                               -> Nothing
 
 
 
-buildUnwrap :: InteropOptions -> InternalRep -> Maybe String
-buildUnwrap opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr _ -> Just $ tplUnwrap opts base constr
-    DataRecIR base constr _ -> Just $ tplUnwrap opts base constr
-    _ -> Nothing
+buildMk :: ExportT (Maybe String)
+buildMk = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplMk opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplMk opts base constr fields
+      _                               -> Nothing
 
 
 
-buildToJSON :: InteropOptions -> InternalRep -> Maybe String
-buildToJSON opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplToJSON_Record opts base constr fields
-    DataRecIR base constr fields -> Just $ tplToJSON_Record opts base constr fields
-    DataNormalIR base fields -> Just $ tplToJSON_SumType opts base fields
-    _ -> Nothing
+buildUnwrap :: ExportT (Maybe String)
+buildUnwrap = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr _ -> Just $ tplUnwrap opts base constr
+      DataRecIR base constr _    -> Just $ tplUnwrap opts base constr
+      _                          -> Nothing
 
 
 
-buildFromJSON :: InteropOptions -> InternalRep -> Maybe String
-buildFromJSON opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplFromJSON_Record opts base constr fields
-    DataRecIR base constr fields -> Just $ tplFromJSON_Record opts base constr fields
-    DataNormalIR base fields -> Just $ tplFromJSON_SumType opts base fields
-    _ -> Nothing
+buildToJSON :: ExportT (Maybe String)
+buildToJSON = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplToJSON_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplToJSON_Record opts base constr fields
+      DataNormalIR base fields        -> Just $ tplToJSON_SumType opts base fields
+      _                               -> Nothing
 
 
 
-buildEncodeJson :: InteropOptions -> InternalRep -> Maybe String
-buildEncodeJson opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
-    DataRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
-    DataNormalIR base fields -> Just $ tplEncodeJson_SumType opts base fields
-    _ -> Nothing
+buildFromJSON :: ExportT (Maybe String)
+buildFromJSON = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplFromJSON_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplFromJSON_Record opts base constr fields
+      DataNormalIR base fields        -> Just $ tplFromJSON_SumType opts base fields
+      _                               -> Nothing
 
 
 
-buildDecodeJson :: InteropOptions -> InternalRep -> Maybe String
-buildDecodeJson opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
-    DataRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
-    DataNormalIR base fields -> Just $ tplDecodeJson_SumType opts base fields
-    _ -> Nothing
+buildEncodeJson :: ExportT (Maybe String)
+buildEncodeJson = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplEncodeJson_Record opts base constr fields
+      DataNormalIR base fields        -> Just $ tplEncodeJson_SumType opts base fields
+      _                               -> Nothing
 
 
 
-buildRequestable :: InteropOptions -> InternalRep -> Maybe String
-buildRequestable opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base _ _ -> Just $ tplRequestable opts base
-    DataRecIR base _ _    -> Just $ tplRequestable opts base
-    DataNormalIR base _   -> Just $ tplRequestable opts base
-    _ -> Nothing
+buildDecodeJson :: ExportT (Maybe String)
+buildDecodeJson = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplDecodeJson_Record opts base constr fields
+      DataNormalIR base fields        -> Just $ tplDecodeJson_SumType opts base fields
+      _                               -> Nothing
 
 
 
-buildRespondable :: InteropOptions -> InternalRep -> Maybe String
-buildRespondable opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base _ _ -> Just $ tplRespondable opts base
-    DataRecIR base _ _    -> Just $ tplRespondable opts base
-    DataNormalIR base _   -> Just $ tplRespondable opts base
-    _ -> Nothing
+buildRequestable :: ExportT (Maybe String)
+buildRequestable = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base _ _ -> Just $ tplRequestable opts base
+      DataRecIR base _ _    -> Just $ tplRequestable opts base
+      DataNormalIR base _   -> Just $ tplRequestable opts base
+      _                     -> Nothing
 
 
 
-buildIsForeign :: InteropOptions -> InternalRep -> Maybe String
-buildIsForeign opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR base _ _ -> Just $ tplIsForeign opts base
-    DataRecIR base _ _    -> Just $ tplIsForeign opts base
-    DataNormalIR base _   -> Just $ tplIsForeign opts base
-    _ -> Nothing
+buildRespondable :: ExportT (Maybe String)
+buildRespondable = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base _ _ -> Just $ tplRespondable opts base
+      DataRecIR base _ _    -> Just $ tplRespondable opts base
+      DataNormalIR base _   -> Just $ tplRespondable opts base
+      _                     -> Nothing
 
 
 
-buildShow :: InteropOptions -> InternalRep -> Maybe String
-buildShow opts@InteropOptions{..} ir =
-  case ir of
-    NewtypeRecIR _ _ _ -> Nothing
-    DataRecIR _ _ _ -> Nothing
-    DataNormalIR base fields -> Just $ tplShow_SumType opts base fields
-    _ -> Nothing
+buildIsForeign :: ExportT (Maybe String)
+buildIsForeign = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base _ _ -> Just $ tplIsForeign opts base
+      DataRecIR base _ _    -> Just $ tplIsForeign opts base
+      DataNormalIR base _   -> Just $ tplIsForeign opts base
+      _                     -> Nothing
 
 
 
-runMk :: InteropOptions -> InternalRep -> Mk -> Maybe String
-runMk opts@InteropOptions{..} ir mk =
+buildShow :: ExportT (Maybe String)
+buildShow = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR _ _ _       -> Nothing
+      DataRecIR _ _ _          -> Nothing
+      DataNormalIR base fields -> Just $ tplShow_SumType opts base fields
+      _                        -> Nothing
+
+
+
+runMk :: Mk -> ExportT (Maybe String)
+runMk mk = do
   case mk of
-    MkType              -> buildType opts ir
-    MkLens              -> buildLens opts ir
-    MkLensFields        -> Nothing
-    MkMk                -> buildMk opts ir
-    MkUnwrap            -> buildUnwrap opts ir
-    MkToJSON            -> buildToJSON opts ir
-    MkFromJSON          -> buildFromJSON opts ir
-    MkEncodeJson        -> buildEncodeJson opts ir
-    MkDecodeJson        -> buildDecodeJson opts ir
-    MkRequestable       -> buildRequestable opts ir
-    MkRespondable       -> buildRespondable opts ir
-    MkIsForeign         -> buildIsForeign opts ir
-    MkShow              -> buildShow opts ir
+    MkType              -> buildType
+    MkLens              -> buildLens
+    MkMk                -> buildMk
+    MkUnwrap            -> buildUnwrap
+    MkToJSON            -> buildToJSON
+    MkFromJSON          -> buildFromJSON
+    MkEncodeJson        -> buildEncodeJson
+    MkDecodeJson        -> buildDecodeJson
+    MkRequestable       -> buildRequestable
+    MkRespondable       -> buildRespondable
+    MkIsForeign         -> buildIsForeign
+    MkShow              -> buildShow
 
 
 
-runMkG :: InteropOptions -> MkG -> String -> Maybe String
-runMkG InteropOptions{..} mkg s =
-  case mkg of
-    MkGPurescriptImports -> Just $ tplPurescriptImports s
-    MkGHaskellImports    -> Just $ tplHaskellImports s
-    MkGHeader header     -> Just $ tplHeader header s
-    MkGFooter footer     -> Just $ tplFooter footer s
+runMkG :: MkG -> String -> ExportT (Maybe String)
+runMkG mkg s = do
+  opts   <- asks irInterop
+  fields <- asks irFields
+  return $
+    case mkg of
+      MkGPurescriptImports -> Just $ tplPurescriptImports s
+      MkGHaskellImports    -> Just $ tplHaskellImports s
+      MkGLensFields        -> Just $ tplLensFields opts fields s
+      MkGHeader header     -> Just $ tplHeader header s
+      MkGFooter footer     -> Just $ tplFooter footer s
 
 
 
 -- | This is the meat and potatoes. It exports types to a files
 --
 mkExports :: Options -> [(Name, [Mk], [Mk])] -> Q [Dec]
-mkExports opts@Options{..} nmm = do
+mkExports Options{..} nmm = do
 
-  ir_ps <- forM nmm $ (\(t, psMks, hsMks) -> do
+  ir_ps <- forM nmm $ (\(t, psMks, _) -> do
       TyConI dec <- reify t
       return (buildInternalRep psInterop dec, psMks)
     )
 
-  ir_hs <- forM nmm $ (\(t, psMks, hsMks) -> do
+  ir_hs <- forM nmm $ (\(t, _, hsMks) -> do
       TyConI dec <- reify t
       return $ (buildInternalRep hsInterop dec, hsMks)
     )
 
   let
     ps_fields = buildFields psInterop $ map fst ir_ps
-    (ps, _) = evalRWS (mkExports' psInterop psMkGs ir_ps) (InteropReader psInterop ps_fields) ()
-    (hs, _) = evalRWS (mkExports' hsInterop hsMkGs ir_hs) (InteropReader hsInterop []) ()
+    (ps, _) = evalRWS (mkExports' psInterop psMkGs ir_ps) (InteropReader psInterop ps_fields) undefined
+    (hs, _) = evalRWS (mkExports' hsInterop hsMkGs ir_hs) (InteropReader hsInterop []) undefined
 
   runIO $ persistInterop psInterop ps
   runIO $ persistInterop hsInterop hs
@@ -211,25 +245,35 @@ mkExports opts@Options{..} nmm = do
 -- and leaves us with a string representation of a module.
 --
 mkExports' :: InteropOptions -> [MkG] -> [(InternalRep, [Mk])] -> ExportT String
-mkExports' opts@InteropOptions{..} mkgs xs =
+mkExports' InteropOptions{..} mkgs xs = do
 
-  return last_pass
+  -- build a list of results of applying each mk to each Dec (type)
+  mks <-
+    mapM (\(ir,mks) -> do
+        -- build*'s need ir in state
+        put $ InteropState ir
+        mapM (\mk -> do
+            runMk mk
+          ) mks
+      ) xs
 
-  where
-  mks         = map (\(ir,mks) -> map (\mk -> runMk opts ir mk) mks) xs
-  first_pass  = concat $ intersperse (newlines spacingNL) $ catMaybes $ concat mks
-  last_pass   =
-    foldl'
-      (\acc mkg -> let m = runMkG opts mkg acc in if m == Nothing then acc else fromJust m)
-      first_pass
-      mkgs
+  -- fold over the stringified module, adding imports, headers, footers etc
+  foldM
+    (\acc mkg -> do
+      r <- runMkG mkg acc
+      case r of
+        Nothing -> return acc
+        Just r' -> return r'
+    )
+    (concat $ intersperse (newlines spacingNL) $ catMaybes $ concat mks)
+    mkgs
 
 
 
 -- | Build the internel representation
 --
 buildInternalRep :: InteropOptions -> Dec -> InternalRep
-buildInternalRep opts@InteropOptions{..} dec =
+buildInternalRep InteropOptions{..} dec =
 
   parseInternalRep dec
 
@@ -275,8 +319,8 @@ buildInternalRep opts@InteropOptions{..} dec =
 
 
 buildFields :: InteropOptions -> [InternalRep] -> [String]
-buildFields opts@InteropOptions{..} ir =
-  concat $ map go ir
+buildFields InteropOptions{..} ir =
+  concat $ nub $ sort $ map go ir
   where
   go (NewtypeRecIR _ _ fields) = map fst fields
   go (DataRecIR _ _ fields)    = map fst fields
@@ -285,6 +329,6 @@ buildFields opts@InteropOptions{..} ir =
 
 
 persistInterop :: InteropOptions -> String -> IO ()
-persistInterop opts@InteropOptions{..} s = do
+persistInterop InteropOptions{..} s = do
 
   writeFile filePath s

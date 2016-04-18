@@ -3,6 +3,7 @@
 module Purescript.Interop.Prime.Template (
   tplType,
   tplLensP,
+  tplLensFields,
   tplNewtypeRecord,
   tplDataRecord,
   tplRecord,
@@ -49,6 +50,19 @@ tplLensP InteropOptions{..} base constr fields =
   ++ (concat $ intersperse ",\n" $ map (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields)
   ++ "\n}\n"
   ++ printf "_%s f (%s o) = %s <$> f o\n" base constr constr
+
+
+
+tplLensFields :: InteropOptions -> [String] -> String -> String
+tplLensFields InteropOptions{..} fields s =
+  s ++ (newlines spacingNL) ++ (intercalate (newlines spacingNL) $ map tplLensField fields)
+
+
+
+tplLensField :: String -> String
+tplLensField field =
+     printf "%s_ :: forall b a r. Lens { %s :: a | r } { %s :: b | r } a b\n" field field field
+  ++ printf "%s_ f o = o { %s = _ } <$> f o.%s\n" field field field
 
 
 

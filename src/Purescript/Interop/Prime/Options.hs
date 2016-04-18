@@ -137,7 +137,6 @@ defaultPurescriptMks =
   , MkUnwrap
   , MkToJSON
   , MkFromJSON
-  , MkLensFields
   , MkEncodeJson
   , MkDecodeJson
   , MkRequestable
@@ -152,6 +151,7 @@ defaultPurescriptMkGs :: String -> [MkG]
 defaultPurescriptMkGs header =
   [ MkGPurescriptImports
   , MkGHeader header
+  , MkGLensFields
   , MkGFooter "-- footer"
   ]
 

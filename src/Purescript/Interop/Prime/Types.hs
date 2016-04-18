@@ -13,14 +13,14 @@ module Purescript.Interop.Prime.Types (
   InteropOptions (..),
   InternalRep (..),
   InteropReader (..),
+  InteropState (..),
   StringTransformFn,
 ) where
 
 
 
-import qualified Data.Map as M
-import Control.Monad.Trans.RWS
-import Language.Haskell.TH
+import           Control.Monad.Trans.RWS
+import qualified Data.Map                as M
 
 
 
@@ -38,7 +38,6 @@ data Mk
   | MkUnwrap
   | MkMk
   | MkLens
-  | MkLensFields
   | MkEncodeJson
   | MkDecodeJson
   | MkRequestable
@@ -52,6 +51,7 @@ data Mk
 data MkG
   = MkGPurescriptImports
   | MkGHaskellImports
+  | MkGLensFields
   | MkGHeader String
   | MkGFooter String
   deriving (Show)
@@ -97,11 +97,15 @@ data InternalRep
 
 
 data InteropReader = InteropReader {
-  isInterop :: InteropOptions,
-  isFields :: [String]
+  irInterop :: InteropOptions,
+  irFields  :: [String]
 }
 
 
+data InteropState = InteropState {
+  isRep :: InternalRep
+}
+
 
 -- newtype RWST r w s m a
-type ExportT = RWS InteropReader () ()
+type ExportT = RWS InteropReader () InteropState
