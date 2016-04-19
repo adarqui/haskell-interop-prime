@@ -30,7 +30,6 @@ module Purescript.Interop.Prime.Options (
 import           Data.Char
 import           Data.List
 import qualified Data.Map                       as M
-import           Data.Maybe
 import           Data.Transform.UnCamel
 import           Purescript.Interop.Prime.Misc
 import           Purescript.Interop.Prime.Types
@@ -95,21 +94,40 @@ defaultOptionsClean lang path = InteropOptions {
   filePath = path
 }
 
+-- The logic for checking empty string after stripPrefix:
+--
+-- This becomes important when a field within a record is named exactly after the constructor,
+-- which results in an empty name if you 'strip off' the constructor prefix. So, we keep the
+-- original field name in this case.
+--
+
 defaultFieldNameTransformClean :: StringTransformFn
 defaultFieldNameTransformClean nb s =
   if isPrefixOf ftl s
-    then firstToLower $ fromJust $ stripPrefix ftl s
+    then firstToLower fixed
     else s
   where
   ftl = firstToLower nb
+  stripped = stripPrefix ftl s
+  fixed =
+    case stripped of
+      Nothing -> s
+      Just "" -> s
+      Just v  -> v
 
 defaultJsonNameTransformClean :: StringTransformFn
 defaultJsonNameTransformClean nb s =
   if isPrefixOf ftl s
-    then map toLower $ unCamelSource '_' $ fromJust $ stripPrefix ftl s
+    then map toLower $ unCamelSource '_' fixed
     else map toLower $ unCamelSource '_' s
   where
   ftl = firstToLower nb
+  stripped = stripPrefix ftl s
+  fixed =
+    case stripped of
+      Nothing -> s
+      Just "" -> s
+      Just v  -> v
 
 defaultJsonTagNameTransformClean :: StringTransformFn
 defaultJsonTagNameTransformClean _ s = s

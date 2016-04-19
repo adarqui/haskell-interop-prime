@@ -31,7 +31,8 @@ data BigRecord = BigRecord {
   bigRecordData         :: String,
   bigRecordClass        :: String,
   bigRecordLet          :: String,
-  bigRecordModule       :: String
+  bigRecordModule       :: String,
+  bigRecord             :: Bool
 }
 
 newtype DateMaybe = DateMaybe (Maybe String)

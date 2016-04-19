@@ -336,18 +336,11 @@ buildFields opts@InteropOptions{..} ir =
 
 buildField :: InteropOptions -> String -> String -> String
 buildField InteropOptions{..} base field =
-  case M.lookup name' reservedMap of
-    Nothing  -> name'
+  case M.lookup name reservedMap of
+    Nothing  -> name
     Just new -> new
   where
   name  = fieldNameTransform base field
-  -- This becomes important when a field within a record is named exactly after the constructor,
-  -- which results in an empty name if you 'strip off' the constructor prefix. So, we keep the
-  -- original field name in this case.
-  name' =
-    if name == ""
-      then field
-      else name
 
 
 
