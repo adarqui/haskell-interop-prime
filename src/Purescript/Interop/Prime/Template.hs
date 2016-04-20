@@ -441,6 +441,7 @@ tplHaskellImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Data.Aeson"
+  , "import Data.Text   (Text)"
   , ""
   , ""
   ]) ++ s
@@ -477,9 +478,6 @@ tplTestHeader module_name =
   , "{-# LANGUAGE RecordWildCards      #-}"
   , ""
   , "module " ++ module_name ++ " where"
-  , ""
-  , ""
-  , "import Test"
   , ""
   , ""
   ]
