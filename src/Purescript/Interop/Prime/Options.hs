@@ -220,7 +220,8 @@ defaultHaskellMks =
 
 defaultHaskellMkGs :: String -> [MkG]
 defaultHaskellMkGs header =
-  [ MkGHaskellImports
+  [ MkGHeader "default (Text)\n\n"
+  , MkGHaskellImports
   , MkGHeader header
   , MkGFooter "-- footer"
   ]

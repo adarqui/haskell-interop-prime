@@ -54,7 +54,7 @@ mkExports
     (defaultOptionsPurescript "/tmp/Interop.purs")
     (defaultPurescriptMkGs "module Interop where")
     (defaultOptionsHaskell "/tmp/Interop.hs")
-    (defaultHaskellMkGs "module Interop where"))
+    (defaultHaskellMkGs $ tplTestHeader "Interop"))
   [
     (''Session,     defaultPurescriptMks, defaultHaskellMks),
     (''SumType,     defaultPurescriptMks, defaultHaskellMks),
@@ -72,7 +72,7 @@ mkExports
     (defaultOptionsCleanPurescript "/tmp/Interop.Clean.purs")
     (defaultPurescriptMkGs "module Interop.Clean where")
     (defaultOptionsCleanHaskell "/tmp/Interop.Clean.hs")
-    (defaultHaskellMkGs "module Interop.Clean where"))
+    (defaultHaskellMkGs $ tplTestHeader "Interop.Clean"))
   [
     (''Session,     defaultPurescriptMks, defaultHaskellMks),
     (''SumType,     defaultPurescriptMks, defaultHaskellMks),

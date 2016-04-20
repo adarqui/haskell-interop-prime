@@ -27,7 +27,8 @@ module Purescript.Interop.Prime.Template (
   tplHaskellImports,
   tplHeader,
   tplFooter,
-  tplJObject
+  tplJObject,
+  tplTestHeader
 ) where
 
 
@@ -124,9 +125,9 @@ tplUnwrap InteropOptions{..} base constr =
 tplToJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplToJSON_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ printf "toJSON (%s v) = object $\n" constr
+  ++ spaces si1 ++ tojson_decl
   ++ spaces si2 ++ printf "[ \"tag\" .= \"%s\"\n" base
-  ++ concatMap (\(n,_) -> spaces si2 ++ printf ", \"%s\" .= v.%s\n" (jsonNameTransform base n) (fieldNameTransform base n)) fields
+  ++ concatMap (\(n,_) -> spaces si2 ++ printf ", \"%s\" .= %s\n" (jsonNameTransform base n) (fieldref_decl n)) fields
   ++ spaces si2 ++ printf "]\n"
   where
   si1 = spacingIndent*1
@@ -135,13 +136,21 @@ tplToJSON_Record InteropOptions{..} base constr fields =
     case lang of
       LangPurescript -> printf "instance %sToJson :: ToJSON %s where\n" (firstToLower base) base
       LangHaskell    -> printf "instance ToJSON %s where\n" base
+  tojson_decl =
+    case lang of
+      LangPurescript -> printf "toJSON (%s v) = object $\n" constr
+      LangHaskell    -> printf "toJSON %s{..} = object $\n" constr
+  fieldref_decl n =
+    case lang of
+      LangPurescript -> printf "v.%s" (fieldNameTransform base n)
+      LangHaskell    -> fieldNameTransform base n
 
 
 
 tplFromJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplFromJSON_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ printf "parseJSON (%s o) = do\n" (tplJObject lang)
+  ++ spaces si1 ++ parsejson_decl
   ++ concatMap (\(n,_) -> spaces si2 ++ printf "%s <- o .: \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
   ++ spaces si2 ++ printf "return $ %s {\n" constr
   ++ intercalateMap ",\n" (\(n,_) -> spaces si3 ++ printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields
@@ -159,6 +168,10 @@ tplFromJSON_Record InteropOptions{..} base constr fields =
     case lang of
       LangPurescript -> ":"
       LangHaskell    -> "="
+  parsejson_decl =
+    case lang of
+      LangPurescript -> "parseJSON (JObject o) = do\n"
+      LangHaskell    -> "parseJSON (Object o) = do\n"
 
 
 
@@ -180,7 +193,7 @@ tplToJSON_SumType_Field InteropOptions{..} field vars =
   ++ spaces si2 ++ printf "[ \"tag\" .= \"%s\"\n" field
   ++
      (if null vars
-        then spaces si2 ++ printf ", \"contents\" .= ([] :: Array String)\n"
+        then spaces si2 ++ printf ", \"contents\" .= %s\n" (tplArrayString lang)
         else spaces si2 ++ printf ", \"contents\" .= " ++ wrapContent vars (intercalateMap ", " ("toJSON " ++) vars') ++ "\n")
   ++ spaces si2 ++ "]\n"
   where
@@ -282,7 +295,7 @@ tplEncodeJson_SumType_Field InteropOptions{..} field vars =
   ++ spaces si3 ++ printf " \"tag\" := \"%s\"\n" field
   ++
      (if null vars
-        then spaces si2 ++ printf "~> \"contents\" := ([] :: Array String)\n"
+        then spaces si2 ++ printf "~> \"contents\" := %s\n" (tplArrayString lang)
         else spaces si2 ++ printf "~> \"contents\" := " ++ wrapContent vars (intercalateMap ", " ("encodeJson " ++) vars') ++ "\n")
   ++ spaces si2 ++ "~> jsonEmptyObject\n"
   where
@@ -447,3 +460,26 @@ tplFooter footer s = s ++ "\n" ++ footer
 tplJObject :: Lang -> String
 tplJObject LangPurescript = "JObject"
 tplJObject LangHaskell    = "Object"
+
+
+
+tplArrayString :: Lang -> String
+tplArrayString LangPurescript = "([] :: Array String)"
+tplArrayString LangHaskell    = "([] :: [Text])"
+
+
+
+tplTestHeader :: String -> String
+tplTestHeader module_name =
+  intercalate "\n" $
+  [ "{-# LANGUAGE ExtendedDefaultRules #-}"
+  , "{-# LANGUAGE OverloadedStrings    #-}"
+  , "{-# LANGUAGE RecordWildCards      #-}"
+  , ""
+  , "module " ++ module_name ++ " where"
+  , ""
+  , ""
+  , "import Test"
+  , ""
+  , ""
+  ]
