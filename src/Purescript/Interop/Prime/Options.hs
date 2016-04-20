@@ -15,6 +15,9 @@ module Purescript.Interop.Prime.Options (
   defaultJsonNameTransformClean,
   defaultJsonTagNameTransformClean,
 
+  defaultOptions_Purescript_adarqui,
+  defaultOptions_Haskell_adarqui,
+
   defaultTypeMap,
   defaultReservedMap,
 
@@ -131,6 +134,21 @@ defaultJsonNameTransformClean nb s =
 
 defaultJsonTagNameTransformClean :: StringTransformFn
 defaultJsonTagNameTransformClean _ s = s
+
+
+
+
+
+defaultOptions_Purescript_adarqui :: FilePath -> InteropOptions
+defaultOptions_Purescript_adarqui = defaultOptionsCleanPurescript
+
+defaultOptions_Haskell_adarqui :: FilePath -> InteropOptions
+defaultOptions_Haskell_adarqui path =
+  (defaultOptionsHaskell path) {
+    jsonNameTransform = defaultJsonNameTransformClean
+  }
+
+
 
 
 
