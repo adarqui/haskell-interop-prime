@@ -7,6 +7,7 @@ import Data.Argonaut.Core
 import Data.Argonaut.Decode
 import Data.Argonaut.Encode
 import Data.Argonaut.Printer
+import Data.Date
 import Data.Either
 import Data.Foreign (readString)
 import Data.Foreign.Class
@@ -288,7 +289,12 @@ newtype BigRecord = BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
-  bigRecordSumType :: SumType
+  bigRecordSumType :: SumType,
+  bigRecordData :: String,
+  bigRecordClass :: String,
+  bigRecordLet :: String,
+  bigRecordModule :: String,
+  bigRecord :: Boolean
 }
 
 
@@ -299,14 +305,19 @@ _BigRecord :: LensP BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
-  bigRecordSumType :: SumType
+  bigRecordSumType :: SumType,
+  bigRecordData :: String,
+  bigRecordClass :: String,
+  bigRecordLet :: String,
+  bigRecordModule :: String,
+  bigRecord :: Boolean
 }
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> BigRecord
-mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordSumType =
-  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordSumType}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
+mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecord =
+  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecord}
 
 
 unwrapBigRecord (BigRecord r) = r
@@ -321,6 +332,11 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "bigRecordMaybeInteger" .= v.bigRecordMaybeInteger
     , "bigRecordString" .= v.bigRecordString
     , "bigRecordSumType" .= v.bigRecordSumType
+    , "bigRecordData" .= v.bigRecordData
+    , "bigRecordClass" .= v.bigRecordClass
+    , "bigRecordLet" .= v.bigRecordLet
+    , "bigRecordModule" .= v.bigRecordModule
+    , "bigRecord" .= v.bigRecord
     ]
 
 
@@ -333,6 +349,11 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
     bigRecordString <- o .: "bigRecordString"
     bigRecordSumType <- o .: "bigRecordSumType"
+    bigRecordData <- o .: "bigRecordData"
+    bigRecordClass <- o .: "bigRecordClass"
+    bigRecordLet <- o .: "bigRecordLet"
+    bigRecordModule <- o .: "bigRecordModule"
+    bigRecord <- o .: "bigRecord"
     return $ BigRecord {
       bigRecordBool : bigRecordBool,
       bigRecordInt : bigRecordInt,
@@ -340,7 +361,12 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
       bigRecordInteger : bigRecordInteger,
       bigRecordMaybeInteger : bigRecordMaybeInteger,
       bigRecordString : bigRecordString,
-      bigRecordSumType : bigRecordSumType
+      bigRecordSumType : bigRecordSumType,
+      bigRecordData : bigRecordData,
+      bigRecordClass : bigRecordClass,
+      bigRecordLet : bigRecordLet,
+      bigRecordModule : bigRecordModule,
+      bigRecord : bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -355,6 +381,11 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "bigRecordMaybeInteger" := o.bigRecordMaybeInteger
     ~> "bigRecordString" := o.bigRecordString
     ~> "bigRecordSumType" := o.bigRecordSumType
+    ~> "bigRecordData" := o.bigRecordData
+    ~> "bigRecordClass" := o.bigRecordClass
+    ~> "bigRecordLet" := o.bigRecordLet
+    ~> "bigRecordModule" := o.bigRecordModule
+    ~> "bigRecord" := o.bigRecord
     ~> jsonEmptyObject
 
 
@@ -368,6 +399,11 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     bigRecordMaybeInteger <- obj .? "bigRecordMaybeInteger"
     bigRecordString <- obj .? "bigRecordString"
     bigRecordSumType <- obj .? "bigRecordSumType"
+    bigRecordData <- obj .? "bigRecordData"
+    bigRecordClass <- obj .? "bigRecordClass"
+    bigRecordLet <- obj .? "bigRecordLet"
+    bigRecordModule <- obj .? "bigRecordModule"
+    bigRecord <- obj .? "bigRecord"
     pure $ BigRecord {
       bigRecordBool,
       bigRecordInt,
@@ -375,7 +411,12 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       bigRecordInteger,
       bigRecordMaybeInteger,
       bigRecordString,
-      bigRecordSumType
+      bigRecordSumType,
+      bigRecordData,
+      bigRecordClass,
+      bigRecordLet,
+      bigRecordModule,
+      bigRecord
     }
 
 
@@ -501,6 +542,26 @@ bigRecordString_ f o = o { bigRecordString = _ } <$> f o.bigRecordString
 
 bigRecordSumType_ :: forall b a r. Lens { bigRecordSumType :: a | r } { bigRecordSumType :: b | r } a b
 bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
+
+
+bigRecordData_ :: forall b a r. Lens { bigRecordData :: a | r } { bigRecordData :: b | r } a b
+bigRecordData_ f o = o { bigRecordData = _ } <$> f o.bigRecordData
+
+
+bigRecordClass_ :: forall b a r. Lens { bigRecordClass :: a | r } { bigRecordClass :: b | r } a b
+bigRecordClass_ f o = o { bigRecordClass = _ } <$> f o.bigRecordClass
+
+
+bigRecordLet_ :: forall b a r. Lens { bigRecordLet :: a | r } { bigRecordLet :: b | r } a b
+bigRecordLet_ f o = o { bigRecordLet = _ } <$> f o.bigRecordLet
+
+
+bigRecordModule_ :: forall b a r. Lens { bigRecordModule :: a | r } { bigRecordModule :: b | r } a b
+bigRecordModule_ f o = o { bigRecordModule = _ } <$> f o.bigRecordModule
+
+
+bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
+bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
 
 boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b

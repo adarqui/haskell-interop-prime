@@ -1,12 +1,22 @@
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE RecordWildCards      #-}
+
 module Interop.Clean where
 
 
+
+
 import Data.Aeson
+import Data.Text   (Text)
+
+default (Text)
+
 
 instance ToJSON Session where
-  toJSON (Session v) = object $
+  toJSON Session{..} = object $
     [ "tag" .= "Session"
-    , "un_session" .= v.unSession
+    , "un_session" .= unSession
     ]
 
 
@@ -22,7 +32,7 @@ instance FromJSON Session where
 instance ToJSON SumType where
   toJSON (A ) = object $
     [ "tag" .= "A"
-    , "contents" .= ([] :: Array String)
+    , "contents" .= ([] :: [Text])
     ]
   toJSON (B x0) = object $
     [ "tag" .= "B"
@@ -93,15 +103,20 @@ instance FromJSON SumType where
 
 
 instance ToJSON BigRecord where
-  toJSON (BigRecord v) = object $
+  toJSON BigRecord{..} = object $
     [ "tag" .= "BigRecord"
-    , "bool" .= v.bool
-    , "int" .= v.int
-    , "maybe_int" .= v.maybeInt
-    , "integer" .= v.integer
-    , "maybe_integer" .= v.maybeInteger
-    , "string" .= v.string
-    , "sum_type" .= v.sumType
+    , "bool" .= bool
+    , "int" .= int
+    , "maybe_int" .= maybeInt
+    , "integer" .= integer
+    , "maybe_integer" .= maybeInteger
+    , "string" .= string
+    , "sum_type" .= sumType
+    , "data'" .= data'
+    , "class'" .= class'
+    , "let'" .= let'
+    , "module'" .= module'
+    , "big_record" .= bigRecord
     ]
 
 
@@ -114,6 +129,11 @@ instance FromJSON BigRecord where
     maybeInteger <- o .: "maybe_integer"
     string <- o .: "string"
     sumType <- o .: "sum_type"
+    data' <- o .: "data'"
+    class' <- o .: "class'"
+    let' <- o .: "let'"
+    module' <- o .: "module'"
+    bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool = bool,
       int = int,
@@ -121,15 +141,20 @@ instance FromJSON BigRecord where
       integer = integer,
       maybeInteger = maybeInteger,
       string = string,
-      sumType = sumType
+      sumType = sumType,
+      data' = data',
+      class' = class',
+      let' = let',
+      module' = module',
+      bigRecord = bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
 instance ToJSON FunkyRecord where
-  toJSON (Boom1 v) = object $
+  toJSON Boom1{..} = object $
     [ "tag" .= "FunkyRecord"
-    , "boom1" .= v.boom1
+    , "boom1" .= boom1
     ]
 
 

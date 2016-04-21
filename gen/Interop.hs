@@ -1,12 +1,22 @@
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE RecordWildCards      #-}
+
 module Interop where
 
 
+
+
 import Data.Aeson
+import Data.Text   (Text)
+
+default (Text)
+
 
 instance ToJSON Session where
-  toJSON (Session v) = object $
+  toJSON Session{..} = object $
     [ "tag" .= "Session"
-    , "unSession" .= v.unSession
+    , "unSession" .= unSession
     ]
 
 
@@ -22,7 +32,7 @@ instance FromJSON Session where
 instance ToJSON SumType where
   toJSON (A ) = object $
     [ "tag" .= "A"
-    , "contents" .= ([] :: Array String)
+    , "contents" .= ([] :: [Text])
     ]
   toJSON (B x0) = object $
     [ "tag" .= "B"
@@ -93,15 +103,20 @@ instance FromJSON SumType where
 
 
 instance ToJSON BigRecord where
-  toJSON (BigRecord v) = object $
+  toJSON BigRecord{..} = object $
     [ "tag" .= "BigRecord"
-    , "bigRecordBool" .= v.bigRecordBool
-    , "bigRecordInt" .= v.bigRecordInt
-    , "bigRecordMaybeInt" .= v.bigRecordMaybeInt
-    , "bigRecordInteger" .= v.bigRecordInteger
-    , "bigRecordMaybeInteger" .= v.bigRecordMaybeInteger
-    , "bigRecordString" .= v.bigRecordString
-    , "bigRecordSumType" .= v.bigRecordSumType
+    , "bigRecordBool" .= bigRecordBool
+    , "bigRecordInt" .= bigRecordInt
+    , "bigRecordMaybeInt" .= bigRecordMaybeInt
+    , "bigRecordInteger" .= bigRecordInteger
+    , "bigRecordMaybeInteger" .= bigRecordMaybeInteger
+    , "bigRecordString" .= bigRecordString
+    , "bigRecordSumType" .= bigRecordSumType
+    , "bigRecordData" .= bigRecordData
+    , "bigRecordClass" .= bigRecordClass
+    , "bigRecordLet" .= bigRecordLet
+    , "bigRecordModule" .= bigRecordModule
+    , "bigRecord" .= bigRecord
     ]
 
 
@@ -114,6 +129,11 @@ instance FromJSON BigRecord where
     bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
     bigRecordString <- o .: "bigRecordString"
     bigRecordSumType <- o .: "bigRecordSumType"
+    bigRecordData <- o .: "bigRecordData"
+    bigRecordClass <- o .: "bigRecordClass"
+    bigRecordLet <- o .: "bigRecordLet"
+    bigRecordModule <- o .: "bigRecordModule"
+    bigRecord <- o .: "bigRecord"
     return $ BigRecord {
       bigRecordBool = bigRecordBool,
       bigRecordInt = bigRecordInt,
@@ -121,15 +141,20 @@ instance FromJSON BigRecord where
       bigRecordInteger = bigRecordInteger,
       bigRecordMaybeInteger = bigRecordMaybeInteger,
       bigRecordString = bigRecordString,
-      bigRecordSumType = bigRecordSumType
+      bigRecordSumType = bigRecordSumType,
+      bigRecordData = bigRecordData,
+      bigRecordClass = bigRecordClass,
+      bigRecordLet = bigRecordLet,
+      bigRecordModule = bigRecordModule,
+      bigRecord = bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
 instance ToJSON FunkyRecord where
-  toJSON (Boom1 v) = object $
+  toJSON Boom1{..} = object $
     [ "tag" .= "FunkyRecord"
-    , "boom1" .= v.boom1
+    , "boom1" .= boom1
     ]
 
 

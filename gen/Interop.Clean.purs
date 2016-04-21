@@ -7,6 +7,7 @@ import Data.Argonaut.Core
 import Data.Argonaut.Decode
 import Data.Argonaut.Encode
 import Data.Argonaut.Printer
+import Data.Date
 import Data.Either
 import Data.Foreign (readString)
 import Data.Foreign.Class
@@ -288,7 +289,12 @@ newtype BigRecord = BigRecord {
   integer :: Int,
   maybeInteger :: (Maybe Int),
   string :: String,
-  sumType :: SumType
+  sumType :: SumType,
+  data' :: String,
+  class' :: String,
+  let' :: String,
+  module' :: String,
+  bigRecord :: Boolean
 }
 
 
@@ -299,14 +305,19 @@ _BigRecord :: LensP BigRecord {
   integer :: Int,
   maybeInteger :: (Maybe Int),
   string :: String,
-  sumType :: SumType
+  sumType :: SumType,
+  data' :: String,
+  class' :: String,
+  let' :: String,
+  module' :: String,
+  bigRecord :: Boolean
 }
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> BigRecord
-mkBigRecord bool int maybeInt integer maybeInteger string sumType =
-  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, sumType}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
+mkBigRecord bool int maybeInt integer maybeInteger string sumType data' class' let' module' bigRecord =
+  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, sumType, data', class', let', module', bigRecord}
 
 
 unwrapBigRecord (BigRecord r) = r
@@ -321,6 +332,11 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "maybe_integer" .= v.maybeInteger
     , "string" .= v.string
     , "sum_type" .= v.sumType
+    , "data'" .= v.data'
+    , "class'" .= v.class'
+    , "let'" .= v.let'
+    , "module'" .= v.module'
+    , "big_record" .= v.bigRecord
     ]
 
 
@@ -333,6 +349,11 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     maybeInteger <- o .: "maybe_integer"
     string <- o .: "string"
     sumType <- o .: "sum_type"
+    data' <- o .: "data'"
+    class' <- o .: "class'"
+    let' <- o .: "let'"
+    module' <- o .: "module'"
+    bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool : bool,
       int : int,
@@ -340,7 +361,12 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
       integer : integer,
       maybeInteger : maybeInteger,
       string : string,
-      sumType : sumType
+      sumType : sumType,
+      data' : data',
+      class' : class',
+      let' : let',
+      module' : module',
+      bigRecord : bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -355,6 +381,11 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "maybe_integer" := o.maybeInteger
     ~> "string" := o.string
     ~> "sum_type" := o.sumType
+    ~> "data'" := o.data'
+    ~> "class'" := o.class'
+    ~> "let'" := o.let'
+    ~> "module'" := o.module'
+    ~> "big_record" := o.bigRecord
     ~> jsonEmptyObject
 
 
@@ -368,6 +399,11 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     maybeInteger <- obj .? "maybe_integer"
     string <- obj .? "string"
     sumType <- obj .? "sum_type"
+    data' <- obj .? "data'"
+    class' <- obj .? "class'"
+    let' <- obj .? "let'"
+    module' <- obj .? "module'"
+    bigRecord <- obj .? "big_record"
     pure $ BigRecord {
       bool,
       int,
@@ -375,7 +411,12 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       integer,
       maybeInteger,
       string,
-      sumType
+      sumType,
+      data',
+      class',
+      let',
+      module',
+      bigRecord
     }
 
 
@@ -501,6 +542,26 @@ string_ f o = o { string = _ } <$> f o.string
 
 sumType_ :: forall b a r. Lens { sumType :: a | r } { sumType :: b | r } a b
 sumType_ f o = o { sumType = _ } <$> f o.sumType
+
+
+data'_ :: forall b a r. Lens { data' :: a | r } { data' :: b | r } a b
+data'_ f o = o { data' = _ } <$> f o.data'
+
+
+class'_ :: forall b a r. Lens { class' :: a | r } { class' :: b | r } a b
+class'_ f o = o { class' = _ } <$> f o.class'
+
+
+let'_ :: forall b a r. Lens { let' :: a | r } { let' :: b | r } a b
+let'_ f o = o { let' = _ } <$> f o.let'
+
+
+module'_ :: forall b a r. Lens { module' :: a | r } { module' :: b | r } a b
+module'_ f o = o { module' = _ } <$> f o.module'
+
+
+bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
+bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
 
 boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
