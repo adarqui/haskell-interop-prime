@@ -1,7 +1,7 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE RecordWildCards      #-}
 
-module Purescript.Interop.Prime.Template (
+module Haskell.Interop.Prime.Template (
   tplType,
   tplLensP,
   tplLensFields,
@@ -34,8 +34,8 @@ module Purescript.Interop.Prime.Template (
 
 
 import           Data.List
-import           Purescript.Interop.Prime.Misc
-import           Purescript.Interop.Prime.Types
+import           Haskell.Interop.Prime.Misc
+import           Haskell.Interop.Prime.Types
 import           Text.Printf
 
 

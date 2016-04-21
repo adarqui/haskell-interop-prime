@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards    #-}
 
-module Purescript.Interop.Prime.Options (
+module Haskell.Interop.Prime.Options (
   defaultOptions,
   defaultOptionsHaskell,
   defaultOptionsPurescript,
@@ -34,8 +34,8 @@ import           Data.Char
 import           Data.List
 import qualified Data.Map                       as M
 import           Data.Transform.UnCamel
-import           Purescript.Interop.Prime.Misc
-import           Purescript.Interop.Prime.Types
+import           Haskell.Interop.Prime.Misc
+import           Haskell.Interop.Prime.Types
 
 
 

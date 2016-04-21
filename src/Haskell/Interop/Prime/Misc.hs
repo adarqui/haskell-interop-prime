@@ -1,4 +1,4 @@
-module Purescript.Interop.Prime.Misc (
+module Haskell.Interop.Prime.Misc (
   firstToLower,
   newlines,
   spaces,

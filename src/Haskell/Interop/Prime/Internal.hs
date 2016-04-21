@@ -6,7 +6,7 @@
 {-# OPTIONS -ddump-splices #-}
 {-# OPTIONS -fno-warn-orphans #-}
 
-module Purescript.Interop.Prime.Internal (
+module Haskell.Interop.Prime.Internal (
   mkExports
 ) where
 
@@ -19,9 +19,9 @@ import qualified Data.Map                          as M
 import           Data.Maybe
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
-import           Purescript.Interop.Prime.Misc
-import           Purescript.Interop.Prime.Template
-import           Purescript.Interop.Prime.Types
+import           Haskell.Interop.Prime.Misc
+import           Haskell.Interop.Prime.Template
+import           Haskell.Interop.Prime.Types
 
 
 

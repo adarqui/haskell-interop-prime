@@ -4,7 +4,7 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# OPTIONS -ddump-splices      #-}
 
-module Purescript.Interop.Prime.Types (
+module Haskell.Interop.Prime.Types (
   ExportT,
   Lang (..),
   Mk (..),

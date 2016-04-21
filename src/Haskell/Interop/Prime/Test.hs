@@ -1,10 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Purescript.Interop.Prime.Test where
+module Haskell.Interop.Prime.Test where
 
 
 
-import           Purescript.Interop.Prime
+import           Haskell.Interop.Prime
 
 
 
