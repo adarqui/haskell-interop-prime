@@ -235,7 +235,7 @@ mkExports Options{..} nmm = do
     )
 
   let
-    ps_fields = buildFields psInterop $ map fst ir_ps
+    ps_fields = tplBuildFields psInterop $ map fst ir_ps
     (ps, _) = evalRWS (mkExports' psInterop psMkGs ir_ps) (InteropReader psInterop ps_fields) undefined
     (hs, _) = evalRWS (mkExports' hsInterop hsMkGs ir_hs) (InteropReader hsInterop []) undefined
 
@@ -300,47 +300,22 @@ buildInternalRep opts@InteropOptions{..} dec =
   mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars)
   mkConDataIR' _ _ = ("",[])
 
-  mkVarIR nb (n, _, t) = (buildField opts nb (nameBase n), mkTypeIR t)
+  mkVarIR nb (n, _, t) = (tplBuildField opts nb (nameBase n), mkTypeIR t)
 
   mkVarIR' (_, t) = mkTypeIR t
 
-  mkTypeIR (ConT n) =
-    case M.lookup (nameBase n) typeMap of
-      Nothing -> nameBase n
-      Just t  -> t
+  mkTypeIR (ConT n) = tplBuildType opts (nameBase n)
   mkTypeIR (VarT a) =
     let
       v = takeWhile (/= '_') $ nameBase a
-    in case M.lookup v typeMap of
-      Nothing -> v
-      Just t  -> t
+    in
+      tplBuildType opts v
   mkTypeIR (AppT f x) = "(" ++ mkTypeIR f ++ " " ++ mkTypeIR x ++ ")"
   mkTypeIR (TupleT 0) = "Unit "
   mkTypeIR (TupleT 2) = "Tuple "
   mkTypeIR (TupleT n) = "Tuple" ++ show n ++ " "
   mkTypeIR ListT = "Array "
   mkTypeIR x     = show x
-
-
-
-
-buildFields :: InteropOptions -> [InternalRep] -> [String]
-buildFields opts@InteropOptions{..} ir =
-  concat $ nub $ sort $ map go ir
-  where
-  go (NewtypeRecIR _ constr fields) = map (\(field,_) -> buildField opts constr field) fields
-  go (DataRecIR _ constr fields)    = map (\(field,_) -> buildField opts constr field) fields
-  go _                              = []
-
-
-
-buildField :: InteropOptions -> String -> String -> String
-buildField InteropOptions{..} base field =
-  case M.lookup name reservedMap of
-    Nothing  -> name
-    Just new -> new
-  where
-  name  = fieldNameTransform base field
 
 
 

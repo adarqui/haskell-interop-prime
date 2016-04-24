@@ -25,18 +25,35 @@ module Haskell.Interop.Prime.Template (
   tplShow_SumType,
   tplPurescriptImports,
   tplHaskellImports,
+  tplPurescriptApiImports,
+  tplHaskellApiImports,
   tplHeader,
   tplFooter,
   tplJObject,
-  tplTestHeader
+  tplTestHeader,
+  tplPurescriptApiEntry,
+  tplHaskellApiEntry,
+  tplApiMethod_Prefix,
+  tplApiMethod_ResultType,
+  tplApiMethod_RequestType,
+  tplApiParam_TypeSig,
+  tplApiParam_Arguments,
+  tplApiParam_ByName,
+  tplBuildFields,
+  tplBuildField,
+  tplBuildType,
+  tplArrows,
+  tplArguments,
 ) where
 
 
 
 import           Data.List
+import           Data.Monoid
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Types
 import           Text.Printf
+import           qualified Data.Map as M
 
 
 
@@ -448,6 +465,28 @@ tplHaskellImports s = (intercalate "\n"
 
 
 
+tplPurescriptApiImports :: String -> String
+tplPurescriptApiImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Purescript.Api.Helpers"
+  , ""
+  , ""
+  ]) ++ s
+
+
+
+tplHaskellApiImports :: String -> String
+tplHaskellApiImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Haskell.Api.Helpers"
+  , ""
+  , ""
+  ]) ++ s
+
+
+
 tplHeader :: String -> String -> String
 tplHeader header s = header ++ "\n" ++ s
 
@@ -481,3 +520,137 @@ tplTestHeader module_name =
   , ""
   , ""
   ]
+
+
+
+tplPurescriptApiEntry :: InteropOptions -> ApiEntry -> String
+tplPurescriptApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
+  intercalateMap
+    "\n"
+    (\(param, method) -> tplPurescriptApiEntry' opts route param method)
+    [ (param, method) | param <- params, method <- methods ]
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+
+
+
+tplPurescriptApiEntry' :: InteropOptions -> String -> ApiParam -> ApiMethod -> String
+tplPurescriptApiEntry' opts@InteropOptions{..} route param method =
+     printf "%s :: %s\n"
+       fn_name
+       (tplArrows $ [tplApiParam_ByType opts param] <> (tplApiParam_TypeSig opts param) <> [tplApiMethod_RequestType opts method] <> [tplApiMethod_ResultType opts method])
+  ++ printf "%s %s = undefined\n"
+        fn_name
+        (tplArguments $ [tplApiParam_ByName opts param] <> (tplApiParam_Arguments opts param) <> [jsonNameTransform "" $ tplApiMethod_RequestType opts method])
+  where
+  method' = tplApiMethod_Prefix opts method
+  byname  = tplApiParam_ByName opts param
+  fn_name = fieldNameTransform "" (method' ++ route ++ byname)
+
+
+
+tplHaskellApiEntry :: InteropOptions -> ApiEntry -> String
+tplHaskellApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
+  route
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+
+
+
+tplApiMethod_Prefix :: InteropOptions -> ApiMethod -> String
+tplApiMethod_Prefix _ (ApiGET _)    = "Get"
+tplApiMethod_Prefix _ (ApiPOST _ _) = "Post"
+tplApiMethod_Prefix _ (ApiPUT _ _)  = "Put"
+tplApiMethod_Prefix _ (ApiDELETE _) = "Delete"
+
+
+
+tplApiMethod_ResultType :: InteropOptions -> ApiMethod -> String
+tplApiMethod_ResultType opts (ApiGET r)    = tplBuildType opts r
+tplApiMethod_ResultType opts (ApiPOST _ r) = tplBuildType opts r
+tplApiMethod_ResultType opts (ApiPUT _ r)  = tplBuildType opts r
+tplApiMethod_ResultType opts (ApiDELETE r) = tplBuildType opts r
+
+
+
+tplApiMethod_RequestType :: InteropOptions -> ApiMethod -> String
+tplApiMethod_RequestType opts (ApiGET _)    = ""
+tplApiMethod_RequestType opts (ApiPOST r _) = tplBuildType opts r
+tplApiMethod_RequestType opts (ApiPUT r _)  = tplBuildType opts r
+tplApiMethod_RequestType opts (ApiDELETE _) = ""
+
+
+
+tplApiParam_TypeSig :: InteropOptions -> ApiParam -> [String]
+tplApiParam_TypeSig opts@InteropOptions{..} param =
+  case param of
+    Par params       -> map (tplBuildType opts . snd) params
+    ParBy name type_ -> []
+    ParNone          -> []
+
+
+
+tplApiParam_Arguments :: InteropOptions -> ApiParam -> [String]
+tplApiParam_Arguments opts@InteropOptions{..} param =
+  case param of
+    Par params       -> map fst params
+    ParBy name type_ -> []
+    ParNone          -> []
+
+
+
+tplApiParam_ByName :: InteropOptions -> ApiParam -> String
+tplApiParam_ByName opts@InteropOptions{..} param =
+  case param of
+    Par params       -> ""
+    ParBy name type_ -> "_By" <> name
+    ParNone          -> ""
+
+
+
+tplApiParam_ByType :: InteropOptions -> ApiParam -> String
+tplApiParam_ByType opts@InteropOptions{..} param =
+  case param of
+    Par params       -> ""
+    ParBy name type_ -> tplBuildType opts type_
+    ParNone          -> ""
+
+
+
+tplBuildFields :: InteropOptions -> [InternalRep] -> [String]
+tplBuildFields opts@InteropOptions{..} ir =
+  concat $ nub $ sort $ map go ir
+  where
+  go (NewtypeRecIR _ constr fields) = map (\(field,_) -> tplBuildField opts constr field) fields
+  go (DataRecIR _ constr fields)    = map (\(field,_) -> tplBuildField opts constr field) fields
+  go _                              = []
+
+
+
+tplBuildField :: InteropOptions -> String -> String -> String
+tplBuildField InteropOptions{..} base field =
+  case M.lookup name reservedMap of
+    Nothing  -> name
+    Just new -> new
+  where
+  name  = fieldNameTransform base field
+
+
+
+tplBuildType :: InteropOptions -> String -> String
+tplBuildType InteropOptions{..} name =
+  case M.lookup name typeMap of
+    Nothing -> name
+    Just t  -> t
+
+
+
+tplArrows :: [String] -> String
+tplArrows = intercalate " -> " . filter (/= "")
+
+
+
+tplArguments :: [String] -> String
+tplArguments = intercalate " " . filter (/= "")

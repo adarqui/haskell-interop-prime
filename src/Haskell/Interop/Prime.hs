@@ -4,6 +4,7 @@ module Haskell.Interop.Prime (
 
 
 
+import           Haskell.Interop.Prime.Api      as A
 import           Haskell.Interop.Prime.Internal as A
 import           Haskell.Interop.Prime.Options  as A
 import           Haskell.Interop.Prime.Template as A

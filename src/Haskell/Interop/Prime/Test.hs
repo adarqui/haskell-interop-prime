@@ -4,7 +4,9 @@ module Haskell.Interop.Prime.Test where
 
 
 
+import           Data.Int
 import           Haskell.Interop.Prime
+import           Haskell.Interop.Prime.Test.Internal
 
 
 
@@ -35,6 +37,30 @@ data BigRecord = BigRecord {
   bigRecord             :: Bool
 }
 
+data User = User {
+  userName  :: String,
+  userEmail :: String
+}
+
+data UserRequest = UserRequest {
+  userRequestName  :: String,
+  userRequestEmail :: String
+}
+
+type FakeUTCTime = Integer
+
+data UserResponse = UserResponse {
+  userResponseId         :: Int64,
+  userResponseName       :: String,
+  userResponseEmail      :: String,
+  userResponseCreatedAt  :: Maybe FakeUTCTime,
+  userResponseModifiedAt :: Maybe FakeUTCTime
+}
+
+data UserResponses = UserResponses {
+  userResponses :: [UserResponse]
+}
+
 newtype DateMaybe = DateMaybe (Maybe String)
 
 type Text = String
@@ -55,14 +81,17 @@ mkExports
     (defaultPurescriptMkGs "module Interop where")
     (defaultOptionsHaskell "/tmp/Interop.hs")
     (defaultHaskellMkGs $ tplTestHeader "Interop"))
-  [
-    (''Session,     defaultPurescriptMks, defaultHaskellMks),
-    (''SumType,     defaultPurescriptMks, defaultHaskellMks),
-    (''BigRecord,   defaultPurescriptMks, defaultHaskellMks),
-    (''DateMaybe,   defaultPurescriptMks, defaultHaskellMks),
-    (''Text,        defaultPurescriptMks, defaultHaskellMks),
-    (''TextMaybe,   defaultPurescriptMks, defaultHaskellMks),
-    (''FunkyRecord, defaultPurescriptMks, defaultHaskellMks)
+  [ (''Session,      defaultPurescriptMks, defaultHaskellMks)
+  , (''SumType,      defaultPurescriptMks, defaultHaskellMks)
+  , (''BigRecord,    defaultPurescriptMks, defaultHaskellMks)
+  , (''FakeUTCTime,  defaultPurescriptMks, defaultHaskellMks)
+  , (''User,         defaultPurescriptMks, defaultHaskellMks)
+  , (''UserRequest,  defaultPurescriptMks, defaultHaskellMks)
+  , (''UserResponse, defaultPurescriptMks, defaultHaskellMks)
+  , (''DateMaybe,    defaultPurescriptMks, defaultHaskellMks)
+  , (''Text,         defaultPurescriptMks, defaultHaskellMks)
+  , (''TextMaybe,    defaultPurescriptMks, defaultHaskellMks)
+  , (''FunkyRecord,  defaultPurescriptMks, defaultHaskellMks)
   ]
 
 
@@ -73,12 +102,25 @@ mkExports
     (defaultPurescriptMkGs "module Interop.Clean where")
     (defaultOptionsCleanHaskell "/tmp/Interop.Clean.hs")
     (defaultHaskellMkGs $ tplTestHeader "Interop.Clean"))
-  [
-    (''Session,     defaultPurescriptMks, defaultHaskellMks),
-    (''SumType,     defaultPurescriptMks, defaultHaskellMks),
-    (''BigRecord,   defaultPurescriptMks, defaultHaskellMks),
-    (''DateMaybe,   defaultPurescriptMks, defaultHaskellMks),
-    (''Text,        defaultPurescriptMks, defaultHaskellMks),
-    (''TextMaybe,   defaultPurescriptMks, defaultHaskellMks),
-    (''FunkyRecord, defaultPurescriptMks, defaultHaskellMks)
+  [ (''Session,      defaultPurescriptMks, defaultHaskellMks)
+  , (''SumType,      defaultPurescriptMks, defaultHaskellMks)
+  , (''BigRecord,    defaultPurescriptMks, defaultHaskellMks)
+  , (''FakeUTCTime,  defaultPurescriptMks, defaultHaskellMks)
+  , (''User,         defaultPurescriptMks, defaultHaskellMks)
+  , (''UserRequest,  defaultPurescriptMks, defaultHaskellMks)
+  , (''UserResponse, defaultPurescriptMks, defaultHaskellMks)
+  , (''DateMaybe,    defaultPurescriptMks, defaultHaskellMks)
+  , (''Text,         defaultPurescriptMks, defaultHaskellMks)
+  , (''TextMaybe,    defaultPurescriptMks, defaultHaskellMks)
+  , (''FunkyRecord,  defaultPurescriptMks, defaultHaskellMks)
   ]
+
+
+
+mkApi
+  (Options
+    (defaultOptionsCleanPurescript "/tmp/Interop.Api.purs")
+    (defaultPurescriptMkGs "module Interop.Api where")
+    (defaultOptionsCleanHaskell "/tmp/Interop.Api.hs")
+    (defaultHaskellMkGs $ tplTestHeader "Interop.Api"))
+  apiSpec

@@ -14,6 +14,10 @@ module Haskell.Interop.Prime.Types (
   InternalRep (..),
   InteropReader (..),
   InteropState (..),
+  Api (..),
+  ApiMethod (..),
+  ApiParam (..),
+  ApiEntry (..),
   StringTransformFn,
 ) where
 
@@ -106,6 +110,37 @@ data InteropReader = InteropReader {
 data InteropState = InteropState {
   isRep :: InternalRep
 }
+
+
+
+data Api = Api {
+  apiPrefix :: String,
+  apiEntries :: [ApiEntry]
+} deriving (Show)
+
+
+
+data ApiMethod
+  = ApiGET    String
+  | ApiPOST   String String
+  | ApiPUT    String String
+  | ApiDELETE String
+  deriving (Show)
+
+
+
+data ApiParam
+  = Par [(String, String)]
+  | ParBy String String
+  | ParNone
+  deriving (Show)
+
+
+
+data ApiEntry
+  = ApiEntry String [ApiParam] [ApiMethod]
+  deriving (Show)
+
 
 
 -- newtype RWST r w s m a
