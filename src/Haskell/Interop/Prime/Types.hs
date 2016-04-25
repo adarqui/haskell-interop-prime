@@ -18,6 +18,10 @@ module Haskell.Interop.Prime.Types (
   ApiMethod (..),
   ApiParam (..),
   ApiEntry (..),
+  Api_TH (..),
+  ApiMethod_TH (..),
+  ApiParam_TH (..),
+  ApiEntry_TH (..),
   StringTransformFn,
 ) where
 
@@ -25,6 +29,7 @@ module Haskell.Interop.Prime.Types (
 
 import           Control.Monad.Trans.RWS
 import qualified Data.Map                as M
+import           Language.Haskell.TH
 
 
 
@@ -114,7 +119,7 @@ data InteropState = InteropState {
 
 
 data Api = Api {
-  apiPrefix :: String,
+  apiPrefix  :: String,
   apiEntries :: [ApiEntry]
 } deriving (Show)
 
@@ -139,6 +144,36 @@ data ApiParam
 
 data ApiEntry
   = ApiEntry String [ApiParam] [ApiMethod]
+  deriving (Show)
+
+
+
+data Api_TH = Api_TH {
+  apiPrefix_TH  :: String,
+  apiEntries_TH :: [ApiEntry_TH]
+} deriving (Show)
+
+
+
+data ApiMethod_TH
+  = ApiGET_TH    Name
+  | ApiPOST_TH   Name Name
+  | ApiPUT_TH    Name Name
+  | ApiDELETE_TH Name
+  deriving (Show)
+
+
+
+data ApiParam_TH
+  = Par_TH [(String, Name)]
+  | ParBy_TH String Name
+  | ParNone_TH
+  deriving (Show)
+
+
+
+data ApiEntry_TH
+  = ApiEntry_TH String [ApiParam_TH] [ApiMethod_TH]
   deriving (Show)
 
 

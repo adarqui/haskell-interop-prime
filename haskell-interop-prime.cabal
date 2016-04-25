@@ -28,6 +28,7 @@ library
                      , Haskell.Interop.Prime.Types
   other-modules:       Haskell.Interop.Prime.Test
                      , Haskell.Interop.Prime.Test.Internal
+                     , Haskell.Interop.Prime.Test.Types
   other-extensions:    DeriveDataTypeable
                      , OverloadedStrings
                      , TemplateHaskell
