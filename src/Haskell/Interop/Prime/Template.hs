@@ -536,23 +536,68 @@ tplPurescriptApiEntry :: InteropOptions -> ApiEntry -> String
 tplPurescriptApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
   intercalateMap
     "\n"
-    (\(param, method) -> tplPurescriptApiEntry' opts route param method)
+    (\(param, method) ->
+      tplPurescriptApiEntry' opts False route param method
+      ++ "\n" ++
+      tplPurescriptApiEntry' opts True route param method
+    )
     [ (param, method) | param <- params, method <- methods ]
 
 
 
-tplPurescriptApiEntry' :: InteropOptions -> String -> ApiParam -> ApiMethod -> String
-tplPurescriptApiEntry' opts@InteropOptions{..} route param method =
+tplPurescriptApiEntry' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String
+tplPurescriptApiEntry' opts@InteropOptions{..} simplified route param method =
      printf "%s :: %s\n"
-       fn_name
-       (tplArrows $ [tplApiParam_ByType opts param] <> (tplApiParam_TypeSig opts param) <> [tplApiMethod_RequestType opts method] <> [tplApiMethod_ResultType opts method])
-  ++ printf "%s %s = undefined\n"
-        fn_name
-        (tplArguments $ [tplApiParam_ByName opts param] <> (tplApiParam_Arguments opts param) <> [jsonNameTransform "" $ tplApiMethod_RequestType opts method])
+       fn_name'
+       (tplArrows typesig')
+  ++ printf "%s %s = %s\n"
+       fn_name'
+       (tplArguments args')
+       action
   where
-  method' = tplApiMethod_Prefix opts method
-  byname  = tplApiParam_ByName opts param
-  fn_name = fieldNameTransform "" (method' ++ route ++ byname)
+  typesig  =
+    [tplApiParam_ByType opts param] <>
+    (tplApiParam_TypeSig opts param) <>
+    [tplApiMethod_RequestType opts method] <>
+    ["ApiEff (Either ForeignError " ++ tplApiMethod_ResultType opts method ++ ")"]
+  typesig' =
+    if simplified
+      then typesig
+      else "Array (Tuple String String)" : typesig
+  args     =
+    [tplApiParam_ByName opts param] <>
+    (tplApiParam_Arguments opts param) <>
+    [jsonNameTransform "" $ tplApiMethod_RequestType opts method]
+  args'    =
+    if simplified
+      then args
+      else ["params"] <> args
+  method'  = tplApiMethod_Prefix opts method
+  byname   = tplApiParam_ByName opts param
+  fn_name  = fieldNameTransform "" (method' ++ route ++ byname)
+  fn_name' =
+    if simplified
+      then fn_name <> "'"
+      else fn_name
+  firstarg =
+    if simplified
+      then "[]"
+      else "params"
+  action = tplApiAction opts simplified route method param args
+
+
+
+tplApiAction :: InteropOptions -> Bool -> String -> ApiMethod -> ApiParam -> [String] -> String
+tplApiAction opts@InteropOptions{..} simplified route api_method api_param args =
+  case api_method of
+    ApiGET _    -> printf "getAt %s [] %s" firstarg paths
+    ApiPOST _ _ -> printf "postAt %s [] %s %s" firstarg (last args) paths
+    ApiPUT _ _  -> printf "putAt %s [] %s %s" firstarg (last args) paths
+    ApiDELETE _ -> printf "deleteAt %s [] %s" firstarg paths
+  where
+  firstarg = if simplified then "[]" else "params"
+  paths    = "[" ++ (intercalate ", " $ ["\"" ++ route' ++ "\""] ++ tplApiParam_Arguments_Show opts api_param) ++ "]"
+  route'   = jsonNameTransform "" route
 
 
 
@@ -619,6 +664,20 @@ tplApiParam_Arguments _ param =
     Par params       -> map fst params
     ParBy _ _        -> []
     ParNone          -> []
+
+
+
+tplApiParam_Arguments_Show :: InteropOptions -> ApiParam -> [String]
+tplApiParam_Arguments_Show _ param =
+  case param of
+    Par params       -> map go params
+    ParBy _ _        -> []
+    ParNone          -> []
+  where
+  go (n,t) =
+    if t == "String"
+      then n
+      else "show " ++ n
 
 
 
