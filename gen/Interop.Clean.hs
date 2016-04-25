@@ -151,6 +151,72 @@ instance FromJSON BigRecord where
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
+instance ToJSON User where
+  toJSON User{..} = object $
+    [ "tag" .= "User"
+    , "name" .= name
+    , "email" .= email
+    ]
+
+
+instance FromJSON User where
+  parseJSON (Object o) = do
+    name <- o .: "name"
+    email <- o .: "email"
+    return $ User {
+      name = name,
+      email = email
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance ToJSON UserRequest where
+  toJSON UserRequest{..} = object $
+    [ "tag" .= "UserRequest"
+    , "name" .= name
+    , "email" .= email
+    ]
+
+
+instance FromJSON UserRequest where
+  parseJSON (Object o) = do
+    name <- o .: "name"
+    email <- o .: "email"
+    return $ UserRequest {
+      name = name,
+      email = email
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance ToJSON UserResponse where
+  toJSON UserResponse{..} = object $
+    [ "tag" .= "UserResponse"
+    , "id" .= id
+    , "name" .= name
+    , "email" .= email
+    , "created_at" .= createdAt
+    , "modified_at" .= modifiedAt
+    ]
+
+
+instance FromJSON UserResponse where
+  parseJSON (Object o) = do
+    id <- o .: "id"
+    name <- o .: "name"
+    email <- o .: "email"
+    createdAt <- o .: "created_at"
+    modifiedAt <- o .: "modified_at"
+    return $ UserResponse {
+      id = id,
+      name = name,
+      email = email,
+      createdAt = createdAt,
+      modifiedAt = modifiedAt
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
 instance ToJSON FunkyRecord where
   toJSON Boom1{..} = object $
     [ "tag" .= "FunkyRecord"

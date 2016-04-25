@@ -151,6 +151,72 @@ instance FromJSON BigRecord where
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
+instance ToJSON User where
+  toJSON User{..} = object $
+    [ "tag" .= "User"
+    , "userName" .= userName
+    , "userEmail" .= userEmail
+    ]
+
+
+instance FromJSON User where
+  parseJSON (Object o) = do
+    userName <- o .: "userName"
+    userEmail <- o .: "userEmail"
+    return $ User {
+      userName = userName,
+      userEmail = userEmail
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance ToJSON UserRequest where
+  toJSON UserRequest{..} = object $
+    [ "tag" .= "UserRequest"
+    , "userRequestName" .= userRequestName
+    , "userRequestEmail" .= userRequestEmail
+    ]
+
+
+instance FromJSON UserRequest where
+  parseJSON (Object o) = do
+    userRequestName <- o .: "userRequestName"
+    userRequestEmail <- o .: "userRequestEmail"
+    return $ UserRequest {
+      userRequestName = userRequestName,
+      userRequestEmail = userRequestEmail
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance ToJSON UserResponse where
+  toJSON UserResponse{..} = object $
+    [ "tag" .= "UserResponse"
+    , "userResponseId" .= userResponseId
+    , "userResponseName" .= userResponseName
+    , "userResponseEmail" .= userResponseEmail
+    , "userResponseCreatedAt" .= userResponseCreatedAt
+    , "userResponseModifiedAt" .= userResponseModifiedAt
+    ]
+
+
+instance FromJSON UserResponse where
+  parseJSON (Object o) = do
+    userResponseId <- o .: "userResponseId"
+    userResponseName <- o .: "userResponseName"
+    userResponseEmail <- o .: "userResponseEmail"
+    userResponseCreatedAt <- o .: "userResponseCreatedAt"
+    userResponseModifiedAt <- o .: "userResponseModifiedAt"
+    return $ UserResponse {
+      userResponseId = userResponseId,
+      userResponseName = userResponseName,
+      userResponseEmail = userResponseEmail,
+      userResponseCreatedAt = userResponseCreatedAt,
+      userResponseModifiedAt = userResponseModifiedAt
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
 instance ToJSON FunkyRecord where
   toJSON Boom1{..} = object $
     [ "tag" .= "FunkyRecord"

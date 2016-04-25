@@ -440,6 +440,267 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
     Left er -> Left er
 
 
+type FakeUTCTime = Int
+
+
+newtype User = User {
+  userName :: String,
+  userEmail :: String
+}
+
+
+_User :: LensP User {
+  userName :: String,
+  userEmail :: String
+}
+_User f (User o) = User <$> f o
+
+
+mkUser :: String -> String -> User
+mkUser userName userEmail =
+  User{userName, userEmail}
+
+
+unwrapUser (User r) = r
+
+instance userToJson :: ToJSON User where
+  toJSON (User v) = object $
+    [ "tag" .= "User"
+    , "userName" .= v.userName
+    , "userEmail" .= v.userEmail
+    ]
+
+
+instance userFromJSON :: FromJSON User where
+  parseJSON (JObject o) = do
+    userName <- o .: "userName"
+    userEmail <- o .: "userEmail"
+    return $ User {
+      userName : userName,
+      userEmail : userEmail
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance userEncodeJson :: EncodeJson User where
+  encodeJson (User o) =
+       "tag" := "User"
+    ~> "userName" := o.userName
+    ~> "userEmail" := o.userEmail
+    ~> jsonEmptyObject
+
+
+instance userDecodeJson :: DecodeJson User where
+  decodeJson o = do
+    obj <- decodeJson o
+    userName <- obj .? "userName"
+    userEmail <- obj .? "userEmail"
+    pure $ User {
+      userName,
+      userEmail
+    }
+
+
+instance userRequestable :: Requestable User where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance userRespondable :: Respondable User where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
+instance userIsForeign :: IsForeign User where
+  read f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
+newtype UserRequest = UserRequest {
+  userRequestName :: String,
+  userRequestEmail :: String
+}
+
+
+_UserRequest :: LensP UserRequest {
+  userRequestName :: String,
+  userRequestEmail :: String
+}
+_UserRequest f (UserRequest o) = UserRequest <$> f o
+
+
+mkUserRequest :: String -> String -> UserRequest
+mkUserRequest userRequestName userRequestEmail =
+  UserRequest{userRequestName, userRequestEmail}
+
+
+unwrapUserRequest (UserRequest r) = r
+
+instance userRequestToJson :: ToJSON UserRequest where
+  toJSON (UserRequest v) = object $
+    [ "tag" .= "UserRequest"
+    , "userRequestName" .= v.userRequestName
+    , "userRequestEmail" .= v.userRequestEmail
+    ]
+
+
+instance userRequestFromJSON :: FromJSON UserRequest where
+  parseJSON (JObject o) = do
+    userRequestName <- o .: "userRequestName"
+    userRequestEmail <- o .: "userRequestEmail"
+    return $ UserRequest {
+      userRequestName : userRequestName,
+      userRequestEmail : userRequestEmail
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance userRequestEncodeJson :: EncodeJson UserRequest where
+  encodeJson (UserRequest o) =
+       "tag" := "UserRequest"
+    ~> "userRequestName" := o.userRequestName
+    ~> "userRequestEmail" := o.userRequestEmail
+    ~> jsonEmptyObject
+
+
+instance userRequestDecodeJson :: DecodeJson UserRequest where
+  decodeJson o = do
+    obj <- decodeJson o
+    userRequestName <- obj .? "userRequestName"
+    userRequestEmail <- obj .? "userRequestEmail"
+    pure $ UserRequest {
+      userRequestName,
+      userRequestEmail
+    }
+
+
+instance userRequestRequestable :: Requestable UserRequest where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance userRequestRespondable :: Respondable UserRequest where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
+instance userRequestIsForeign :: IsForeign UserRequest where
+  read f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
+newtype UserResponse = UserResponse {
+  userResponseId :: Int,
+  userResponseName :: String,
+  userResponseEmail :: String,
+  userResponseCreatedAt :: (Maybe FakeUTCTime),
+  userResponseModifiedAt :: (Maybe FakeUTCTime)
+}
+
+
+_UserResponse :: LensP UserResponse {
+  userResponseId :: Int,
+  userResponseName :: String,
+  userResponseEmail :: String,
+  userResponseCreatedAt :: (Maybe FakeUTCTime),
+  userResponseModifiedAt :: (Maybe FakeUTCTime)
+}
+_UserResponse f (UserResponse o) = UserResponse <$> f o
+
+
+mkUserResponse :: Int -> String -> String -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
+mkUserResponse userResponseId userResponseName userResponseEmail userResponseCreatedAt userResponseModifiedAt =
+  UserResponse{userResponseId, userResponseName, userResponseEmail, userResponseCreatedAt, userResponseModifiedAt}
+
+
+unwrapUserResponse (UserResponse r) = r
+
+instance userResponseToJson :: ToJSON UserResponse where
+  toJSON (UserResponse v) = object $
+    [ "tag" .= "UserResponse"
+    , "userResponseId" .= v.userResponseId
+    , "userResponseName" .= v.userResponseName
+    , "userResponseEmail" .= v.userResponseEmail
+    , "userResponseCreatedAt" .= v.userResponseCreatedAt
+    , "userResponseModifiedAt" .= v.userResponseModifiedAt
+    ]
+
+
+instance userResponseFromJSON :: FromJSON UserResponse where
+  parseJSON (JObject o) = do
+    userResponseId <- o .: "userResponseId"
+    userResponseName <- o .: "userResponseName"
+    userResponseEmail <- o .: "userResponseEmail"
+    userResponseCreatedAt <- o .: "userResponseCreatedAt"
+    userResponseModifiedAt <- o .: "userResponseModifiedAt"
+    return $ UserResponse {
+      userResponseId : userResponseId,
+      userResponseName : userResponseName,
+      userResponseEmail : userResponseEmail,
+      userResponseCreatedAt : userResponseCreatedAt,
+      userResponseModifiedAt : userResponseModifiedAt
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance userResponseEncodeJson :: EncodeJson UserResponse where
+  encodeJson (UserResponse o) =
+       "tag" := "UserResponse"
+    ~> "userResponseId" := o.userResponseId
+    ~> "userResponseName" := o.userResponseName
+    ~> "userResponseEmail" := o.userResponseEmail
+    ~> "userResponseCreatedAt" := o.userResponseCreatedAt
+    ~> "userResponseModifiedAt" := o.userResponseModifiedAt
+    ~> jsonEmptyObject
+
+
+instance userResponseDecodeJson :: DecodeJson UserResponse where
+  decodeJson o = do
+    obj <- decodeJson o
+    userResponseId <- obj .? "userResponseId"
+    userResponseName <- obj .? "userResponseName"
+    userResponseEmail <- obj .? "userResponseEmail"
+    userResponseCreatedAt <- obj .? "userResponseCreatedAt"
+    userResponseModifiedAt <- obj .? "userResponseModifiedAt"
+    pure $ UserResponse {
+      userResponseId,
+      userResponseName,
+      userResponseEmail,
+      userResponseCreatedAt,
+      userResponseModifiedAt
+    }
+
+
+instance userResponseRequestable :: Requestable UserResponse where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance userResponseRespondable :: Respondable UserResponse where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
+instance userResponseIsForeign :: IsForeign UserResponse where
+  read f = case readString f of
+    Right s -> readJSON s
+    Left er -> Left er
+
+
 type Text = String
 
 
@@ -570,5 +831,41 @@ boom1_ f o = o { boom1 = _ } <$> f o.boom1
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
 unSession_ f o = o { unSession = _ } <$> f o.unSession
+
+
+userName_ :: forall b a r. Lens { userName :: a | r } { userName :: b | r } a b
+userName_ f o = o { userName = _ } <$> f o.userName
+
+
+userEmail_ :: forall b a r. Lens { userEmail :: a | r } { userEmail :: b | r } a b
+userEmail_ f o = o { userEmail = _ } <$> f o.userEmail
+
+
+userRequestName_ :: forall b a r. Lens { userRequestName :: a | r } { userRequestName :: b | r } a b
+userRequestName_ f o = o { userRequestName = _ } <$> f o.userRequestName
+
+
+userRequestEmail_ :: forall b a r. Lens { userRequestEmail :: a | r } { userRequestEmail :: b | r } a b
+userRequestEmail_ f o = o { userRequestEmail = _ } <$> f o.userRequestEmail
+
+
+userResponseId_ :: forall b a r. Lens { userResponseId :: a | r } { userResponseId :: b | r } a b
+userResponseId_ f o = o { userResponseId = _ } <$> f o.userResponseId
+
+
+userResponseName_ :: forall b a r. Lens { userResponseName :: a | r } { userResponseName :: b | r } a b
+userResponseName_ f o = o { userResponseName = _ } <$> f o.userResponseName
+
+
+userResponseEmail_ :: forall b a r. Lens { userResponseEmail :: a | r } { userResponseEmail :: b | r } a b
+userResponseEmail_ f o = o { userResponseEmail = _ } <$> f o.userResponseEmail
+
+
+userResponseCreatedAt_ :: forall b a r. Lens { userResponseCreatedAt :: a | r } { userResponseCreatedAt :: b | r } a b
+userResponseCreatedAt_ f o = o { userResponseCreatedAt = _ } <$> f o.userResponseCreatedAt
+
+
+userResponseModifiedAt_ :: forall b a r. Lens { userResponseModifiedAt :: a | r } { userResponseModifiedAt :: b | r } a b
+userResponseModifiedAt_ f o = o { userResponseModifiedAt = _ } <$> f o.userResponseModifiedAt
 
 -- footer
