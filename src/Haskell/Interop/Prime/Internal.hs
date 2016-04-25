@@ -3,8 +3,8 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE TemplateHaskell      #-}
-{-# OPTIONS -ddump-splices #-}
-{-# OPTIONS -fno-warn-orphans #-}
+{-# OPTIONS -ddump-splices        #-}
+{-# OPTIONS -fno-warn-orphans     #-}
 
 module Haskell.Interop.Prime.Internal (
   mkExports
@@ -15,11 +15,11 @@ module Haskell.Interop.Prime.Internal (
 import           Control.Monad
 import           Control.Monad.Trans.RWS
 import           Data.List
-import qualified Data.Map                          as M
 import           Data.Maybe
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
 import           Haskell.Interop.Prime.Misc
+import           Haskell.Interop.Prime.Shared
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
 
@@ -239,8 +239,8 @@ mkExports Options{..} nmm = do
     (ps, _) = evalRWS (mkExports' psInterop psMkGs ir_ps) (InteropReader psInterop ps_fields) undefined
     (hs, _) = evalRWS (mkExports' hsInterop hsMkGs ir_hs) (InteropReader hsInterop []) undefined
 
-  runIO $ persistInterop psInterop ps
-  runIO $ persistInterop hsInterop hs
+  runIO $ persistResults psInterop ps
+  runIO $ persistResults hsInterop hs
 
   return []
 
@@ -290,7 +290,7 @@ buildInternalRep opts@InteropOptions{..} dec =
       (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
       (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
       _              -> EmptyIR
-  parseInternalRep (TySynD n _ t) = TypeIR (nameBase n) (mkTypeIR t)
+  parseInternalRep (TySynD n _ t) = TypeIR (nameBase n) (mkTypeIR opts t)
   parseInternalRep _ = EmptyIR
 
   mkConNewtypeIR nb (RecC n vars) = NewtypeRecIR nb (nameBase n) (map (mkVarIR nb) vars)
@@ -300,26 +300,6 @@ buildInternalRep opts@InteropOptions{..} dec =
   mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars)
   mkConDataIR' _ _ = ("",[])
 
-  mkVarIR nb (n, _, t) = (tplBuildField opts nb (nameBase n), mkTypeIR t)
+  mkVarIR nb (n, _, t) = (tplBuildField opts nb (nameBase n), mkTypeIR opts t)
 
-  mkVarIR' (_, t) = mkTypeIR t
-
-  mkTypeIR (ConT n) = tplBuildType opts (nameBase n)
-  mkTypeIR (VarT a) =
-    let
-      v = takeWhile (/= '_') $ nameBase a
-    in
-      tplBuildType opts v
-  mkTypeIR (AppT f x) = "(" ++ mkTypeIR f ++ " " ++ mkTypeIR x ++ ")"
-  mkTypeIR (TupleT 0) = "Unit "
-  mkTypeIR (TupleT 2) = "Tuple "
-  mkTypeIR (TupleT n) = "Tuple" ++ show n ++ " "
-  mkTypeIR ListT = "Array "
-  mkTypeIR x     = show x
-
-
-
-persistInterop :: InteropOptions -> String -> IO ()
-persistInterop InteropOptions{..} s = do
-
-  writeFile filePath s
+  mkVarIR' (_, t) = mkTypeIR opts t

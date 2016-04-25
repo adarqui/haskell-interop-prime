@@ -4,7 +4,6 @@ module Haskell.Interop.Prime.Test where
 
 
 
-import           Data.Int
 import           Haskell.Interop.Prime
 import           Haskell.Interop.Prime.Test.Internal
 import           Haskell.Interop.Prime.Test.Types
@@ -55,8 +54,8 @@ mkExports
 
 mkApi
   (Options
-    (defaultOptionsCleanPurescript "/tmp/Interop.Api.purs")
+    ((defaultOptionsCleanPurescript "/tmp/Interop.Api.purs") { debug = True })
     (defaultPurescriptMkGs "module Interop.Api where")
-    (defaultOptionsCleanHaskell "/tmp/Interop.Api.hs")
+    ((defaultOptionsCleanHaskell "/tmp/Interop.Api.hs" ) { debug = True })
     (defaultHaskellMkGs $ tplTestHeader "Interop.Api"))
-  apiSpec
+  apiSpec_TH

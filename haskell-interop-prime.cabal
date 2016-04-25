@@ -24,6 +24,7 @@ library
                      , Haskell.Interop.Prime.Internal
                      , Haskell.Interop.Prime.Misc
                      , Haskell.Interop.Prime.Options
+                     , Haskell.Interop.Prime.Shared
                      , Haskell.Interop.Prime.Template
                      , Haskell.Interop.Prime.Types
   other-modules:       Haskell.Interop.Prime.Test

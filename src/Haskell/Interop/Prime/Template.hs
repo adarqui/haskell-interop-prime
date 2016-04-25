@@ -31,6 +31,7 @@ module Haskell.Interop.Prime.Template (
   tplFooter,
   tplJObject,
   tplTestHeader,
+  tplApiEntry,
   tplPurescriptApiEntry,
   tplHaskellApiEntry,
   tplApiMethod_Prefix,
@@ -49,11 +50,11 @@ module Haskell.Interop.Prime.Template (
 
 
 import           Data.List
+import qualified Data.Map                    as M
 import           Data.Monoid
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Types
 import           Text.Printf
-import           qualified Data.Map as M
 
 
 
@@ -523,15 +524,20 @@ tplTestHeader module_name =
 
 
 
+tplApiEntry :: InteropOptions -> ApiEntry -> String
+tplApiEntry opts@InteropOptions{..} api_entry =
+  case lang of
+    LangPurescript -> tplPurescriptApiEntry opts api_entry
+    LangHaskell    -> tplHaskellApiEntry opts api_entry
+
+
+
 tplPurescriptApiEntry :: InteropOptions -> ApiEntry -> String
 tplPurescriptApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
   intercalateMap
     "\n"
     (\(param, method) -> tplPurescriptApiEntry' opts route param method)
     [ (param, method) | param <- params, method <- methods ]
-  where
-  si1 = spacingIndent
-  si2 = spacingIndent*2
 
 
 
@@ -552,10 +558,25 @@ tplPurescriptApiEntry' opts@InteropOptions{..} route param method =
 
 tplHaskellApiEntry :: InteropOptions -> ApiEntry -> String
 tplHaskellApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
-  route
+  intercalateMap
+    "\n"
+    (\(param, method) -> tplHaskellApiEntry' opts route param method)
+    [ (param, method) | param <- params, method <- methods ]
+
+
+
+tplHaskellApiEntry' :: InteropOptions -> String -> ApiParam -> ApiMethod -> String
+tplHaskellApiEntry' opts@InteropOptions{..} route param method =
+     printf "%s :: %s\n"
+       fn_name
+       (tplArrows $ [tplApiParam_ByType opts param] <> (tplApiParam_TypeSig opts param) <> [tplApiMethod_RequestType opts method] <> [tplApiMethod_ResultType opts method])
+  ++ printf "%s %s = undefined\n"
+        fn_name
+        (tplArguments $ [tplApiParam_ByName opts param] <> (tplApiParam_Arguments opts param) <> [jsonNameTransform "" $ tplApiMethod_RequestType opts method])
   where
-  si1 = spacingIndent
-  si2 = spacingIndent*2
+  method' = tplApiMethod_Prefix opts method
+  byname  = tplApiParam_ByName opts param
+  fn_name = fieldNameTransform "" (method' ++ route ++ byname)
 
 
 
@@ -576,10 +597,10 @@ tplApiMethod_ResultType opts (ApiDELETE r) = tplBuildType opts r
 
 
 tplApiMethod_RequestType :: InteropOptions -> ApiMethod -> String
-tplApiMethod_RequestType opts (ApiGET _)    = ""
+tplApiMethod_RequestType _ (ApiGET _)    = ""
 tplApiMethod_RequestType opts (ApiPOST r _) = tplBuildType opts r
 tplApiMethod_RequestType opts (ApiPUT r _)  = tplBuildType opts r
-tplApiMethod_RequestType opts (ApiDELETE _) = ""
+tplApiMethod_RequestType _ (ApiDELETE _) = ""
 
 
 
@@ -587,25 +608,25 @@ tplApiParam_TypeSig :: InteropOptions -> ApiParam -> [String]
 tplApiParam_TypeSig opts@InteropOptions{..} param =
   case param of
     Par params       -> map (tplBuildType opts . snd) params
-    ParBy name type_ -> []
+    ParBy _ _        -> []
     ParNone          -> []
 
 
 
 tplApiParam_Arguments :: InteropOptions -> ApiParam -> [String]
-tplApiParam_Arguments opts@InteropOptions{..} param =
+tplApiParam_Arguments _ param =
   case param of
     Par params       -> map fst params
-    ParBy name type_ -> []
+    ParBy _ _        -> []
     ParNone          -> []
 
 
 
 tplApiParam_ByName :: InteropOptions -> ApiParam -> String
-tplApiParam_ByName opts@InteropOptions{..} param =
+tplApiParam_ByName _ param =
   case param of
-    Par params       -> ""
-    ParBy name type_ -> "_By" <> name
+    Par _            -> ""
+    ParBy name _     -> "_By" <> name
     ParNone          -> ""
 
 
@@ -613,8 +634,8 @@ tplApiParam_ByName opts@InteropOptions{..} param =
 tplApiParam_ByType :: InteropOptions -> ApiParam -> String
 tplApiParam_ByType opts@InteropOptions{..} param =
   case param of
-    Par params       -> ""
-    ParBy name type_ -> tplBuildType opts type_
+    Par _            -> ""
+    ParBy    _ type_ -> tplBuildType opts type_
     ParNone          -> ""
 
 

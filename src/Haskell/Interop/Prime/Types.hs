@@ -81,7 +81,8 @@ data InteropOptions = InteropOptions {
   reservedMap          :: M.Map String String,
   lang                 :: Lang,
   psDataToNewtype      :: Bool,
-  filePath             :: FilePath
+  filePath             :: FilePath,
+  debug                :: Bool
 }
 
 

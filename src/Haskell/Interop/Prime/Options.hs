@@ -62,7 +62,8 @@ defaultOptions lang path = InteropOptions {
   spacingIndent = 2,
   lang = lang,
   psDataToNewtype = True,
-  filePath = path
+  filePath = path,
+  debug = False
 }
 
 defaultFieldNameTransform :: StringTransformFn
@@ -94,7 +95,8 @@ defaultOptionsClean lang path = InteropOptions {
   spacingIndent = 2,
   lang = lang,
   psDataToNewtype = True,
-  filePath = path
+  filePath = path,
+  debug = False
 }
 
 -- The logic for checking empty string after stripPrefix:

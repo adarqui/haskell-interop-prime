@@ -2,15 +2,16 @@
 
 module Haskell.Interop.Prime.Test.Internal (
   apiSpec,
-  apiEntries
+  apiSpec_TH,
+  apiEntries,
+  apiEntries_TH
 ) where
 
 
 
+import           Data.Int
 import           Haskell.Interop.Prime
 import           Haskell.Interop.Prime.Test.Types
-import Language.Haskell.TH
-import Data.Int
 
 
 
