@@ -1,9 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Haskell.Interop.Prime.Test.Internal (
-  apiSpec,
   apiSpec_TH,
-  apiEntries,
   apiEntries_TH
 ) where
 
@@ -12,37 +10,6 @@ module Haskell.Interop.Prime.Test.Internal (
 import           Data.Int
 import           Haskell.Interop.Prime
 import           Haskell.Interop.Prime.Test.Types
-
-
-
-apiSpec :: Api
-apiSpec = Api {
-  apiPrefix  = "/api",
-  apiEntries = apiEntries'
-}
-
-
-apiEntries' :: [ApiEntry]
-apiEntries' =
-  [ ApiEntry "Users"
-    [ ParNone
-    , ParBy "UsersIds" "[Int64]"
-    , ParBy "UsersNames" "[String]"
-    , ParBy "UsersEmails" "[String]"
-    ]
-    [ ApiGET "UserResponses" ]
-
-  , ApiEntry "User"
-    [ ParNone ]
-    [ ApiPOST "UserRequest" "UserResponse" ]
-
-  , ApiEntry "User"
-    [ Par [("user_id", "Int64")] ]
-    [ ApiGET "UserResponse"
-    , ApiPUT "UserRequest" "UserResponse"
-    , ApiDELETE "()"
-    ]
-  ]
 
 
 
