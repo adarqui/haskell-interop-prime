@@ -23,10 +23,10 @@ getUsers_ByUsersEmails' :: (Array  String) -> ApiEff (Either ForeignError UserRe
 getUsers_ByUsersEmails' _ByUsersEmails = getAt [] [] ["users"]
 
 postUser :: Array (Tuple String String) -> UserRequest -> ApiEff (Either ForeignError UserResponse)
-postUser params user_request = postAt params [] user_request ["user"]
+postUser params user_request = postAt params [] ["user"] user_request
 
 postUser' :: UserRequest -> ApiEff (Either ForeignError UserResponse)
-postUser' user_request = postAt [] [] user_request ["user"]
+postUser' user_request = postAt [] [] ["user"] user_request
 
 getUser :: Array (Tuple String String) -> Int -> ApiEff (Either ForeignError UserResponse)
 getUser params user_id = getAt params [] ["user", show user_id]
@@ -35,10 +35,10 @@ getUser' :: Int -> ApiEff (Either ForeignError UserResponse)
 getUser' user_id = getAt [] [] ["user", show user_id]
 
 putUser :: Array (Tuple String String) -> Int -> UserRequest -> ApiEff (Either ForeignError UserResponse)
-putUser params user_id user_request = putAt params [] user_request ["user", show user_id]
+putUser params user_id user_request = putAt params [] ["user", show user_id] user_request
 
 putUser' :: Int -> UserRequest -> ApiEff (Either ForeignError UserResponse)
-putUser' user_id user_request = putAt [] [] user_request ["user", show user_id]
+putUser' user_id user_request = putAt [] [] ["user", show user_id] user_request
 
 deleteUser :: Array (Tuple String String) -> Int -> ApiEff (Either ForeignError Unit)
 deleteUser params user_id = deleteAt params [] ["user", show user_id]

@@ -591,8 +591,8 @@ tplApiAction :: InteropOptions -> Bool -> String -> ApiMethod -> ApiParam -> [St
 tplApiAction opts@InteropOptions{..} simplified route api_method api_param args =
   case api_method of
     ApiGET _    -> printf "getAt %s [] %s" firstarg paths
-    ApiPOST _ _ -> printf "postAt %s [] %s %s" firstarg (last args) paths
-    ApiPUT _ _  -> printf "putAt %s [] %s %s" firstarg (last args) paths
+    ApiPOST _ _ -> printf "postAt %s [] %s %s" firstarg paths (last args)
+    ApiPUT _ _  -> printf "putAt %s [] %s %s" firstarg paths (last args)
     ApiDELETE _ -> printf "deleteAt %s [] %s" firstarg paths
   where
   firstarg = if simplified then "[]" else "params"
