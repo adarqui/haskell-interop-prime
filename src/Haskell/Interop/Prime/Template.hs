@@ -561,7 +561,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
   typesig' =
     if simplified
       then typesig
-      else "Array (Tuple String String)" : typesig
+      else paramsType' : typesig
   paramsType' =
     case lang of
       LangPurescript -> "Array (Tuple String String)"
@@ -596,10 +596,10 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
 tplApiAction :: InteropOptions -> Bool -> String -> ApiMethod -> ApiParam -> [String] -> String
 tplApiAction opts@InteropOptions{..} simplified route api_method api_param args =
   case api_method of
-    ApiGET _    -> printf "getAt %s %s %s" firstarg by paths
-    ApiPOST _ _ -> printf "postAt %s %s %s %s" firstarg by paths (last args)
-    ApiPUT _ _  -> printf "putAt %s %s %s %s" firstarg by paths (last args)
-    ApiDELETE _ -> printf "deleteAt %s %s %s" firstarg by paths
+    ApiGET _    -> printf "getAt %s %s" params paths
+    ApiPOST _ _ -> printf "postAt %s %s %s" params paths (last args)
+    ApiPUT _ _  -> printf "putAt %s %s %s" params paths (last args)
+    ApiDELETE _ -> printf "deleteAt %s %s" params paths
   where
   firstarg =
     if simplified
@@ -611,6 +611,12 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
       v  -> "[" ++ v ++ "]"
   paths    = "[" ++ (intercalate ", " $ ["\"" ++ route' ++ "\""] ++ tplApiParam_Arguments_Show opts api_param) ++ "]"
   route'   = jsonNameTransform "" route
+  params =
+    case (firstarg, by) of
+      ("[]", "[]") -> []
+      ("[]", _)    -> by
+      (_, "[]")    -> firstarg
+      (_, _)       -> (printf "(%s ++ %s)" firstarg by) :: String
 
 
 
