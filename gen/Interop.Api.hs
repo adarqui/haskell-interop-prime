@@ -1,3 +1,17 @@
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE RecordWildCards      #-}
+
+module Interop.Api where
+
+
+
+
+import Haskell.Api.Helpers
+
+default (Text)
+
+
 getUsers :: [(String, String)] -> ApiEff (Either Status UserResponses)
 getUsers params = getAt params ["users"]
 
@@ -45,3 +59,5 @@ deleteUser params user_id = deleteAt params ["user", show user_id]
 
 deleteUser' :: Int64 -> ApiEff (Either Status ())
 deleteUser' user_id = deleteAt  ["user", show user_id]
+
+-- footer
