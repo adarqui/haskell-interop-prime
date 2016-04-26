@@ -1,0 +1,5 @@
+generate:
+- yesod route
+- api ADT
+- optparse-generic cli
+- persistent config models
