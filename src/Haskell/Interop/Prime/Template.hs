@@ -632,7 +632,7 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
   route'   = jsonNameTransform "" route
   params =
     case (firstarg, by) of
-      ("[]", "[]") -> []
+      ("[]", "[]") -> "[]"
       ("[]", _)    -> by
       (_, "[]")    -> firstarg
       (_, _)       -> (printf "(%s ++ %s)" firstarg by) :: String
