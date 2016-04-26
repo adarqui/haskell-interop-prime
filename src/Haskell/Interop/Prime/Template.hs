@@ -1,4 +1,5 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE RecordWildCards      #-}
 
 module Haskell.Interop.Prime.Template (
