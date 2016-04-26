@@ -205,19 +205,6 @@ runMk mk = do
 
 
 
-runMkG :: MkG -> String -> ExportT (Maybe String)
-runMkG mkg s = do
-  opts   <- asks irInterop
-  fields <- asks irFields
-  return $
-    case mkg of
-      MkGPurescriptImports -> Just $ tplPurescriptImports s
-      MkGHaskellImports    -> Just $ tplHaskellImports s
-      MkGLensFields        -> Just $ tplLensFields opts fields s
-      MkGHeader header     -> Just $ tplHeader header s
-      MkGFooter footer     -> Just $ tplFooter footer s
-
-
 
 -- | This is the meat and potatoes. It exports types to a files
 --

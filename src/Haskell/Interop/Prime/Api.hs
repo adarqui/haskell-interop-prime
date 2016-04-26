@@ -13,6 +13,7 @@ module Haskell.Interop.Prime.Api (
 
 
 import           Control.Monad
+import           Control.Monad.Trans.RWS
 import           Data.List
 import           Haskell.Interop.Prime.Shared
 import           Haskell.Interop.Prime.Template
@@ -69,15 +70,15 @@ buildInternalApiRep opts@InteropOptions{..} (ApiEntry_TH route params methods) =
 mkApi :: Options -> Api_TH -> Q [Dec]
 mkApi Options{..} api@Api_TH{..} = do
 
-  mkApi' psInterop api
-  mkApi' hsInterop api
+  mkApi' psInterop psMkGs api
+  mkApi' hsInterop hsMkGs api
 
   return []
 
 
 
-mkApi' :: InteropOptions -> Api_TH -> Q ()
-mkApi' opts@InteropOptions{..} Api_TH{..} = do
+mkApi' :: InteropOptions -> [MkG] -> Api_TH -> Q ()
+mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
 
   ir <- forM apiEntries_TH $ (\api_entry_th -> do
      buildInternalApiRep opts api_entry_th
@@ -92,7 +93,23 @@ mkApi' opts@InteropOptions{..} Api_TH{..} = do
       return $ tplApiEntry opts api_entry
     )
 
-  let api_module = intercalate "\n" result
+  let
+    intermediate_module = intercalate "\n" result
+    (api_module, _)     =
+      -- EEK
+      evalRWS
+        (
+          foldM (\acc mkg -> do
+              r <- runMkG mkg acc
+              case r of
+                Nothing -> return acc
+                Just r' -> return r'
+            )
+            intermediate_module
+            mkgs
+        )
+        (InteropReader opts [])
+        undefined
 
   runDebug opts $ putStrLn api_module
 

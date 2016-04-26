@@ -23,8 +23,10 @@ module Haskell.Interop.Prime.Template (
   tplRespondable,
   tplIsForeign,
   tplShow_SumType,
+  tplImports,
   tplPurescriptImports,
   tplHaskellImports,
+  tplApiImports,
   tplPurescriptApiImports,
   tplHaskellApiImports,
   tplHeader,
@@ -422,6 +424,14 @@ tplShow_SumType_Field InteropOptions{..} field vars =
 
 
 
+tplImports :: InteropOptions -> String -> String
+tplImports opts@InteropOptions{..} =
+  case lang of
+    LangPurescript -> tplPurescriptImports
+    LangHaskell    -> tplHaskellImports
+
+
+
 tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
@@ -461,6 +471,14 @@ tplHaskellImports s = (intercalate "\n"
   , ""
   , ""
   ]) ++ s
+
+
+
+tplApiImports :: InteropOptions -> String -> String
+tplApiImports opts@InteropOptions{..} =
+  case lang of
+    LangPurescript -> tplPurescriptApiImports
+    LangHaskell    -> tplHaskellApiImports
 
 
 

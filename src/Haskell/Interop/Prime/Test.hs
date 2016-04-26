@@ -55,7 +55,7 @@ mkExports
 mkApi
   (Options
     ((defaultOptionsCleanPurescript "/tmp/Interop.Api.purs") { debug = True })
-    (defaultPurescriptMkGs "module Interop.Api where")
+    (defaultPurescriptApiMkGs "module Interop.Api where")
     ((defaultOptionsCleanHaskell "/tmp/Interop.Api.hs" ) { debug = True })
-    (defaultHaskellMkGs $ tplTestHeader "Interop.Api"))
+    (defaultHaskellApiMkGs $ tplTestHeader "Interop.Api"))
   apiSpec_TH

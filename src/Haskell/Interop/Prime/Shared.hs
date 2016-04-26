@@ -9,6 +9,7 @@
 module Haskell.Interop.Prime.Shared (
   nameAndType,
   mkTypeIR,
+  runMkG,
   persistResults,
   runDebug
 ) where
@@ -16,6 +17,7 @@ module Haskell.Interop.Prime.Shared (
 
 
 import           Control.Monad
+import           Control.Monad.Trans.RWS
 import           Language.Haskell.TH
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
@@ -72,6 +74,23 @@ mkTypeIR_Haskell _ (TupleT 0) = "() "
 mkTypeIR_Haskell _ (TupleT 2) = "Tuple "
 mkTypeIR_Haskell _ (TupleT n) = "Tuple" ++ show n ++ " "
 mkTypeIR_Haskell _ x     = show x
+
+
+
+
+runMkG :: MkG -> String -> ExportT (Maybe String)
+runMkG mkg s = do
+  opts   <- asks irInterop
+  fields <- asks irFields
+  return $
+    case mkg of
+      MkGPurescriptImports    -> Just $ tplPurescriptImports s
+      MkGPurescriptApiImports -> Just $ tplApiImports opts s
+      MkGHaskellImports       -> Just $ tplHaskellImports s
+      MkGHaskellApiImports    -> Just $ tplApiImports opts s
+      MkGLensFields           -> Just $ tplLensFields opts fields s
+      MkGHeader header        -> Just $ tplHeader header s
+      MkGFooter footer        -> Just $ tplFooter footer s
 
 
 

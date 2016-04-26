@@ -23,9 +23,11 @@ module Haskell.Interop.Prime.Options (
 
   defaultPurescriptMks,
   defaultPurescriptMkGs,
+  defaultPurescriptApiMkGs,
 
   defaultHaskellMks,
-  defaultHaskellMkGs
+  defaultHaskellMkGs,
+  defaultHaskellApiMkGs
 ) where
 
 
@@ -212,6 +214,15 @@ defaultPurescriptMkGs header =
 
 
 
+defaultPurescriptApiMkGs :: String -> [MkG]
+defaultPurescriptApiMkGs header =
+  [ MkGPurescriptApiImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
+
+
+
 defaultHaskellMks :: [Mk]
 defaultHaskellMks =
   [ MkToJSON
@@ -224,6 +235,16 @@ defaultHaskellMkGs :: String -> [MkG]
 defaultHaskellMkGs header =
   [ MkGHeader "default (Text)\n\n"
   , MkGHaskellImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
+
+
+
+defaultHaskellApiMkGs :: String -> [MkG]
+defaultHaskellApiMkGs header =
+  [ MkGHeader "default (Text)\n\n"
+  , MkGHaskellApiImports
   , MkGHeader header
   , MkGFooter "-- footer"
   ]

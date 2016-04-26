@@ -59,7 +59,9 @@ data Mk
 
 data MkG
   = MkGPurescriptImports
+  | MkGPurescriptApiImports
   | MkGHaskellImports
+  | MkGHaskellApiImports
   | MkGLensFields
   | MkGHeader String
   | MkGFooter String
@@ -179,5 +181,5 @@ data ApiEntry_TH
 
 
 
--- newtype RWST r w s m a
+-- newtype RWS r w s a
 type ExportT = RWS InteropReader () InteropState
