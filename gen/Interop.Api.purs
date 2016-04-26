@@ -5,22 +5,22 @@ getUsers' :: ApiEff (Either ForeignError UserResponses)
 getUsers'  = getAt [] [] ["users"]
 
 getUsers_ByUsersIds :: Array (Tuple String String) -> (Array  Int) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersIds params _ByUsersIds = getAt params [] ["users"]
+getUsers_ByUsersIds params _ByUsersIds = getAt params [ByUsersIds _ByUsersIds] ["users"]
 
 getUsers_ByUsersIds' :: (Array  Int) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersIds' _ByUsersIds = getAt [] [] ["users"]
+getUsers_ByUsersIds' _ByUsersIds = getAt [] [ByUsersIds _ByUsersIds] ["users"]
 
 getUsers_ByUsersNames :: Array (Tuple String String) -> (Array  String) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersNames params _ByUsersNames = getAt params [] ["users"]
+getUsers_ByUsersNames params _ByUsersNames = getAt params [ByUsersNames _ByUsersNames] ["users"]
 
 getUsers_ByUsersNames' :: (Array  String) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersNames' _ByUsersNames = getAt [] [] ["users"]
+getUsers_ByUsersNames' _ByUsersNames = getAt [] [ByUsersNames _ByUsersNames] ["users"]
 
 getUsers_ByUsersEmails :: Array (Tuple String String) -> (Array  String) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersEmails params _ByUsersEmails = getAt params [] ["users"]
+getUsers_ByUsersEmails params _ByUsersEmails = getAt params [ByUsersEmails _ByUsersEmails] ["users"]
 
 getUsers_ByUsersEmails' :: (Array  String) -> ApiEff (Either ForeignError UserResponses)
-getUsers_ByUsersEmails' _ByUsersEmails = getAt [] [] ["users"]
+getUsers_ByUsersEmails' _ByUsersEmails = getAt [] [ByUsersEmails _ByUsersEmails] ["users"]
 
 postUser :: Array (Tuple String String) -> UserRequest -> ApiEff (Either ForeignError UserResponse)
 postUser params user_request = postAt params [] ["user"] user_request

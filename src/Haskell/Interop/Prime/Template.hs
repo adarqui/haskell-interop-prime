@@ -32,8 +32,6 @@ module Haskell.Interop.Prime.Template (
   tplJObject,
   tplTestHeader,
   tplApiEntry,
-  tplPurescriptApiEntry,
-  tplHaskellApiEntry,
   tplApiMethod_Prefix,
   tplApiMethod_ResultType,
   tplApiMethod_RequestType,
@@ -527,26 +525,26 @@ tplTestHeader module_name =
 tplApiEntry :: InteropOptions -> ApiEntry -> String
 tplApiEntry opts@InteropOptions{..} api_entry =
   case lang of
-    LangPurescript -> tplPurescriptApiEntry opts api_entry
-    LangHaskell    -> tplHaskellApiEntry opts api_entry
+    LangPurescript -> tplApiEntry' opts api_entry
+    LangHaskell    -> tplApiEntry' opts api_entry
 
 
 
-tplPurescriptApiEntry :: InteropOptions -> ApiEntry -> String
-tplPurescriptApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
+tplApiEntry' :: InteropOptions -> ApiEntry -> String
+tplApiEntry' opts@InteropOptions{..} (ApiEntry route params methods) =
   intercalateMap
     "\n"
     (\(param, method) ->
-      tplPurescriptApiEntry' opts False route param method
+      tplApiEntry'' opts False route param method
       ++ "\n" ++
-      tplPurescriptApiEntry' opts True route param method
+      tplApiEntry'' opts True route param method
     )
     [ (param, method) | param <- params, method <- methods ]
 
 
 
-tplPurescriptApiEntry' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String
-tplPurescriptApiEntry' opts@InteropOptions{..} simplified route param method =
+tplApiEntry'' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String
+tplApiEntry'' opts@InteropOptions{..} simplified route param method =
      printf "%s :: %s\n"
        fn_name'
        (tplArrows typesig')
@@ -559,11 +557,15 @@ tplPurescriptApiEntry' opts@InteropOptions{..} simplified route param method =
     [tplApiParam_ByType opts param] <>
     (tplApiParam_TypeSig opts param) <>
     [tplApiMethod_RequestType opts method] <>
-    ["ApiEff (Either ForeignError " ++ tplApiMethod_ResultType opts method ++ ")"]
+    [printf "ApiEff (Either %s " error' ++ tplApiMethod_ResultType opts method ++ ")"]
   typesig' =
     if simplified
       then typesig
       else "Array (Tuple String String)" : typesig
+  paramsType' =
+    case lang of
+      LangPurescript -> "Array (Tuple String String)"
+      LangHaskell    -> "[(String, String)]"
   args     =
     [tplApiParam_ByName opts param] <>
     (tplApiParam_Arguments opts param) <>
@@ -584,44 +586,31 @@ tplPurescriptApiEntry' opts@InteropOptions{..} simplified route param method =
       then "[]"
       else "params"
   action = tplApiAction opts simplified route method param args
+  error' =
+    case lang of
+      LangPurescript -> "ForeignError"
+      LangHaskell    -> "Status"
 
 
 
 tplApiAction :: InteropOptions -> Bool -> String -> ApiMethod -> ApiParam -> [String] -> String
 tplApiAction opts@InteropOptions{..} simplified route api_method api_param args =
   case api_method of
-    ApiGET _    -> printf "getAt %s [] %s" firstarg paths
-    ApiPOST _ _ -> printf "postAt %s [] %s %s" firstarg paths (last args)
-    ApiPUT _ _  -> printf "putAt %s [] %s %s" firstarg paths (last args)
-    ApiDELETE _ -> printf "deleteAt %s [] %s" firstarg paths
+    ApiGET _    -> printf "getAt %s %s %s" firstarg by paths
+    ApiPOST _ _ -> printf "postAt %s %s %s %s" firstarg by paths (last args)
+    ApiPUT _ _  -> printf "putAt %s %s %s %s" firstarg by paths (last args)
+    ApiDELETE _ -> printf "deleteAt %s %s %s" firstarg by paths
   where
-  firstarg = if simplified then "[]" else "params"
+  firstarg =
+    if simplified
+      then "[]"
+      else "params"
+  by =
+    case (tplApiParam_By opts api_param) of
+      "" -> "[]"
+      v  -> "[" ++ v ++ "]"
   paths    = "[" ++ (intercalate ", " $ ["\"" ++ route' ++ "\""] ++ tplApiParam_Arguments_Show opts api_param) ++ "]"
   route'   = jsonNameTransform "" route
-
-
-
-tplHaskellApiEntry :: InteropOptions -> ApiEntry -> String
-tplHaskellApiEntry opts@InteropOptions{..} (ApiEntry route params methods) =
-  intercalateMap
-    "\n"
-    (\(param, method) -> tplHaskellApiEntry' opts route param method)
-    [ (param, method) | param <- params, method <- methods ]
-
-
-
-tplHaskellApiEntry' :: InteropOptions -> String -> ApiParam -> ApiMethod -> String
-tplHaskellApiEntry' opts@InteropOptions{..} route param method =
-     printf "%s :: %s\n"
-       fn_name
-       (tplArrows $ [tplApiParam_ByType opts param] <> (tplApiParam_TypeSig opts param) <> [tplApiMethod_RequestType opts method] <> [tplApiMethod_ResultType opts method])
-  ++ printf "%s %s = undefined\n"
-        fn_name
-        (tplArguments $ [tplApiParam_ByName opts param] <> (tplApiParam_Arguments opts param) <> [jsonNameTransform "" $ tplApiMethod_RequestType opts method])
-  where
-  method' = tplApiMethod_Prefix opts method
-  byname  = tplApiParam_ByName opts param
-  fn_name = fieldNameTransform "" (method' ++ route ++ byname)
 
 
 
@@ -695,6 +684,15 @@ tplApiParam_ByType opts@InteropOptions{..} param =
   case param of
     Par _            -> ""
     ParBy    _ type_ -> tplBuildType opts type_
+    ParNone          -> ""
+
+
+
+tplApiParam_By :: InteropOptions -> ApiParam -> String
+tplApiParam_By opts@InteropOptions{..} param =
+  case param of
+    Par _            -> ""
+    ParBy name _     -> printf "By%s %s" name (tplApiParam_ByName opts param)
     ParNone          -> ""
 
 
