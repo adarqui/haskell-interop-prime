@@ -233,8 +233,7 @@ defaultHaskellMks =
 
 defaultHaskellMkGs :: String -> [MkG]
 defaultHaskellMkGs header =
-  [ MkGHeader "default (Text)\n\n"
-  , MkGHaskellImports
+  [ MkGHaskellImports
   , MkGHeader header
   , MkGFooter "-- footer"
   ]
@@ -243,8 +242,7 @@ defaultHaskellMkGs header =
 
 defaultHaskellApiMkGs :: String -> [MkG]
 defaultHaskellApiMkGs header =
-  [ MkGHeader "default (Text)\n\n"
-  , MkGHaskellApiImports
+  [ MkGHaskellApiImports
   , MkGHeader header
   , MkGFooter "-- footer"
   ]

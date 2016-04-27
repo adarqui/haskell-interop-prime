@@ -499,6 +499,7 @@ tplHaskellApiImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Haskell.Api.Helpers"
+  , "import Data.Int"
   , ""
   , ""
   ]) ++ s
