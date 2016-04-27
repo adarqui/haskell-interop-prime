@@ -12,9 +12,6 @@ module Interop.Clean where
 import Data.Aeson
 import Data.Text   (Text)
 
-default (Text)
-
-
 instance ToJSON Session where
   toJSON Session{..} = object $
     [ "tag" .= "Session"

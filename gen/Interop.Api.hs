@@ -10,56 +10,54 @@ module Interop.Api where
 
 
 import Haskell.Api.Helpers
+import Data.Int
 
-default (Text)
+getUsers :: forall qp. QueryParam qp => [qp] -> ApiEff (Either ApiError UserResponses)
+getUsers params = handleError <$> getAt params ["users"]
 
+getUsers' :: ApiEff (Either ApiError UserResponses)
+getUsers'  = handleError <$> getAt ([] :: [(String, String)]) ["users"]
 
-getUsers :: forall qp. QueryParam qp => [qp] -> ApiEff (Either Status UserResponses)
-getUsers params = getAt params ["users"]
+getUsers_ByUsersIds :: forall qp. QueryParam qp => [qp] -> [Int64] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersIds params _ByUsersIds = handleError <$> getAt (params ++ [ByUsersIds _ByUsersIds]) ["users"]
 
-getUsers' :: ApiEff (Either Status UserResponses)
-getUsers'  = getAt [] ["users"]
+getUsers_ByUsersIds' :: [Int64] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersIds' _ByUsersIds = handleError <$> getAt [ByUsersIds _ByUsersIds] ["users"]
 
-getUsers_ByUsersIds :: forall qp. QueryParam qp => [qp] -> [Int64] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersIds params _ByUsersIds = getAt (params ++ [ByUsersIds _ByUsersIds]) ["users"]
+getUsers_ByUsersNames :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersNames params _ByUsersNames = handleError <$> getAt (params ++ [ByUsersNames _ByUsersNames]) ["users"]
 
-getUsers_ByUsersIds' :: [Int64] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersIds' _ByUsersIds = getAt [ByUsersIds _ByUsersIds] ["users"]
+getUsers_ByUsersNames' :: [String] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersNames' _ByUsersNames = handleError <$> getAt [ByUsersNames _ByUsersNames] ["users"]
 
-getUsers_ByUsersNames :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersNames params _ByUsersNames = getAt (params ++ [ByUsersNames _ByUsersNames]) ["users"]
+getUsers_ByUsersEmails :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersEmails params _ByUsersEmails = handleError <$> getAt (params ++ [ByUsersEmails _ByUsersEmails]) ["users"]
 
-getUsers_ByUsersNames' :: [String] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersNames' _ByUsersNames = getAt [ByUsersNames _ByUsersNames] ["users"]
+getUsers_ByUsersEmails' :: [String] -> ApiEff (Either ApiError UserResponses)
+getUsers_ByUsersEmails' _ByUsersEmails = handleError <$> getAt [ByUsersEmails _ByUsersEmails] ["users"]
 
-getUsers_ByUsersEmails :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersEmails params _ByUsersEmails = getAt (params ++ [ByUsersEmails _ByUsersEmails]) ["users"]
+postUser :: forall qp. QueryParam qp => [qp] -> UserRequest -> ApiEff (Either ApiError UserResponse)
+postUser params user_request = handleError <$> postAt params ["user"] user_request
 
-getUsers_ByUsersEmails' :: [String] -> ApiEff (Either Status UserResponses)
-getUsers_ByUsersEmails' _ByUsersEmails = getAt [ByUsersEmails _ByUsersEmails] ["users"]
+postUser' :: UserRequest -> ApiEff (Either ApiError UserResponse)
+postUser' user_request = handleError <$> postAt ([] :: [(String, String)]) ["user"] user_request
 
-postUser :: forall qp. QueryParam qp => [qp] -> UserRequest -> ApiEff (Either Status UserResponse)
-postUser params user_request = postAt params ["user"] user_request
+getUser :: forall qp. QueryParam qp => [qp] -> Int64 -> ApiEff (Either ApiError UserResponse)
+getUser params user_id = handleError <$> getAt params ["user", show user_id]
 
-postUser' :: UserRequest -> ApiEff (Either Status UserResponse)
-postUser' user_request = postAt [] ["user"] user_request
+getUser' :: Int64 -> ApiEff (Either ApiError UserResponse)
+getUser' user_id = handleError <$> getAt ([] :: [(String, String)]) ["user", show user_id]
 
-getUser :: forall qp. QueryParam qp => [qp] -> Int64 -> ApiEff (Either Status UserResponse)
-getUser params user_id = getAt params ["user", show user_id]
+putUser :: forall qp. QueryParam qp => [qp] -> Int64 -> UserRequest -> ApiEff (Either ApiError UserResponse)
+putUser params user_id user_request = handleError <$> putAt params ["user", show user_id] user_request
 
-getUser' :: Int64 -> ApiEff (Either Status UserResponse)
-getUser' user_id = getAt [] ["user", show user_id]
+putUser' :: Int64 -> UserRequest -> ApiEff (Either ApiError UserResponse)
+putUser' user_id user_request = handleError <$> putAt ([] :: [(String, String)]) ["user", show user_id] user_request
 
-putUser :: forall qp. QueryParam qp => [qp] -> Int64 -> UserRequest -> ApiEff (Either Status UserResponse)
-putUser params user_id user_request = putAt params ["user", show user_id] user_request
+deleteUser :: forall qp. QueryParam qp => [qp] -> Int64 -> ApiEff (Either ApiError ())
+deleteUser params user_id = handleError <$> deleteAt params ["user", show user_id]
 
-putUser' :: Int64 -> UserRequest -> ApiEff (Either Status UserResponse)
-putUser' user_id user_request = putAt [] ["user", show user_id] user_request
-
-deleteUser :: forall qp. QueryParam qp => [qp] -> Int64 -> ApiEff (Either Status ())
-deleteUser params user_id = deleteAt params ["user", show user_id]
-
-deleteUser' :: Int64 -> ApiEff (Either Status ())
-deleteUser' user_id = deleteAt [] ["user", show user_id]
+deleteUser' :: Int64 -> ApiEff (Either ApiError ())
+deleteUser' user_id = handleError <$> deleteAt ([] :: [(String, String)]) ["user", show user_id]
 
 -- footer
