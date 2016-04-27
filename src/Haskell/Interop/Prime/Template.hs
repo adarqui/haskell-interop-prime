@@ -628,22 +628,22 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
     ApiPUT _ _  -> printf "putAt %s %s %s" params paths (last args)
     ApiDELETE _ -> printf "deleteAt %s %s" params paths
   where
-  firstarg =
+  (firstarg, firstarg') =
     if simplified
-      then tplEmptyQueryParams opts
-      else "params"
-  by =
+      then (tplEmptyQueryParams opts, False)
+      else ("params", True)
+  (by, by') =
     case (tplApiParam_By opts api_param) of
-      "" -> "[]"
-      v  -> "[" ++ v ++ "]"
+      "" -> ("[]", False)
+      v  -> ("[" ++ v ++ "]", True)
   paths    = "[" ++ (intercalate ", " $ ["\"" ++ route' ++ "\""] ++ tplApiParam_Arguments_Show opts api_param) ++ "]"
   route'   = jsonNameTransform "" route
   params =
-    case (firstarg, by) of
-      ("[]", "[]") -> "[]"
-      ("[]", _)    -> by
-      (_, "[]")    -> firstarg
-      (_, _)       -> (printf "(%s ++ %s)" firstarg by) :: String
+    case (firstarg', by') of
+      (False, False) -> tplEmptyQueryParams opts
+      (False, _)     -> by
+      (_, False)     -> firstarg
+      (_, _)         -> (printf "(%s ++ %s)" firstarg by) :: String
 
 
 
