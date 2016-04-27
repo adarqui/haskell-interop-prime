@@ -403,7 +403,7 @@ tplIsForeign InteropOptions{..} base =
 tplShow_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplShow_Rec opts@InteropOptions{..} base constr fields =
      instance_decl
-  ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s:\" o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s: \" ++ show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si2 = spacingIndent*2
   instance_decl =
