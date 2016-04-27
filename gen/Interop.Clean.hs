@@ -1,6 +1,8 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE RecordWildCards      #-}
+{-# LANGUAGE ExplicitForAll       #-}
+{-# LANGUAGE RankNTypes           #-}
 
 module Interop.Clean where
 
