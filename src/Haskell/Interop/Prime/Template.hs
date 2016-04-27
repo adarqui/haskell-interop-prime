@@ -570,7 +570,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
        fn_name'
        prolog
        (tplArrows typesig')
-  ++ printf "%s %s = %s\n"
+  ++ printf "%s %s = handleError <$> %s\n"
        fn_name'
        (tplArguments args')
        action
@@ -583,7 +583,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
     [tplApiParam_ByType opts param] <>
     (tplApiParam_TypeSig opts param) <>
     [tplApiMethod_RequestType opts method] <>
-    [printf "ApiEff (Either %s " error' ++ tplApiMethod_ResultType opts method ++ ")"]
+    [printf "ApiEff (Either ApiError " ++ tplApiMethod_ResultType opts method ++ ")"]
   typesig' =
     if simplified
       then typesig
@@ -607,15 +607,15 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
     if simplified
       then fn_name <> "'"
       else fn_name
-  firstarg =
-    if simplified
-      then "[]"
-      else "params"
   action = tplApiAction opts simplified route method param args
-  error' =
-    case lang of
-      LangPurescript -> "ForeignError"
-      LangHaskell    -> "Status"
+
+
+
+tplEmptyQueryParams :: InteropOptions -> String
+tplEmptyQueryParams InteropOptions{..} =
+  case lang of
+    LangPurescript -> "[]"
+    LangHaskell    -> "([] :: [(String, String)])"
 
 
 
@@ -629,7 +629,7 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
   where
   firstarg =
     if simplified
-      then "[]"
+      then tplEmptyQueryParams opts
       else "params"
   by =
     case (tplApiParam_By opts api_param) of
