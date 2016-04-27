@@ -732,7 +732,7 @@ tplApiParam_By opts@InteropOptions{..} param =
 
 tplBuildFields :: InteropOptions -> [InternalRep] -> [String]
 tplBuildFields opts@InteropOptions{..} ir =
-  concat $ nub $ sort $ map go ir
+  nub $ sort $ concat $ map go ir
   where
   go (NewtypeRecIR _ constr fields) = map (\(field,_) -> tplBuildField opts constr field) fields
   go (DataRecIR _ constr fields)    = map (\(field,_) -> tplBuildField opts constr field) fields
