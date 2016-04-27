@@ -533,6 +533,8 @@ tplTestHeader module_name =
   [ "{-# LANGUAGE ExtendedDefaultRules #-}"
   , "{-# LANGUAGE OverloadedStrings    #-}"
   , "{-# LANGUAGE RecordWildCards      #-}"
+  , "{-# LANGUAGE ExplicitForAll       #-}"
+  , "{-# LANGUAGE RankNTypes           #-}"
   , ""
   , "module " ++ module_name ++ " where"
   , ""
@@ -564,14 +566,19 @@ tplApiEntry' opts@InteropOptions{..} (ApiEntry route params methods) =
 
 tplApiEntry'' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String
 tplApiEntry'' opts@InteropOptions{..} simplified route param method =
-     printf "%s :: %s\n"
+     printf "%s :: %s%s\n"
        fn_name'
+       prolog
        (tplArrows typesig')
   ++ printf "%s %s = %s\n"
        fn_name'
        (tplArguments args')
        action
   where
+  prolog =
+    if simplified
+      then ""
+      else "forall qp. QueryParam qp => "
   typesig  =
     [tplApiParam_ByType opts param] <>
     (tplApiParam_TypeSig opts param) <>
@@ -583,8 +590,8 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
       else paramsType' : typesig
   paramsType' =
     case lang of
-      LangPurescript -> "Array (Tuple String String)"
-      LangHaskell    -> "[(String, String)]"
+      LangPurescript -> "Array qp"
+      LangHaskell    -> "[qp]"
   args     =
     [tplApiParam_ByName opts param] <>
     (tplApiParam_Arguments opts param) <>
