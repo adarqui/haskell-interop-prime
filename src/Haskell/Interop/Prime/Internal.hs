@@ -180,10 +180,10 @@ buildShow = do
   (opts, ir) <- opts_ir
   return $
     case ir of
-      NewtypeRecIR _ _ _       -> Nothing
-      DataRecIR _ _ _          -> Nothing
-      DataNormalIR base fields -> Just $ tplShow_SumType opts base fields
-      _                        -> Nothing
+      NewtypeRecIR base constr fields -> Just $ tplShow_Rec opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplShow_Rec opts base constr fields
+      DataNormalIR base fields        -> Just $ tplShow_SumType opts base fields
+      _                               -> Nothing
 
 
 

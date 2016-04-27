@@ -23,6 +23,7 @@ module Haskell.Interop.Prime.Template (
   tplRequestable,
   tplRespondable,
   tplIsForeign,
+  tplShow_Rec,
   tplShow_SumType,
   tplImports,
   tplPurescriptImports,
@@ -396,6 +397,21 @@ tplIsForeign InteropOptions{..} base =
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+
+
+
+tplShow_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplShow_Rec opts@InteropOptions{..} base constr fields =
+     instance_decl
+  ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s:\" o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  where
+  si2 = spacingIndent*2
+  instance_decl =
+    case lang of
+      LangPurescript ->
+           printf "instance %sShow :: Show %s where\n" (firstToLower base) base
+        ++ spaces si2 ++ printf "show (%s o) = " constr
+      LangHaskell    -> haskellNotSupported
 
 
 
