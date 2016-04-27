@@ -643,7 +643,7 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
       (False, False) -> tplEmptyQueryParams opts
       (False, _)     -> by
       (_, False)     -> firstarg
-      (_, _)         -> (printf "(%s ++ %s)" firstarg by) :: String
+      (_, _)         -> (printf "(map qp %s ++ map qp %s)" firstarg by) :: String
 
 
 
