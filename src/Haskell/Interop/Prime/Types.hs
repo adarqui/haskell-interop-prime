@@ -36,7 +36,7 @@ import           Language.Haskell.TH
 data Lang
   = LangPurescript
   | LangHaskell
-  deriving (Show)
+  deriving (Show, Eq, Ord, Enum)
 
 
 
@@ -53,7 +53,7 @@ data Mk
   | MkRespondable
   | MkIsForeign
   | MkShow
-  deriving (Show)
+  deriving (Show, Eq, Ord, Enum)
 
 
 
@@ -65,7 +65,7 @@ data MkG
   | MkGLensFields
   | MkGHeader String
   | MkGFooter String
-  deriving (Show)
+  deriving (Show, Eq, Ord)
 
 
 
