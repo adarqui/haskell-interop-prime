@@ -38,6 +38,7 @@ data BigRecord = BigRecord {
   bigRecordInteger      :: Integer,
   bigRecordMaybeInteger :: Maybe Integer,
   bigRecordString       :: String,
+  bigRecordString2      :: [Char],
   bigRecordSumType      :: SumType,
   bigRecordData         :: String,
   bigRecordClass        :: String,

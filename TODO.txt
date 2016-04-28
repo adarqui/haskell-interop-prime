@@ -4,3 +4,6 @@ generate:
 - optparse-generic cli
 - persistent config models
 - request to response?
+
+fixes:
+- Array Char -> String
