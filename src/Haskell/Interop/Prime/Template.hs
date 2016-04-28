@@ -478,14 +478,14 @@ tplEq_SumType_Field InteropOptions{..} field vars =
     then
       spaces si1
       ++
-      printf "eq (%s) (%s) = \"true\"" field field
+      printf "eq (%s) (%s) = true" field field
     else
       spaces si1
       ++
       printf "eq (%s %s) (%s %s) = %s"
         field (intercalate " " vars'a)
         field (intercalate " " vars'b)
-        (intercalateMap " && " (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))
+        (intercalateMap (" && " :: String) (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))
   )
   ++ "\n"
   where
