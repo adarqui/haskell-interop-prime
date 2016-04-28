@@ -95,6 +95,9 @@ instance sessionIsForeign :: IsForeign Session where
 instance sessionShow :: Show Session where
     show (Session o) = show "unSession: " ++ show o.unSession
 
+instance sessionEq :: Eq Session where
+  eq (Session a) (Session b) = a.unSession == b.unSession
+
 data SumType
   = A 
   | B Int
@@ -285,6 +288,17 @@ instance sumTypeShow :: Show SumType where
   show (H x0 x1 x2 x3) = "H: " ++ show x0 ++ " " ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3
 
 
+instance sumTypeEq :: Eq SumType where
+  eq (A) (A) = "true"
+  eq (B x0a) (B x0b) = x0a == x0b
+  eq (C x0a) (C x0b) = x0a == x0b
+  eq (D x0a) (D x0b) = x0a == x0b
+  eq (E x0a) (E x0b) = x0a == x0b
+  eq (F x0a) (F x0b) = x0a == x0b
+  eq (G x0a) (G x0b) = x0a == x0b
+  eq (H x0a x1a x2a x3a) (H x0b x1b x2b x3b) = x0a == x0b && x1a == x1b && x2a == x2b && x3a == x3b
+  eq _ _ = false
+
 newtype BigRecord = BigRecord {
   bool :: Boolean,
   int :: Int,
@@ -446,6 +460,9 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
 instance bigRecordShow :: Show BigRecord where
     show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "data': " ++ show o.data' ++ ", " ++ show "class': " ++ show o.class' ++ ", " ++ show "let': " ++ show o.let' ++ ", " ++ show "module': " ++ show o.module' ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
 
+instance bigRecordEq :: Eq BigRecord where
+  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.sumType == b.sumType && a.data' == b.data' && a.class' == b.class' && a.let' == b.let' && a.module' == b.module' && a.bigRecord == b.bigRecord
+
 type FakeUTCTime = Int
 
 
@@ -530,6 +547,9 @@ instance userIsForeign :: IsForeign User where
 instance userShow :: Show User where
     show (User o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
 
+instance userEq :: Eq User where
+  eq (User a) (User b) = a.name == b.name && a.email == b.email
+
 newtype UserRequest = UserRequest {
   name :: String,
   email :: String
@@ -610,6 +630,9 @@ instance userRequestIsForeign :: IsForeign UserRequest where
 
 instance userRequestShow :: Show UserRequest where
     show (UserRequest o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
+
+instance userRequestEq :: Eq UserRequest where
+  eq (UserRequest a) (UserRequest b) = a.name == b.name && a.email == b.email
 
 newtype UserResponse = UserResponse {
   id :: Int,
@@ -716,6 +739,9 @@ instance userResponseIsForeign :: IsForeign UserResponse where
 instance userResponseShow :: Show UserResponse where
     show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
 
+instance userResponseEq :: Eq UserResponse where
+  eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
+
 type Text = String
 
 
@@ -794,6 +820,9 @@ instance funkyRecordIsForeign :: IsForeign FunkyRecord where
 
 instance funkyRecordShow :: Show FunkyRecord where
     show (Boom1 o) = show "boom1: " ++ show o.boom1
+
+instance funkyRecordEq :: Eq FunkyRecord where
+  eq (Boom1 a) (Boom1 b) = a.boom1 == b.boom1
 
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
