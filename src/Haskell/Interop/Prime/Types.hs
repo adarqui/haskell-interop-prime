@@ -53,6 +53,7 @@ data Mk
   | MkRespondable
   | MkIsForeign
   | MkShow
+  | MkEq
   deriving (Show, Eq, Ord, Enum)
 
 

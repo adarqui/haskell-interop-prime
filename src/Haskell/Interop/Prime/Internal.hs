@@ -187,6 +187,18 @@ buildShow = do
 
 
 
+buildEq :: ExportT (Maybe String)
+buildEq = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base constr fields -> Just $ tplEq_Rec opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplEq_Rec opts base constr fields
+      DataNormalIR base fields        -> Just $ tplEq_SumType opts base fields
+      _                               -> Nothing
+
+
+
 runMk :: Mk -> ExportT (Maybe String)
 runMk mk = do
   case mk of
@@ -202,6 +214,7 @@ runMk mk = do
     MkRespondable       -> buildRespondable
     MkIsForeign         -> buildIsForeign
     MkShow              -> buildShow
+    MkEq                -> buildEq
 
 
 

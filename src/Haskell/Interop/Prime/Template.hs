@@ -25,6 +25,8 @@ module Haskell.Interop.Prime.Template (
   tplIsForeign,
   tplShow_Rec,
   tplShow_SumType,
+  tplEq_Rec,
+  tplEq_SumType,
   tplImports,
   tplPurescriptImports,
   tplHaskellImports,
@@ -401,7 +403,7 @@ tplIsForeign InteropOptions{..} base =
 
 
 tplShow_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplShow_Rec opts@InteropOptions{..} base constr fields =
+tplShow_Rec InteropOptions{..} base constr fields =
      instance_decl
   ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s: \" ++ show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
@@ -441,8 +443,62 @@ tplShow_SumType_Field InteropOptions{..} field vars =
 
 
 
+tplEq_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplEq_Rec InteropOptions{..} base constr fields =
+     instance_decl
+  ++ intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  ++ spaces si1 ++ "eq _ _ = false"
+  where
+  si1 = spacingIndent
+  instance_decl =
+    case lang of
+      LangPurescript ->
+           printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
+        ++ spaces si1 ++ printf "eq (%s a) (%s b) = " constr constr
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplEq_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplEq_SumType opts@InteropOptions{..} base fields =
+     instance_decl
+  ++ concatMap (\(f,vars) -> tplEq_SumType_Field opts f vars) fields
+  ++ spaces si1 ++ "eq _ _ = false"
+  where
+  si1 = spacingIndent
+  instance_decl =
+    case lang of
+      LangPurescript -> printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
+      LangHaskell    -> haskellNotSupported
+
+
+
+tplEq_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplEq_SumType_Field InteropOptions{..} field vars =
+ (if null vars
+    then
+      spaces si1
+      ++
+      printf "eq (%s) (%s) = \"true\"" field field
+    else
+      spaces si1
+      ++
+      printf "eq (%s %s) (%s %s) = %s"
+        field (intercalate " " vars'a)
+        field (intercalate " " vars'b)
+        (intercalateMap " && " (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))
+  )
+  ++ "\n"
+  where
+  si1 = spacingIndent
+  vars'  = vars_x $ length vars
+  vars'a = map (++"a") vars'
+  vars'b = map (++"b") vars'
+
+
+
 tplImports :: InteropOptions -> String -> String
-tplImports opts@InteropOptions{..} =
+tplImports InteropOptions{..} =
   case lang of
     LangPurescript -> tplPurescriptImports
     LangHaskell    -> tplHaskellImports
@@ -492,7 +548,7 @@ tplHaskellImports s = (intercalate "\n"
 
 
 tplApiImports :: InteropOptions -> String -> String
-tplApiImports opts@InteropOptions{..} =
+tplApiImports InteropOptions{..} =
   case lang of
     LangPurescript -> tplPurescriptApiImports
     LangHaskell    -> tplHaskellApiImports
