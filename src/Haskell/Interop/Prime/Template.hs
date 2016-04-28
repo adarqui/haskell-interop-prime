@@ -723,7 +723,7 @@ tplApiParam_ByName :: InteropOptions -> ApiParam -> String
 tplApiParam_ByName _ param =
   case param of
     Par _            -> ""
-    ParBy name _     -> "_By" <> name
+    ParBy name _     -> "_" <> name
     ParNone          -> ""
 
 
@@ -741,7 +741,7 @@ tplApiParam_By :: InteropOptions -> ApiParam -> String
 tplApiParam_By opts@InteropOptions{..} param =
   case param of
     Par _            -> ""
-    ParBy name _     -> printf "By%s %s" name (tplApiParam_ByName opts param)
+    ParBy name _     -> printf "%s %s" name (tplApiParam_ByName opts param)
     ParNone          -> ""
 
 
