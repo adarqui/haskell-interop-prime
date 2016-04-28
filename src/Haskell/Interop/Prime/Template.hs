@@ -634,7 +634,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
 tplEmptyQueryParams :: InteropOptions -> String
 tplEmptyQueryParams InteropOptions{..} =
   case lang of
-    LangPurescript -> "[]"
+    LangPurescript -> "([] :: Array Boolean)"
     LangHaskell    -> "([] :: [(String, String)])"
 
 
