@@ -2,12 +2,15 @@ module Interop.Api where
 
 
 import Purescript.Api.Helpers
+import Prelude
+import Data.Either
+import Data.Tuple
 
 getUsers :: forall qp. QueryParam qp => Array qp -> ApiEff (Either ApiError UserResponses)
 getUsers params = handleError <$> getAt params ["users"]
 
 getUsers' :: ApiEff (Either ApiError UserResponses)
-getUsers'  = handleError <$> getAt [] ["users"]
+getUsers'  = handleError <$> getAt ([] :: Array Boolean) ["users"]
 
 getUsers_UsersIds :: forall qp. QueryParam qp => Array qp -> (Array  Int) -> ApiEff (Either ApiError UserResponses)
 getUsers_UsersIds params _UsersIds = handleError <$> getAt (map qp params ++ map qp [UsersIds _UsersIds]) ["users"]
@@ -31,24 +34,24 @@ postUser :: forall qp. QueryParam qp => Array qp -> UserRequest -> ApiEff (Eithe
 postUser params user_request = handleError <$> postAt params ["user"] user_request
 
 postUser' :: UserRequest -> ApiEff (Either ApiError UserResponse)
-postUser' user_request = handleError <$> postAt [] ["user"] user_request
+postUser' user_request = handleError <$> postAt ([] :: Array Boolean) ["user"] user_request
 
 getUser :: forall qp. QueryParam qp => Array qp -> Int -> ApiEff (Either ApiError UserResponse)
 getUser params user_id = handleError <$> getAt params ["user", show user_id]
 
 getUser' :: Int -> ApiEff (Either ApiError UserResponse)
-getUser' user_id = handleError <$> getAt [] ["user", show user_id]
+getUser' user_id = handleError <$> getAt ([] :: Array Boolean) ["user", show user_id]
 
 putUser :: forall qp. QueryParam qp => Array qp -> Int -> UserRequest -> ApiEff (Either ApiError UserResponse)
 putUser params user_id user_request = handleError <$> putAt params ["user", show user_id] user_request
 
 putUser' :: Int -> UserRequest -> ApiEff (Either ApiError UserResponse)
-putUser' user_id user_request = handleError <$> putAt [] ["user", show user_id] user_request
+putUser' user_id user_request = handleError <$> putAt ([] :: Array Boolean) ["user", show user_id] user_request
 
 deleteUser :: forall qp. QueryParam qp => Array qp -> Int -> ApiEff (Either ApiError Unit)
 deleteUser params user_id = handleError <$> deleteAt params ["user", show user_id]
 
 deleteUser' :: Int -> ApiEff (Either ApiError Unit)
-deleteUser' user_id = handleError <$> deleteAt [] ["user", show user_id]
+deleteUser' user_id = handleError <$> deleteAt ([] :: Array Boolean) ["user", show user_id]
 
 -- footer
