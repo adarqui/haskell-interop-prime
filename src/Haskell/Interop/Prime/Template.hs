@@ -447,7 +447,6 @@ tplEq_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplEq_Rec InteropOptions{..} base constr fields =
      instance_decl
   ++ intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
-  ++ spaces si1 ++ "eq _ _ = false"
   where
   si1 = spacingIndent
   instance_decl =
