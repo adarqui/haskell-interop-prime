@@ -7,7 +7,7 @@ import Data.Argonaut.Core
 import Data.Argonaut.Decode
 import Data.Argonaut.Encode
 import Data.Argonaut.Printer
-import Data.Date
+import Data.Date.Helpers
 import Data.Either
 import Data.Foreign (readString)
 import Data.Foreign.Class
@@ -91,6 +91,9 @@ instance sessionIsForeign :: IsForeign Session where
     Right s -> readJSON s
     Left er -> Left er
 
+
+instance sessionShow :: Show Session where
+    show (Session o) = show "unSession: " ++ show o.unSession
 
 data SumType
   = A 
@@ -440,6 +443,9 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
     Left er -> Left er
 
 
+instance bigRecordShow :: Show BigRecord where
+    show (BigRecord o) = show "bigRecordBool: " ++ show o.bigRecordBool ++ ", " ++ show "bigRecordInt: " ++ show o.bigRecordInt ++ ", " ++ show "bigRecordMaybeInt: " ++ show o.bigRecordMaybeInt ++ ", " ++ show "bigRecordInteger: " ++ show o.bigRecordInteger ++ ", " ++ show "bigRecordMaybeInteger: " ++ show o.bigRecordMaybeInteger ++ ", " ++ show "bigRecordString: " ++ show o.bigRecordString ++ ", " ++ show "bigRecordSumType: " ++ show o.bigRecordSumType ++ ", " ++ show "bigRecordData: " ++ show o.bigRecordData ++ ", " ++ show "bigRecordClass: " ++ show o.bigRecordClass ++ ", " ++ show "bigRecordLet: " ++ show o.bigRecordLet ++ ", " ++ show "bigRecordModule: " ++ show o.bigRecordModule ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+
 type FakeUTCTime = Int
 
 
@@ -521,6 +527,9 @@ instance userIsForeign :: IsForeign User where
     Left er -> Left er
 
 
+instance userShow :: Show User where
+    show (User o) = show "userName: " ++ show o.userName ++ ", " ++ show "userEmail: " ++ show o.userEmail
+
 newtype UserRequest = UserRequest {
   userRequestName :: String,
   userRequestEmail :: String
@@ -598,6 +607,9 @@ instance userRequestIsForeign :: IsForeign UserRequest where
     Right s -> readJSON s
     Left er -> Left er
 
+
+instance userRequestShow :: Show UserRequest where
+    show (UserRequest o) = show "userRequestName: " ++ show o.userRequestName ++ ", " ++ show "userRequestEmail: " ++ show o.userRequestEmail
 
 newtype UserResponse = UserResponse {
   userResponseId :: Int,
@@ -701,6 +713,9 @@ instance userResponseIsForeign :: IsForeign UserResponse where
     Left er -> Left er
 
 
+instance userResponseShow :: Show UserResponse where
+    show (UserResponse o) = show "userResponseId: " ++ show o.userResponseId ++ ", " ++ show "userResponseName: " ++ show o.userResponseName ++ ", " ++ show "userResponseEmail: " ++ show o.userResponseEmail ++ ", " ++ show "userResponseCreatedAt: " ++ show o.userResponseCreatedAt ++ ", " ++ show "userResponseModifiedAt: " ++ show o.userResponseModifiedAt
+
 type Text = String
 
 
@@ -777,24 +792,47 @@ instance funkyRecordIsForeign :: IsForeign FunkyRecord where
     Left er -> Left er
 
 
+instance funkyRecordShow :: Show FunkyRecord where
+    show (Boom1 o) = show "boom1: " ++ show o.boom1
+
+bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
+bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
+
+
 bigRecordBool_ :: forall b a r. Lens { bigRecordBool :: a | r } { bigRecordBool :: b | r } a b
 bigRecordBool_ f o = o { bigRecordBool = _ } <$> f o.bigRecordBool
+
+
+bigRecordClass_ :: forall b a r. Lens { bigRecordClass :: a | r } { bigRecordClass :: b | r } a b
+bigRecordClass_ f o = o { bigRecordClass = _ } <$> f o.bigRecordClass
+
+
+bigRecordData_ :: forall b a r. Lens { bigRecordData :: a | r } { bigRecordData :: b | r } a b
+bigRecordData_ f o = o { bigRecordData = _ } <$> f o.bigRecordData
 
 
 bigRecordInt_ :: forall b a r. Lens { bigRecordInt :: a | r } { bigRecordInt :: b | r } a b
 bigRecordInt_ f o = o { bigRecordInt = _ } <$> f o.bigRecordInt
 
 
-bigRecordMaybeInt_ :: forall b a r. Lens { bigRecordMaybeInt :: a | r } { bigRecordMaybeInt :: b | r } a b
-bigRecordMaybeInt_ f o = o { bigRecordMaybeInt = _ } <$> f o.bigRecordMaybeInt
-
-
 bigRecordInteger_ :: forall b a r. Lens { bigRecordInteger :: a | r } { bigRecordInteger :: b | r } a b
 bigRecordInteger_ f o = o { bigRecordInteger = _ } <$> f o.bigRecordInteger
 
 
+bigRecordLet_ :: forall b a r. Lens { bigRecordLet :: a | r } { bigRecordLet :: b | r } a b
+bigRecordLet_ f o = o { bigRecordLet = _ } <$> f o.bigRecordLet
+
+
+bigRecordMaybeInt_ :: forall b a r. Lens { bigRecordMaybeInt :: a | r } { bigRecordMaybeInt :: b | r } a b
+bigRecordMaybeInt_ f o = o { bigRecordMaybeInt = _ } <$> f o.bigRecordMaybeInt
+
+
 bigRecordMaybeInteger_ :: forall b a r. Lens { bigRecordMaybeInteger :: a | r } { bigRecordMaybeInteger :: b | r } a b
 bigRecordMaybeInteger_ f o = o { bigRecordMaybeInteger = _ } <$> f o.bigRecordMaybeInteger
+
+
+bigRecordModule_ :: forall b a r. Lens { bigRecordModule :: a | r } { bigRecordModule :: b | r } a b
+bigRecordModule_ f o = o { bigRecordModule = _ } <$> f o.bigRecordModule
 
 
 bigRecordString_ :: forall b a r. Lens { bigRecordString :: a | r } { bigRecordString :: b | r } a b
@@ -805,26 +843,6 @@ bigRecordSumType_ :: forall b a r. Lens { bigRecordSumType :: a | r } { bigRecor
 bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
 
 
-bigRecordData_ :: forall b a r. Lens { bigRecordData :: a | r } { bigRecordData :: b | r } a b
-bigRecordData_ f o = o { bigRecordData = _ } <$> f o.bigRecordData
-
-
-bigRecordClass_ :: forall b a r. Lens { bigRecordClass :: a | r } { bigRecordClass :: b | r } a b
-bigRecordClass_ f o = o { bigRecordClass = _ } <$> f o.bigRecordClass
-
-
-bigRecordLet_ :: forall b a r. Lens { bigRecordLet :: a | r } { bigRecordLet :: b | r } a b
-bigRecordLet_ f o = o { bigRecordLet = _ } <$> f o.bigRecordLet
-
-
-bigRecordModule_ :: forall b a r. Lens { bigRecordModule :: a | r } { bigRecordModule :: b | r } a b
-bigRecordModule_ f o = o { bigRecordModule = _ } <$> f o.bigRecordModule
-
-
-bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
-bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
-
-
 boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
 boom1_ f o = o { boom1 = _ } <$> f o.boom1
 
@@ -833,39 +851,39 @@ unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a
 unSession_ f o = o { unSession = _ } <$> f o.unSession
 
 
-userName_ :: forall b a r. Lens { userName :: a | r } { userName :: b | r } a b
-userName_ f o = o { userName = _ } <$> f o.userName
-
-
 userEmail_ :: forall b a r. Lens { userEmail :: a | r } { userEmail :: b | r } a b
 userEmail_ f o = o { userEmail = _ } <$> f o.userEmail
 
 
-userRequestName_ :: forall b a r. Lens { userRequestName :: a | r } { userRequestName :: b | r } a b
-userRequestName_ f o = o { userRequestName = _ } <$> f o.userRequestName
+userName_ :: forall b a r. Lens { userName :: a | r } { userName :: b | r } a b
+userName_ f o = o { userName = _ } <$> f o.userName
 
 
 userRequestEmail_ :: forall b a r. Lens { userRequestEmail :: a | r } { userRequestEmail :: b | r } a b
 userRequestEmail_ f o = o { userRequestEmail = _ } <$> f o.userRequestEmail
 
 
-userResponseId_ :: forall b a r. Lens { userResponseId :: a | r } { userResponseId :: b | r } a b
-userResponseId_ f o = o { userResponseId = _ } <$> f o.userResponseId
-
-
-userResponseName_ :: forall b a r. Lens { userResponseName :: a | r } { userResponseName :: b | r } a b
-userResponseName_ f o = o { userResponseName = _ } <$> f o.userResponseName
-
-
-userResponseEmail_ :: forall b a r. Lens { userResponseEmail :: a | r } { userResponseEmail :: b | r } a b
-userResponseEmail_ f o = o { userResponseEmail = _ } <$> f o.userResponseEmail
+userRequestName_ :: forall b a r. Lens { userRequestName :: a | r } { userRequestName :: b | r } a b
+userRequestName_ f o = o { userRequestName = _ } <$> f o.userRequestName
 
 
 userResponseCreatedAt_ :: forall b a r. Lens { userResponseCreatedAt :: a | r } { userResponseCreatedAt :: b | r } a b
 userResponseCreatedAt_ f o = o { userResponseCreatedAt = _ } <$> f o.userResponseCreatedAt
 
 
+userResponseEmail_ :: forall b a r. Lens { userResponseEmail :: a | r } { userResponseEmail :: b | r } a b
+userResponseEmail_ f o = o { userResponseEmail = _ } <$> f o.userResponseEmail
+
+
+userResponseId_ :: forall b a r. Lens { userResponseId :: a | r } { userResponseId :: b | r } a b
+userResponseId_ f o = o { userResponseId = _ } <$> f o.userResponseId
+
+
 userResponseModifiedAt_ :: forall b a r. Lens { userResponseModifiedAt :: a | r } { userResponseModifiedAt :: b | r } a b
 userResponseModifiedAt_ f o = o { userResponseModifiedAt = _ } <$> f o.userResponseModifiedAt
+
+
+userResponseName_ :: forall b a r. Lens { userResponseName :: a | r } { userResponseName :: b | r } a b
+userResponseName_ f o = o { userResponseName = _ } <$> f o.userResponseName
 
 -- footer

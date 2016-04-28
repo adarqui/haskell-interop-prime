@@ -7,7 +7,7 @@ import Data.Argonaut.Core
 import Data.Argonaut.Decode
 import Data.Argonaut.Encode
 import Data.Argonaut.Printer
-import Data.Date
+import Data.Date.Helpers
 import Data.Either
 import Data.Foreign (readString)
 import Data.Foreign.Class
@@ -91,6 +91,9 @@ instance sessionIsForeign :: IsForeign Session where
     Right s -> readJSON s
     Left er -> Left er
 
+
+instance sessionShow :: Show Session where
+    show (Session o) = show "unSession: " ++ show o.unSession
 
 data SumType
   = A 
@@ -440,6 +443,9 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
     Left er -> Left er
 
 
+instance bigRecordShow :: Show BigRecord where
+    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "data': " ++ show o.data' ++ ", " ++ show "class': " ++ show o.class' ++ ", " ++ show "let': " ++ show o.let' ++ ", " ++ show "module': " ++ show o.module' ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+
 type FakeUTCTime = Int
 
 
@@ -521,6 +527,9 @@ instance userIsForeign :: IsForeign User where
     Left er -> Left er
 
 
+instance userShow :: Show User where
+    show (User o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
+
 newtype UserRequest = UserRequest {
   name :: String,
   email :: String
@@ -598,6 +607,9 @@ instance userRequestIsForeign :: IsForeign UserRequest where
     Right s -> readJSON s
     Left er -> Left er
 
+
+instance userRequestShow :: Show UserRequest where
+    show (UserRequest o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
 
 newtype UserResponse = UserResponse {
   id :: Int,
@@ -701,6 +713,9 @@ instance userResponseIsForeign :: IsForeign UserResponse where
     Left er -> Left er
 
 
+instance userResponseShow :: Show UserResponse where
+    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
+
 type Text = String
 
 
@@ -777,24 +792,71 @@ instance funkyRecordIsForeign :: IsForeign FunkyRecord where
     Left er -> Left er
 
 
+instance funkyRecordShow :: Show FunkyRecord where
+    show (Boom1 o) = show "boom1: " ++ show o.boom1
+
+bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
+bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
+
+
 bool_ :: forall b a r. Lens { bool :: a | r } { bool :: b | r } a b
 bool_ f o = o { bool = _ } <$> f o.bool
+
+
+boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
+boom1_ f o = o { boom1 = _ } <$> f o.boom1
+
+
+class'_ :: forall b a r. Lens { class' :: a | r } { class' :: b | r } a b
+class'_ f o = o { class' = _ } <$> f o.class'
+
+
+createdAt_ :: forall b a r. Lens { createdAt :: a | r } { createdAt :: b | r } a b
+createdAt_ f o = o { createdAt = _ } <$> f o.createdAt
+
+
+data'_ :: forall b a r. Lens { data' :: a | r } { data' :: b | r } a b
+data'_ f o = o { data' = _ } <$> f o.data'
+
+
+email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
+email_ f o = o { email = _ } <$> f o.email
+
+
+id_ :: forall b a r. Lens { id :: a | r } { id :: b | r } a b
+id_ f o = o { id = _ } <$> f o.id
 
 
 int_ :: forall b a r. Lens { int :: a | r } { int :: b | r } a b
 int_ f o = o { int = _ } <$> f o.int
 
 
-maybeInt_ :: forall b a r. Lens { maybeInt :: a | r } { maybeInt :: b | r } a b
-maybeInt_ f o = o { maybeInt = _ } <$> f o.maybeInt
-
-
 integer_ :: forall b a r. Lens { integer :: a | r } { integer :: b | r } a b
 integer_ f o = o { integer = _ } <$> f o.integer
 
 
+let'_ :: forall b a r. Lens { let' :: a | r } { let' :: b | r } a b
+let'_ f o = o { let' = _ } <$> f o.let'
+
+
+maybeInt_ :: forall b a r. Lens { maybeInt :: a | r } { maybeInt :: b | r } a b
+maybeInt_ f o = o { maybeInt = _ } <$> f o.maybeInt
+
+
 maybeInteger_ :: forall b a r. Lens { maybeInteger :: a | r } { maybeInteger :: b | r } a b
 maybeInteger_ f o = o { maybeInteger = _ } <$> f o.maybeInteger
+
+
+modifiedAt_ :: forall b a r. Lens { modifiedAt :: a | r } { modifiedAt :: b | r } a b
+modifiedAt_ f o = o { modifiedAt = _ } <$> f o.modifiedAt
+
+
+module'_ :: forall b a r. Lens { module' :: a | r } { module' :: b | r } a b
+module'_ f o = o { module' = _ } <$> f o.module'
+
+
+name_ :: forall b a r. Lens { name :: a | r } { name :: b | r } a b
+name_ f o = o { name = _ } <$> f o.name
 
 
 string_ :: forall b a r. Lens { string :: a | r } { string :: b | r } a b
@@ -803,58 +865,6 @@ string_ f o = o { string = _ } <$> f o.string
 
 sumType_ :: forall b a r. Lens { sumType :: a | r } { sumType :: b | r } a b
 sumType_ f o = o { sumType = _ } <$> f o.sumType
-
-
-data'_ :: forall b a r. Lens { data' :: a | r } { data' :: b | r } a b
-data'_ f o = o { data' = _ } <$> f o.data'
-
-
-class'_ :: forall b a r. Lens { class' :: a | r } { class' :: b | r } a b
-class'_ f o = o { class' = _ } <$> f o.class'
-
-
-let'_ :: forall b a r. Lens { let' :: a | r } { let' :: b | r } a b
-let'_ f o = o { let' = _ } <$> f o.let'
-
-
-module'_ :: forall b a r. Lens { module' :: a | r } { module' :: b | r } a b
-module'_ f o = o { module' = _ } <$> f o.module'
-
-
-bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
-bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
-
-
-boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
-boom1_ f o = o { boom1 = _ } <$> f o.boom1
-
-
-id_ :: forall b a r. Lens { id :: a | r } { id :: b | r } a b
-id_ f o = o { id = _ } <$> f o.id
-
-
-name_ :: forall b a r. Lens { name :: a | r } { name :: b | r } a b
-name_ f o = o { name = _ } <$> f o.name
-
-
-email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
-email_ f o = o { email = _ } <$> f o.email
-
-
-createdAt_ :: forall b a r. Lens { createdAt :: a | r } { createdAt :: b | r } a b
-createdAt_ f o = o { createdAt = _ } <$> f o.createdAt
-
-
-modifiedAt_ :: forall b a r. Lens { modifiedAt :: a | r } { modifiedAt :: b | r } a b
-modifiedAt_ f o = o { modifiedAt = _ } <$> f o.modifiedAt
-
-
-name_ :: forall b a r. Lens { name :: a | r } { name :: b | r } a b
-name_ f o = o { name = _ } <$> f o.name
-
-
-email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
-email_ f o = o { email = _ } <$> f o.email
 
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
