@@ -141,6 +141,7 @@ data ApiMethod
 data ApiParam
   = Par [(String, String)]
   | ParBy String String
+  | ParBoth [(String, String)] (String, String)
   | ParNone
   deriving (Show)
 
@@ -171,6 +172,7 @@ data ApiMethod_TH
 data ApiParam_TH
   = Par_TH [(String, Name)]
   | ParBy_TH String Name
+  | ParBoth_TH [(String, Name)] (String, Name)
   | ParNone_TH
   deriving (Show)
 
