@@ -177,11 +177,11 @@ defaultTypeMap =
 defaultReservedMap :: M.Map String String
 defaultReservedMap =
   M.fromList
-    [ ("data", "data'")
-    , ("type", "type'")
-    , ("class", "class'")
-    , ("module", "module'")
-    , ("let", "let'")
+    [ ("data", "dataP")
+    , ("type", "typeP")
+    , ("class", "classP")
+    , ("module", "moduleP")
+    , ("let", "letP")
     ]
 
 
