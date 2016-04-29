@@ -110,6 +110,7 @@ instance ToJSON BigRecord where
     , "bigRecordInteger" .= bigRecordInteger
     , "bigRecordMaybeInteger" .= bigRecordMaybeInteger
     , "bigRecordString" .= bigRecordString
+    , "bigRecordString2" .= bigRecordString2
     , "bigRecordSumType" .= bigRecordSumType
     , "bigRecordData" .= bigRecordData
     , "bigRecordClass" .= bigRecordClass
@@ -127,6 +128,7 @@ instance FromJSON BigRecord where
     bigRecordInteger <- o .: "bigRecordInteger"
     bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
     bigRecordString <- o .: "bigRecordString"
+    bigRecordString2 <- o .: "bigRecordString2"
     bigRecordSumType <- o .: "bigRecordSumType"
     bigRecordData <- o .: "bigRecordData"
     bigRecordClass <- o .: "bigRecordClass"
@@ -140,6 +142,7 @@ instance FromJSON BigRecord where
       bigRecordInteger = bigRecordInteger,
       bigRecordMaybeInteger = bigRecordMaybeInteger,
       bigRecordString = bigRecordString,
+      bigRecordString2 = bigRecordString2,
       bigRecordSumType = bigRecordSumType,
       bigRecordData = bigRecordData,
       bigRecordClass = bigRecordClass,
@@ -155,6 +158,7 @@ instance ToJSON User where
     [ "tag" .= "User"
     , "userName" .= userName
     , "userEmail" .= userEmail
+    , "userActive" .= userActive
     ]
 
 
@@ -162,9 +166,11 @@ instance FromJSON User where
   parseJSON (Object o) = do
     userName <- o .: "userName"
     userEmail <- o .: "userEmail"
+    userActive <- o .: "userActive"
     return $ User {
       userName = userName,
-      userEmail = userEmail
+      userEmail = userEmail,
+      userActive = userActive
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -194,6 +200,7 @@ instance ToJSON UserResponse where
     , "userResponseId" .= userResponseId
     , "userResponseName" .= userResponseName
     , "userResponseEmail" .= userResponseEmail
+    , "userResponseActive" .= userResponseActive
     , "userResponseCreatedAt" .= userResponseCreatedAt
     , "userResponseModifiedAt" .= userResponseModifiedAt
     ]
@@ -204,12 +211,14 @@ instance FromJSON UserResponse where
     userResponseId <- o .: "userResponseId"
     userResponseName <- o .: "userResponseName"
     userResponseEmail <- o .: "userResponseEmail"
+    userResponseActive <- o .: "userResponseActive"
     userResponseCreatedAt <- o .: "userResponseCreatedAt"
     userResponseModifiedAt <- o .: "userResponseModifiedAt"
     return $ UserResponse {
       userResponseId = userResponseId,
       userResponseName = userResponseName,
       userResponseEmail = userResponseEmail,
+      userResponseActive = userResponseActive,
       userResponseCreatedAt = userResponseCreatedAt,
       userResponseModifiedAt = userResponseModifiedAt
     }

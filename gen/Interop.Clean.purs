@@ -289,7 +289,7 @@ instance sumTypeShow :: Show SumType where
 
 
 instance sumTypeEq :: Eq SumType where
-  eq (A) (A) = "true"
+  eq (A) (A) = true
   eq (B x0a) (B x0b) = x0a == x0b
   eq (C x0a) (C x0b) = x0a == x0b
   eq (D x0a) (D x0b) = x0a == x0b
@@ -306,6 +306,7 @@ newtype BigRecord = BigRecord {
   integer :: Int,
   maybeInteger :: (Maybe Int),
   string :: String,
+  string2 :: (Array  Char),
   sumType :: SumType,
   data' :: String,
   class' :: String,
@@ -322,6 +323,7 @@ _BigRecord :: LensP BigRecord {
   integer :: Int,
   maybeInteger :: (Maybe Int),
   string :: String,
+  string2 :: (Array  Char),
   sumType :: SumType,
   data' :: String,
   class' :: String,
@@ -332,9 +334,9 @@ _BigRecord :: LensP BigRecord {
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
-mkBigRecord bool int maybeInt integer maybeInteger string sumType data' class' let' module' bigRecord =
-  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, sumType, data', class', let', module', bigRecord}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> (Array  Char) -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
+mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType data' class' let' module' bigRecord =
+  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, data', class', let', module', bigRecord}
 
 
 unwrapBigRecord (BigRecord r) = r
@@ -348,6 +350,7 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "integer" .= v.integer
     , "maybe_integer" .= v.maybeInteger
     , "string" .= v.string
+    , "string2" .= v.string2
     , "sum_type" .= v.sumType
     , "data'" .= v.data'
     , "class'" .= v.class'
@@ -365,6 +368,7 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     integer <- o .: "integer"
     maybeInteger <- o .: "maybe_integer"
     string <- o .: "string"
+    string2 <- o .: "string2"
     sumType <- o .: "sum_type"
     data' <- o .: "data'"
     class' <- o .: "class'"
@@ -378,6 +382,7 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
       integer : integer,
       maybeInteger : maybeInteger,
       string : string,
+      string2 : string2,
       sumType : sumType,
       data' : data',
       class' : class',
@@ -397,6 +402,7 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "integer" := o.integer
     ~> "maybe_integer" := o.maybeInteger
     ~> "string" := o.string
+    ~> "string2" := o.string2
     ~> "sum_type" := o.sumType
     ~> "data'" := o.data'
     ~> "class'" := o.class'
@@ -415,6 +421,7 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     integer <- obj .? "integer"
     maybeInteger <- obj .? "maybe_integer"
     string <- obj .? "string"
+    string2 <- obj .? "string2"
     sumType <- obj .? "sum_type"
     data' <- obj .? "data'"
     class' <- obj .? "class'"
@@ -428,6 +435,7 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       integer,
       maybeInteger,
       string,
+      string2,
       sumType,
       data',
       class',
@@ -458,30 +466,32 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "data': " ++ show o.data' ++ ", " ++ show "class': " ++ show o.class' ++ ", " ++ show "let': " ++ show o.let' ++ ", " ++ show "module': " ++ show o.module' ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "string2: " ++ show o.string2 ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "data': " ++ show o.data' ++ ", " ++ show "class': " ++ show o.class' ++ ", " ++ show "let': " ++ show o.let' ++ ", " ++ show "module': " ++ show o.module' ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
-  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.sumType == b.sumType && a.data' == b.data' && a.class' == b.class' && a.let' == b.let' && a.module' == b.module' && a.bigRecord == b.bigRecord
+  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.data' == b.data' && a.class' == b.class' && a.let' == b.let' && a.module' == b.module' && a.bigRecord == b.bigRecord
 
 type FakeUTCTime = Int
 
 
 newtype User = User {
   name :: String,
-  email :: String
+  email :: String,
+  active :: Boolean
 }
 
 
 _User :: LensP User {
   name :: String,
-  email :: String
+  email :: String,
+  active :: Boolean
 }
 _User f (User o) = User <$> f o
 
 
-mkUser :: String -> String -> User
-mkUser name email =
-  User{name, email}
+mkUser :: String -> String -> Boolean -> User
+mkUser name email active =
+  User{name, email, active}
 
 
 unwrapUser (User r) = r
@@ -491,6 +501,7 @@ instance userToJson :: ToJSON User where
     [ "tag" .= "User"
     , "name" .= v.name
     , "email" .= v.email
+    , "active" .= v.active
     ]
 
 
@@ -498,9 +509,11 @@ instance userFromJSON :: FromJSON User where
   parseJSON (JObject o) = do
     name <- o .: "name"
     email <- o .: "email"
+    active <- o .: "active"
     return $ User {
       name : name,
-      email : email
+      email : email,
+      active : active
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -510,6 +523,7 @@ instance userEncodeJson :: EncodeJson User where
        "tag" := "User"
     ~> "name" := o.name
     ~> "email" := o.email
+    ~> "active" := o.active
     ~> jsonEmptyObject
 
 
@@ -518,9 +532,11 @@ instance userDecodeJson :: DecodeJson User where
     obj <- decodeJson o
     name <- obj .? "name"
     email <- obj .? "email"
+    active <- obj .? "active"
     pure $ User {
       name,
-      email
+      email,
+      active
     }
 
 
@@ -545,10 +561,10 @@ instance userIsForeign :: IsForeign User where
 
 
 instance userShow :: Show User where
-    show (User o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
+    show (User o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active
 
 instance userEq :: Eq User where
-  eq (User a) (User b) = a.name == b.name && a.email == b.email
+  eq (User a) (User b) = a.name == b.name && a.email == b.email && a.active == b.active
 
 newtype UserRequest = UserRequest {
   name :: String,
@@ -638,6 +654,7 @@ newtype UserResponse = UserResponse {
   id :: Int,
   name :: String,
   email :: String,
+  active :: Boolean,
   createdAt :: (Maybe FakeUTCTime),
   modifiedAt :: (Maybe FakeUTCTime)
 }
@@ -647,15 +664,16 @@ _UserResponse :: LensP UserResponse {
   id :: Int,
   name :: String,
   email :: String,
+  active :: Boolean,
   createdAt :: (Maybe FakeUTCTime),
   modifiedAt :: (Maybe FakeUTCTime)
 }
 _UserResponse f (UserResponse o) = UserResponse <$> f o
 
 
-mkUserResponse :: Int -> String -> String -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
-mkUserResponse id name email createdAt modifiedAt =
-  UserResponse{id, name, email, createdAt, modifiedAt}
+mkUserResponse :: Int -> String -> String -> Boolean -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
+mkUserResponse id name email active createdAt modifiedAt =
+  UserResponse{id, name, email, active, createdAt, modifiedAt}
 
 
 unwrapUserResponse (UserResponse r) = r
@@ -666,6 +684,7 @@ instance userResponseToJson :: ToJSON UserResponse where
     , "id" .= v.id
     , "name" .= v.name
     , "email" .= v.email
+    , "active" .= v.active
     , "created_at" .= v.createdAt
     , "modified_at" .= v.modifiedAt
     ]
@@ -676,12 +695,14 @@ instance userResponseFromJSON :: FromJSON UserResponse where
     id <- o .: "id"
     name <- o .: "name"
     email <- o .: "email"
+    active <- o .: "active"
     createdAt <- o .: "created_at"
     modifiedAt <- o .: "modified_at"
     return $ UserResponse {
       id : id,
       name : name,
       email : email,
+      active : active,
       createdAt : createdAt,
       modifiedAt : modifiedAt
     }
@@ -694,6 +715,7 @@ instance userResponseEncodeJson :: EncodeJson UserResponse where
     ~> "id" := o.id
     ~> "name" := o.name
     ~> "email" := o.email
+    ~> "active" := o.active
     ~> "created_at" := o.createdAt
     ~> "modified_at" := o.modifiedAt
     ~> jsonEmptyObject
@@ -705,12 +727,14 @@ instance userResponseDecodeJson :: DecodeJson UserResponse where
     id <- obj .? "id"
     name <- obj .? "name"
     email <- obj .? "email"
+    active <- obj .? "active"
     createdAt <- obj .? "created_at"
     modifiedAt <- obj .? "modified_at"
     pure $ UserResponse {
       id,
       name,
       email,
+      active,
       createdAt,
       modifiedAt
     }
@@ -737,10 +761,10 @@ instance userResponseIsForeign :: IsForeign UserResponse where
 
 
 instance userResponseShow :: Show UserResponse where
-    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
+    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
 
 instance userResponseEq :: Eq UserResponse where
-  eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
+  eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.active == b.active && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
 
 type Text = String
 
@@ -824,6 +848,10 @@ instance funkyRecordShow :: Show FunkyRecord where
 instance funkyRecordEq :: Eq FunkyRecord where
   eq (Boom1 a) (Boom1 b) = a.boom1 == b.boom1
 
+active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
+active_ f o = o { active = _ } <$> f o.active
+
+
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
@@ -890,6 +918,10 @@ name_ f o = o { name = _ } <$> f o.name
 
 string_ :: forall b a r. Lens { string :: a | r } { string :: b | r } a b
 string_ f o = o { string = _ } <$> f o.string
+
+
+string2_ :: forall b a r. Lens { string2 :: a | r } { string2 :: b | r } a b
+string2_ f o = o { string2 = _ } <$> f o.string2
 
 
 sumType_ :: forall b a r. Lens { sumType :: a | r } { sumType :: b | r } a b

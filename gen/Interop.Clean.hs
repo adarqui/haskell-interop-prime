@@ -110,6 +110,7 @@ instance ToJSON BigRecord where
     , "integer" .= integer
     , "maybe_integer" .= maybeInteger
     , "string" .= string
+    , "string2" .= string2
     , "sum_type" .= sumType
     , "data'" .= data'
     , "class'" .= class'
@@ -127,6 +128,7 @@ instance FromJSON BigRecord where
     integer <- o .: "integer"
     maybeInteger <- o .: "maybe_integer"
     string <- o .: "string"
+    string2 <- o .: "string2"
     sumType <- o .: "sum_type"
     data' <- o .: "data'"
     class' <- o .: "class'"
@@ -140,6 +142,7 @@ instance FromJSON BigRecord where
       integer = integer,
       maybeInteger = maybeInteger,
       string = string,
+      string2 = string2,
       sumType = sumType,
       data' = data',
       class' = class',
@@ -155,6 +158,7 @@ instance ToJSON User where
     [ "tag" .= "User"
     , "name" .= name
     , "email" .= email
+    , "active" .= active
     ]
 
 
@@ -162,9 +166,11 @@ instance FromJSON User where
   parseJSON (Object o) = do
     name <- o .: "name"
     email <- o .: "email"
+    active <- o .: "active"
     return $ User {
       name = name,
-      email = email
+      email = email,
+      active = active
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -194,6 +200,7 @@ instance ToJSON UserResponse where
     , "id" .= id
     , "name" .= name
     , "email" .= email
+    , "active" .= active
     , "created_at" .= createdAt
     , "modified_at" .= modifiedAt
     ]
@@ -204,12 +211,14 @@ instance FromJSON UserResponse where
     id <- o .: "id"
     name <- o .: "name"
     email <- o .: "email"
+    active <- o .: "active"
     createdAt <- o .: "created_at"
     modifiedAt <- o .: "modified_at"
     return $ UserResponse {
       id = id,
       name = name,
       email = email,
+      active = active,
       createdAt = createdAt,
       modifiedAt = modifiedAt
     }

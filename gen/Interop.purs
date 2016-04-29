@@ -289,7 +289,7 @@ instance sumTypeShow :: Show SumType where
 
 
 instance sumTypeEq :: Eq SumType where
-  eq (A) (A) = "true"
+  eq (A) (A) = true
   eq (B x0a) (B x0b) = x0a == x0b
   eq (C x0a) (C x0b) = x0a == x0b
   eq (D x0a) (D x0b) = x0a == x0b
@@ -306,6 +306,7 @@ newtype BigRecord = BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
+  bigRecordString2 :: (Array  Char),
   bigRecordSumType :: SumType,
   bigRecordData :: String,
   bigRecordClass :: String,
@@ -322,6 +323,7 @@ _BigRecord :: LensP BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
+  bigRecordString2 :: (Array  Char),
   bigRecordSumType :: SumType,
   bigRecordData :: String,
   bigRecordClass :: String,
@@ -332,9 +334,9 @@ _BigRecord :: LensP BigRecord {
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
-mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecord =
-  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecord}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> (Array  Char) -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
+mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordString2 bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecord =
+  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordString2, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecord}
 
 
 unwrapBigRecord (BigRecord r) = r
@@ -348,6 +350,7 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "bigRecordInteger" .= v.bigRecordInteger
     , "bigRecordMaybeInteger" .= v.bigRecordMaybeInteger
     , "bigRecordString" .= v.bigRecordString
+    , "bigRecordString2" .= v.bigRecordString2
     , "bigRecordSumType" .= v.bigRecordSumType
     , "bigRecordData" .= v.bigRecordData
     , "bigRecordClass" .= v.bigRecordClass
@@ -365,6 +368,7 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     bigRecordInteger <- o .: "bigRecordInteger"
     bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
     bigRecordString <- o .: "bigRecordString"
+    bigRecordString2 <- o .: "bigRecordString2"
     bigRecordSumType <- o .: "bigRecordSumType"
     bigRecordData <- o .: "bigRecordData"
     bigRecordClass <- o .: "bigRecordClass"
@@ -378,6 +382,7 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
       bigRecordInteger : bigRecordInteger,
       bigRecordMaybeInteger : bigRecordMaybeInteger,
       bigRecordString : bigRecordString,
+      bigRecordString2 : bigRecordString2,
       bigRecordSumType : bigRecordSumType,
       bigRecordData : bigRecordData,
       bigRecordClass : bigRecordClass,
@@ -397,6 +402,7 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "bigRecordInteger" := o.bigRecordInteger
     ~> "bigRecordMaybeInteger" := o.bigRecordMaybeInteger
     ~> "bigRecordString" := o.bigRecordString
+    ~> "bigRecordString2" := o.bigRecordString2
     ~> "bigRecordSumType" := o.bigRecordSumType
     ~> "bigRecordData" := o.bigRecordData
     ~> "bigRecordClass" := o.bigRecordClass
@@ -415,6 +421,7 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     bigRecordInteger <- obj .? "bigRecordInteger"
     bigRecordMaybeInteger <- obj .? "bigRecordMaybeInteger"
     bigRecordString <- obj .? "bigRecordString"
+    bigRecordString2 <- obj .? "bigRecordString2"
     bigRecordSumType <- obj .? "bigRecordSumType"
     bigRecordData <- obj .? "bigRecordData"
     bigRecordClass <- obj .? "bigRecordClass"
@@ -428,6 +435,7 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       bigRecordInteger,
       bigRecordMaybeInteger,
       bigRecordString,
+      bigRecordString2,
       bigRecordSumType,
       bigRecordData,
       bigRecordClass,
@@ -458,30 +466,32 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bigRecordBool: " ++ show o.bigRecordBool ++ ", " ++ show "bigRecordInt: " ++ show o.bigRecordInt ++ ", " ++ show "bigRecordMaybeInt: " ++ show o.bigRecordMaybeInt ++ ", " ++ show "bigRecordInteger: " ++ show o.bigRecordInteger ++ ", " ++ show "bigRecordMaybeInteger: " ++ show o.bigRecordMaybeInteger ++ ", " ++ show "bigRecordString: " ++ show o.bigRecordString ++ ", " ++ show "bigRecordSumType: " ++ show o.bigRecordSumType ++ ", " ++ show "bigRecordData: " ++ show o.bigRecordData ++ ", " ++ show "bigRecordClass: " ++ show o.bigRecordClass ++ ", " ++ show "bigRecordLet: " ++ show o.bigRecordLet ++ ", " ++ show "bigRecordModule: " ++ show o.bigRecordModule ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+    show (BigRecord o) = show "bigRecordBool: " ++ show o.bigRecordBool ++ ", " ++ show "bigRecordInt: " ++ show o.bigRecordInt ++ ", " ++ show "bigRecordMaybeInt: " ++ show o.bigRecordMaybeInt ++ ", " ++ show "bigRecordInteger: " ++ show o.bigRecordInteger ++ ", " ++ show "bigRecordMaybeInteger: " ++ show o.bigRecordMaybeInteger ++ ", " ++ show "bigRecordString: " ++ show o.bigRecordString ++ ", " ++ show "bigRecordString2: " ++ show o.bigRecordString2 ++ ", " ++ show "bigRecordSumType: " ++ show o.bigRecordSumType ++ ", " ++ show "bigRecordData: " ++ show o.bigRecordData ++ ", " ++ show "bigRecordClass: " ++ show o.bigRecordClass ++ ", " ++ show "bigRecordLet: " ++ show o.bigRecordLet ++ ", " ++ show "bigRecordModule: " ++ show o.bigRecordModule ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
-  eq (BigRecord a) (BigRecord b) = a.bigRecordBool == b.bigRecordBool && a.bigRecordInt == b.bigRecordInt && a.bigRecordMaybeInt == b.bigRecordMaybeInt && a.bigRecordInteger == b.bigRecordInteger && a.bigRecordMaybeInteger == b.bigRecordMaybeInteger && a.bigRecordString == b.bigRecordString && a.bigRecordSumType == b.bigRecordSumType && a.bigRecordData == b.bigRecordData && a.bigRecordClass == b.bigRecordClass && a.bigRecordLet == b.bigRecordLet && a.bigRecordModule == b.bigRecordModule && a.bigRecord == b.bigRecord
+  eq (BigRecord a) (BigRecord b) = a.bigRecordBool == b.bigRecordBool && a.bigRecordInt == b.bigRecordInt && a.bigRecordMaybeInt == b.bigRecordMaybeInt && a.bigRecordInteger == b.bigRecordInteger && a.bigRecordMaybeInteger == b.bigRecordMaybeInteger && a.bigRecordString == b.bigRecordString && a.bigRecordString2 == b.bigRecordString2 && a.bigRecordSumType == b.bigRecordSumType && a.bigRecordData == b.bigRecordData && a.bigRecordClass == b.bigRecordClass && a.bigRecordLet == b.bigRecordLet && a.bigRecordModule == b.bigRecordModule && a.bigRecord == b.bigRecord
 
 type FakeUTCTime = Int
 
 
 newtype User = User {
   userName :: String,
-  userEmail :: String
+  userEmail :: String,
+  userActive :: Boolean
 }
 
 
 _User :: LensP User {
   userName :: String,
-  userEmail :: String
+  userEmail :: String,
+  userActive :: Boolean
 }
 _User f (User o) = User <$> f o
 
 
-mkUser :: String -> String -> User
-mkUser userName userEmail =
-  User{userName, userEmail}
+mkUser :: String -> String -> Boolean -> User
+mkUser userName userEmail userActive =
+  User{userName, userEmail, userActive}
 
 
 unwrapUser (User r) = r
@@ -491,6 +501,7 @@ instance userToJson :: ToJSON User where
     [ "tag" .= "User"
     , "userName" .= v.userName
     , "userEmail" .= v.userEmail
+    , "userActive" .= v.userActive
     ]
 
 
@@ -498,9 +509,11 @@ instance userFromJSON :: FromJSON User where
   parseJSON (JObject o) = do
     userName <- o .: "userName"
     userEmail <- o .: "userEmail"
+    userActive <- o .: "userActive"
     return $ User {
       userName : userName,
-      userEmail : userEmail
+      userEmail : userEmail,
+      userActive : userActive
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
@@ -510,6 +523,7 @@ instance userEncodeJson :: EncodeJson User where
        "tag" := "User"
     ~> "userName" := o.userName
     ~> "userEmail" := o.userEmail
+    ~> "userActive" := o.userActive
     ~> jsonEmptyObject
 
 
@@ -518,9 +532,11 @@ instance userDecodeJson :: DecodeJson User where
     obj <- decodeJson o
     userName <- obj .? "userName"
     userEmail <- obj .? "userEmail"
+    userActive <- obj .? "userActive"
     pure $ User {
       userName,
-      userEmail
+      userEmail,
+      userActive
     }
 
 
@@ -545,10 +561,10 @@ instance userIsForeign :: IsForeign User where
 
 
 instance userShow :: Show User where
-    show (User o) = show "userName: " ++ show o.userName ++ ", " ++ show "userEmail: " ++ show o.userEmail
+    show (User o) = show "userName: " ++ show o.userName ++ ", " ++ show "userEmail: " ++ show o.userEmail ++ ", " ++ show "userActive: " ++ show o.userActive
 
 instance userEq :: Eq User where
-  eq (User a) (User b) = a.userName == b.userName && a.userEmail == b.userEmail
+  eq (User a) (User b) = a.userName == b.userName && a.userEmail == b.userEmail && a.userActive == b.userActive
 
 newtype UserRequest = UserRequest {
   userRequestName :: String,
@@ -638,6 +654,7 @@ newtype UserResponse = UserResponse {
   userResponseId :: Int,
   userResponseName :: String,
   userResponseEmail :: String,
+  userResponseActive :: Boolean,
   userResponseCreatedAt :: (Maybe FakeUTCTime),
   userResponseModifiedAt :: (Maybe FakeUTCTime)
 }
@@ -647,15 +664,16 @@ _UserResponse :: LensP UserResponse {
   userResponseId :: Int,
   userResponseName :: String,
   userResponseEmail :: String,
+  userResponseActive :: Boolean,
   userResponseCreatedAt :: (Maybe FakeUTCTime),
   userResponseModifiedAt :: (Maybe FakeUTCTime)
 }
 _UserResponse f (UserResponse o) = UserResponse <$> f o
 
 
-mkUserResponse :: Int -> String -> String -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
-mkUserResponse userResponseId userResponseName userResponseEmail userResponseCreatedAt userResponseModifiedAt =
-  UserResponse{userResponseId, userResponseName, userResponseEmail, userResponseCreatedAt, userResponseModifiedAt}
+mkUserResponse :: Int -> String -> String -> Boolean -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
+mkUserResponse userResponseId userResponseName userResponseEmail userResponseActive userResponseCreatedAt userResponseModifiedAt =
+  UserResponse{userResponseId, userResponseName, userResponseEmail, userResponseActive, userResponseCreatedAt, userResponseModifiedAt}
 
 
 unwrapUserResponse (UserResponse r) = r
@@ -666,6 +684,7 @@ instance userResponseToJson :: ToJSON UserResponse where
     , "userResponseId" .= v.userResponseId
     , "userResponseName" .= v.userResponseName
     , "userResponseEmail" .= v.userResponseEmail
+    , "userResponseActive" .= v.userResponseActive
     , "userResponseCreatedAt" .= v.userResponseCreatedAt
     , "userResponseModifiedAt" .= v.userResponseModifiedAt
     ]
@@ -676,12 +695,14 @@ instance userResponseFromJSON :: FromJSON UserResponse where
     userResponseId <- o .: "userResponseId"
     userResponseName <- o .: "userResponseName"
     userResponseEmail <- o .: "userResponseEmail"
+    userResponseActive <- o .: "userResponseActive"
     userResponseCreatedAt <- o .: "userResponseCreatedAt"
     userResponseModifiedAt <- o .: "userResponseModifiedAt"
     return $ UserResponse {
       userResponseId : userResponseId,
       userResponseName : userResponseName,
       userResponseEmail : userResponseEmail,
+      userResponseActive : userResponseActive,
       userResponseCreatedAt : userResponseCreatedAt,
       userResponseModifiedAt : userResponseModifiedAt
     }
@@ -694,6 +715,7 @@ instance userResponseEncodeJson :: EncodeJson UserResponse where
     ~> "userResponseId" := o.userResponseId
     ~> "userResponseName" := o.userResponseName
     ~> "userResponseEmail" := o.userResponseEmail
+    ~> "userResponseActive" := o.userResponseActive
     ~> "userResponseCreatedAt" := o.userResponseCreatedAt
     ~> "userResponseModifiedAt" := o.userResponseModifiedAt
     ~> jsonEmptyObject
@@ -705,12 +727,14 @@ instance userResponseDecodeJson :: DecodeJson UserResponse where
     userResponseId <- obj .? "userResponseId"
     userResponseName <- obj .? "userResponseName"
     userResponseEmail <- obj .? "userResponseEmail"
+    userResponseActive <- obj .? "userResponseActive"
     userResponseCreatedAt <- obj .? "userResponseCreatedAt"
     userResponseModifiedAt <- obj .? "userResponseModifiedAt"
     pure $ UserResponse {
       userResponseId,
       userResponseName,
       userResponseEmail,
+      userResponseActive,
       userResponseCreatedAt,
       userResponseModifiedAt
     }
@@ -737,10 +761,10 @@ instance userResponseIsForeign :: IsForeign UserResponse where
 
 
 instance userResponseShow :: Show UserResponse where
-    show (UserResponse o) = show "userResponseId: " ++ show o.userResponseId ++ ", " ++ show "userResponseName: " ++ show o.userResponseName ++ ", " ++ show "userResponseEmail: " ++ show o.userResponseEmail ++ ", " ++ show "userResponseCreatedAt: " ++ show o.userResponseCreatedAt ++ ", " ++ show "userResponseModifiedAt: " ++ show o.userResponseModifiedAt
+    show (UserResponse o) = show "userResponseId: " ++ show o.userResponseId ++ ", " ++ show "userResponseName: " ++ show o.userResponseName ++ ", " ++ show "userResponseEmail: " ++ show o.userResponseEmail ++ ", " ++ show "userResponseActive: " ++ show o.userResponseActive ++ ", " ++ show "userResponseCreatedAt: " ++ show o.userResponseCreatedAt ++ ", " ++ show "userResponseModifiedAt: " ++ show o.userResponseModifiedAt
 
 instance userResponseEq :: Eq UserResponse where
-  eq (UserResponse a) (UserResponse b) = a.userResponseId == b.userResponseId && a.userResponseName == b.userResponseName && a.userResponseEmail == b.userResponseEmail && a.userResponseCreatedAt == b.userResponseCreatedAt && a.userResponseModifiedAt == b.userResponseModifiedAt
+  eq (UserResponse a) (UserResponse b) = a.userResponseId == b.userResponseId && a.userResponseName == b.userResponseName && a.userResponseEmail == b.userResponseEmail && a.userResponseActive == b.userResponseActive && a.userResponseCreatedAt == b.userResponseCreatedAt && a.userResponseModifiedAt == b.userResponseModifiedAt
 
 type Text = String
 
@@ -868,6 +892,10 @@ bigRecordString_ :: forall b a r. Lens { bigRecordString :: a | r } { bigRecordS
 bigRecordString_ f o = o { bigRecordString = _ } <$> f o.bigRecordString
 
 
+bigRecordString2_ :: forall b a r. Lens { bigRecordString2 :: a | r } { bigRecordString2 :: b | r } a b
+bigRecordString2_ f o = o { bigRecordString2 = _ } <$> f o.bigRecordString2
+
+
 bigRecordSumType_ :: forall b a r. Lens { bigRecordSumType :: a | r } { bigRecordSumType :: b | r } a b
 bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
 
@@ -878,6 +906,10 @@ boom1_ f o = o { boom1 = _ } <$> f o.boom1
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
 unSession_ f o = o { unSession = _ } <$> f o.unSession
+
+
+userActive_ :: forall b a r. Lens { userActive :: a | r } { userActive :: b | r } a b
+userActive_ f o = o { userActive = _ } <$> f o.userActive
 
 
 userEmail_ :: forall b a r. Lens { userEmail :: a | r } { userEmail :: b | r } a b
@@ -894,6 +926,10 @@ userRequestEmail_ f o = o { userRequestEmail = _ } <$> f o.userRequestEmail
 
 userRequestName_ :: forall b a r. Lens { userRequestName :: a | r } { userRequestName :: b | r } a b
 userRequestName_ f o = o { userRequestName = _ } <$> f o.userRequestName
+
+
+userResponseActive_ :: forall b a r. Lens { userResponseActive :: a | r } { userResponseActive :: b | r } a b
+userResponseActive_ f o = o { userResponseActive = _ } <$> f o.userResponseActive
 
 
 userResponseCreatedAt_ :: forall b a r. Lens { userResponseCreatedAt :: a | r } { userResponseCreatedAt :: b | r } a b
