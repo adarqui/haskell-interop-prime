@@ -112,10 +112,10 @@ instance ToJSON BigRecord where
     , "string" .= string
     , "string2" .= string2
     , "sum_type" .= sumType
-    , "data'" .= data'
-    , "class'" .= class'
-    , "let'" .= let'
-    , "module'" .= module'
+    , "data_p" .= dataP
+    , "class_p" .= classP
+    , "let_p" .= letP
+    , "module_p" .= moduleP
     , "big_record" .= bigRecord
     ]
 
@@ -130,10 +130,10 @@ instance FromJSON BigRecord where
     string <- o .: "string"
     string2 <- o .: "string2"
     sumType <- o .: "sum_type"
-    data' <- o .: "data'"
-    class' <- o .: "class'"
-    let' <- o .: "let'"
-    module' <- o .: "module'"
+    dataP <- o .: "data_p"
+    classP <- o .: "class_p"
+    letP <- o .: "let_p"
+    moduleP <- o .: "module_p"
     bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool = bool,
@@ -144,10 +144,10 @@ instance FromJSON BigRecord where
       string = string,
       string2 = string2,
       sumType = sumType,
-      data' = data',
-      class' = class',
-      let' = let',
-      module' = module',
+      dataP = dataP,
+      classP = classP,
+      letP = letP,
+      moduleP = moduleP,
       bigRecord = bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x

@@ -308,10 +308,10 @@ newtype BigRecord = BigRecord {
   string :: String,
   string2 :: (Array  Char),
   sumType :: SumType,
-  data' :: String,
-  class' :: String,
-  let' :: String,
-  module' :: String,
+  dataP :: String,
+  classP :: String,
+  letP :: String,
+  moduleP :: String,
   bigRecord :: Boolean
 }
 
@@ -325,18 +325,18 @@ _BigRecord :: LensP BigRecord {
   string :: String,
   string2 :: (Array  Char),
   sumType :: SumType,
-  data' :: String,
-  class' :: String,
-  let' :: String,
-  module' :: String,
+  dataP :: String,
+  classP :: String,
+  letP :: String,
+  moduleP :: String,
   bigRecord :: Boolean
 }
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
 mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> (Array  Char) -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
-mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType data' class' let' module' bigRecord =
-  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, data', class', let', module', bigRecord}
+mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType dataP classP letP moduleP bigRecord =
+  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, dataP, classP, letP, moduleP, bigRecord}
 
 
 unwrapBigRecord (BigRecord r) = r
@@ -352,10 +352,10 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "string" .= v.string
     , "string2" .= v.string2
     , "sum_type" .= v.sumType
-    , "data'" .= v.data'
-    , "class'" .= v.class'
-    , "let'" .= v.let'
-    , "module'" .= v.module'
+    , "data_p" .= v.dataP
+    , "class_p" .= v.classP
+    , "let_p" .= v.letP
+    , "module_p" .= v.moduleP
     , "big_record" .= v.bigRecord
     ]
 
@@ -370,10 +370,10 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     string <- o .: "string"
     string2 <- o .: "string2"
     sumType <- o .: "sum_type"
-    data' <- o .: "data'"
-    class' <- o .: "class'"
-    let' <- o .: "let'"
-    module' <- o .: "module'"
+    dataP <- o .: "data_p"
+    classP <- o .: "class_p"
+    letP <- o .: "let_p"
+    moduleP <- o .: "module_p"
     bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool : bool,
@@ -384,10 +384,10 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
       string : string,
       string2 : string2,
       sumType : sumType,
-      data' : data',
-      class' : class',
-      let' : let',
-      module' : module',
+      dataP : dataP,
+      classP : classP,
+      letP : letP,
+      moduleP : moduleP,
       bigRecord : bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
@@ -404,10 +404,10 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "string" := o.string
     ~> "string2" := o.string2
     ~> "sum_type" := o.sumType
-    ~> "data'" := o.data'
-    ~> "class'" := o.class'
-    ~> "let'" := o.let'
-    ~> "module'" := o.module'
+    ~> "data_p" := o.dataP
+    ~> "class_p" := o.classP
+    ~> "let_p" := o.letP
+    ~> "module_p" := o.moduleP
     ~> "big_record" := o.bigRecord
     ~> jsonEmptyObject
 
@@ -423,10 +423,10 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     string <- obj .? "string"
     string2 <- obj .? "string2"
     sumType <- obj .? "sum_type"
-    data' <- obj .? "data'"
-    class' <- obj .? "class'"
-    let' <- obj .? "let'"
-    module' <- obj .? "module'"
+    dataP <- obj .? "data_p"
+    classP <- obj .? "class_p"
+    letP <- obj .? "let_p"
+    moduleP <- obj .? "module_p"
     bigRecord <- obj .? "big_record"
     pure $ BigRecord {
       bool,
@@ -437,10 +437,10 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       string,
       string2,
       sumType,
-      data',
-      class',
-      let',
-      module',
+      dataP,
+      classP,
+      letP,
+      moduleP,
       bigRecord
     }
 
@@ -466,10 +466,10 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "string2: " ++ show o.string2 ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "data': " ++ show o.data' ++ ", " ++ show "class': " ++ show o.class' ++ ", " ++ show "let': " ++ show o.let' ++ ", " ++ show "module': " ++ show o.module' ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "string2: " ++ show o.string2 ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "dataP: " ++ show o.dataP ++ ", " ++ show "classP: " ++ show o.classP ++ ", " ++ show "letP: " ++ show o.letP ++ ", " ++ show "moduleP: " ++ show o.moduleP ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
-  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.data' == b.data' && a.class' == b.class' && a.let' == b.let' && a.module' == b.module' && a.bigRecord == b.bigRecord
+  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.dataP == b.dataP && a.classP == b.classP && a.letP == b.letP && a.moduleP == b.moduleP && a.bigRecord == b.bigRecord
 
 type FakeUTCTime = Int
 
@@ -864,16 +864,16 @@ boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
 boom1_ f o = o { boom1 = _ } <$> f o.boom1
 
 
-class'_ :: forall b a r. Lens { class' :: a | r } { class' :: b | r } a b
-class'_ f o = o { class' = _ } <$> f o.class'
+classP_ :: forall b a r. Lens { classP :: a | r } { classP :: b | r } a b
+classP_ f o = o { classP = _ } <$> f o.classP
 
 
 createdAt_ :: forall b a r. Lens { createdAt :: a | r } { createdAt :: b | r } a b
 createdAt_ f o = o { createdAt = _ } <$> f o.createdAt
 
 
-data'_ :: forall b a r. Lens { data' :: a | r } { data' :: b | r } a b
-data'_ f o = o { data' = _ } <$> f o.data'
+dataP_ :: forall b a r. Lens { dataP :: a | r } { dataP :: b | r } a b
+dataP_ f o = o { dataP = _ } <$> f o.dataP
 
 
 email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
@@ -892,8 +892,8 @@ integer_ :: forall b a r. Lens { integer :: a | r } { integer :: b | r } a b
 integer_ f o = o { integer = _ } <$> f o.integer
 
 
-let'_ :: forall b a r. Lens { let' :: a | r } { let' :: b | r } a b
-let'_ f o = o { let' = _ } <$> f o.let'
+letP_ :: forall b a r. Lens { letP :: a | r } { letP :: b | r } a b
+letP_ f o = o { letP = _ } <$> f o.letP
 
 
 maybeInt_ :: forall b a r. Lens { maybeInt :: a | r } { maybeInt :: b | r } a b
@@ -908,8 +908,8 @@ modifiedAt_ :: forall b a r. Lens { modifiedAt :: a | r } { modifiedAt :: b | r 
 modifiedAt_ f o = o { modifiedAt = _ } <$> f o.modifiedAt
 
 
-module'_ :: forall b a r. Lens { module' :: a | r } { module' :: b | r } a b
-module'_ f o = o { module' = _ } <$> f o.module'
+moduleP_ :: forall b a r. Lens { moduleP :: a | r } { moduleP :: b | r } a b
+moduleP_ f o = o { moduleP = _ } <$> f o.moduleP
 
 
 name_ :: forall b a r. Lens { name :: a | r } { name :: b | r } a b
