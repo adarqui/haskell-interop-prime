@@ -381,9 +381,7 @@ tplRespondable InteropOptions{..} base =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
   ++ spaces si1 ++ "responseType =\n"
   ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse f = case readString f of\n"
-  ++ spaces si2 ++ "Right s -> readJSON s\n"
-  ++ spaces si2 ++ "Left er -> Left er\n"
+  ++ spaces si1 ++ "fromResponse = unsafeFromForeign\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -393,9 +391,7 @@ tplRespondable InteropOptions{..} base =
 tplIsForeign :: InteropOptions -> String -> String
 tplIsForeign InteropOptions{..} base =
      printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "read f = case readString f of\n"
-  ++ spaces si2 ++ "Right s -> readJSON s\n"
-  ++ spaces si2 ++ "Left er -> Left er\n"
+  ++ spaces si1 ++ "read = unsafeFromForeign\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -516,7 +512,7 @@ tplPurescriptImports s = (intercalate "\n"
   , "import Data.Argonaut.Printer"
   , "import Data.Date.Helpers"
   , "import Data.Either"
-  , "import Data.Foreign (readString)"
+  , "import Data.Foreign (unsafeFromForeign)"
   , "import Data.Foreign.Class"
   , "import Data.JSON"
   , "import Data.List (List ())"
