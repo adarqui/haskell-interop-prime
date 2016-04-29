@@ -655,8 +655,8 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
       then ""
       else "forall qp. QueryParam qp => "
   typesig  =
-    [tplApiParam_ByType opts param] <>
     (tplApiParam_TypeSig opts param) <>
+    [tplApiParam_ByType opts param] <>
     [tplApiMethod_RequestType opts method] <>
     [printf "ApiEff (Either ApiError " ++ tplApiMethod_ResultType opts method ++ ")"]
   typesig' =
@@ -668,8 +668,8 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
       LangPurescript -> "Array qp"
       LangHaskell    -> "[qp]"
   args     =
-    [tplApiParam_ByName opts param] <>
     (tplApiParam_Arguments opts param) <>
+    [tplApiParam_ByName opts param] <>
     [jsonNameTransform "" $ tplApiMethod_RequestType opts method]
   args'    =
     if simplified
@@ -750,6 +750,7 @@ tplApiParam_TypeSig opts@InteropOptions{..} param =
   case param of
     Par params       -> map (tplBuildType opts . snd) params
     ParBy _ _        -> []
+    ParBoth params _ -> map (tplBuildType opts . snd) params
     ParNone          -> []
 
 
@@ -759,6 +760,7 @@ tplApiParam_Arguments _ param =
   case param of
     Par params       -> map fst params
     ParBy _ _        -> []
+    ParBoth params _ -> map fst params
     ParNone          -> []
 
 
@@ -768,6 +770,7 @@ tplApiParam_Arguments_Show _ param =
   case param of
     Par params       -> map go params
     ParBy _ _        -> []
+    ParBoth params _ -> map go params
     ParNone          -> []
   where
   go (n,t) =
@@ -780,27 +783,30 @@ tplApiParam_Arguments_Show _ param =
 tplApiParam_ByName :: InteropOptions -> ApiParam -> String
 tplApiParam_ByName _ param =
   case param of
-    Par _            -> ""
-    ParBy name _     -> "_" <> name
-    ParNone          -> ""
+    Par _              -> ""
+    ParBy name _       -> "_" <> name
+    ParBoth _ (name,_) -> "_" <> name
+    ParNone            -> ""
 
 
 
 tplApiParam_ByType :: InteropOptions -> ApiParam -> String
 tplApiParam_ByType opts@InteropOptions{..} param =
   case param of
-    Par _            -> ""
-    ParBy    _ type_ -> tplBuildType opts type_
-    ParNone          -> ""
+    Par _               -> ""
+    ParBy    _ type_    -> tplBuildType opts type_
+    ParBoth _ (_,type_) -> tplBuildType opts type_
+    ParNone             -> ""
 
 
 
 tplApiParam_By :: InteropOptions -> ApiParam -> String
 tplApiParam_By opts@InteropOptions{..} param =
   case param of
-    Par _            -> ""
-    ParBy name _     -> printf "%s %s" name (tplApiParam_ByName opts param)
-    ParNone          -> ""
+    Par _              -> ""
+    ParBy name _       -> printf "%s %s" name (tplApiParam_ByName opts param)
+    ParBoth _ (name,_) -> printf "%s %s" name (tplApiParam_ByName opts param)
+    ParNone            -> ""
 
 
 

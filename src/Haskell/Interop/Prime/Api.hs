@@ -51,13 +51,17 @@ buildParams opts = mapM (buildParam opts)
 buildParam :: InteropOptions -> ApiParam_TH -> Q ApiParam
 buildParam opts@InteropOptions{..} api_param_th =
   case api_param_th of
-    Par_TH params        -> do
+    Par_TH params         -> do
       params' <- mapM (\(p,t) -> nameAndType opts p t) params
       return $ Par params'
-    ParBy_TH param name  -> do
+    ParBy_TH param name   -> do
       (p, t) <- nameAndType opts param name
       return $ ParBy p t
-    ParNone_TH           -> return ParNone
+    ParBoth_TH args (p,t) ->
+      ParBoth
+      <$> mapM (\(p,t) -> nameAndType opts p t) args
+      <*> nameAndType opts p t
+    ParNone_TH            -> return ParNone
 
 
 

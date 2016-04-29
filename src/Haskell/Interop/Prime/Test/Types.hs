@@ -10,7 +10,8 @@ module Haskell.Interop.Prime.Test.Types (
   DateMaybe (..),
   Text,
   TextMaybe,
-  FunkyRecord (..)
+  FunkyRecord (..),
+  Param (..)
 ) where
 
 
@@ -21,6 +22,8 @@ import           Data.Int
 
 newtype Session = Session { unSession :: String }
 
+
+
 data SumType
   = A
   | B Int
@@ -30,6 +33,8 @@ data SumType
   | F SumType
   | G [SumType]
   | H Bool Int String (Maybe Bool)
+
+
 
 data BigRecord = BigRecord {
   bigRecordBool         :: Bool,
@@ -47,38 +52,85 @@ data BigRecord = BigRecord {
   bigRecord             :: Bool
 }
 
+
+
 data User = User {
-  userName  :: String,
-  userEmail :: String
+  userName   :: String,
+  userEmail  :: String,
+  userActive :: Bool
 }
+
+
 
 data UserRequest = UserRequest {
   userRequestName  :: String,
   userRequestEmail :: String
 }
 
+
+
 type FakeUTCTime = Integer
+
+
 
 data UserResponse = UserResponse {
   userResponseId         :: Int64,
   userResponseName       :: String,
   userResponseEmail      :: String,
+  userResponseActive     :: Bool,
   userResponseCreatedAt  :: Maybe FakeUTCTime,
   userResponseModifiedAt :: Maybe FakeUTCTime
 }
+
+
 
 data UserResponses = UserResponses {
   userResponses :: [UserResponse]
 }
 
+
+
 newtype DateMaybe = DateMaybe (Maybe String)
+
+
 
 type Text = String
 
+
+
 type TextMaybe = Maybe Text
+
+
 
 data FunkyRecord
   = Boom1 { boom1 :: Bool }
   | Boom2 { boom2 :: Bool }
   | Boom3 { boom3a :: Bool, boom3b :: Bool, boom3c :: Bool }
   | Boom4
+
+
+
+data Param
+  = Limit         Int
+  | Offset        Int
+  | ByUsersIds    [Int64]
+  | ByUsersNames  [String]
+  | ByUsersEmails [String]
+  | ByUserActive  Bool
+
+
+
+instance QueryParam Param where
+  qp (Limit limit)                = ("limit", show limit)
+  qp (Offset offset)              = ("offset", show offset)
+  qp (ByUsersIds users_ids)       = ("users_ids", show users_ids)
+  qp (ByUsersNames users_names)   = ("users_names", show users_names)
+  qp (ByUsersEmails users_emails) = ("users_emails", show users_emails)
+  qp (ByUserActive bool)          = ("user_active", show bool)
+
+
+
+-- Ripped from my haskell-api-helpers library to give an idea of how the query params work
+--
+class QueryParam a where
+  qp :: a -> (String, String)

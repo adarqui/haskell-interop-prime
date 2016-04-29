@@ -30,11 +30,15 @@ apiEntries_TH' :: [ApiEntry_TH]
 apiEntries_TH' =
   [ ApiEntry_TH "Users"
     [ ParNone_TH
-    , ParBy_TH "UsersIds" ''Int64_L
-    , ParBy_TH "UsersNames" ''String_L
-    , ParBy_TH "UsersEmails" ''String_L
+    , ParBy_TH "ByUsersIds" ''Int64_L
+    , ParBy_TH "ByUsersNames" ''String_L
+    , ParBy_TH "ByUsersEmails" ''String_L
     ]
     [ ApiGET_TH ''UserResponses ]
+
+  , ApiEntry_TH "User"
+    [ ParBoth_TH [("user_id", ''Int64)] ("ByUserActive", ''Bool) ]
+    [ ApiGET_TH ''UserResponse ]
 
   , ApiEntry_TH "User"
     [ ParNone_TH ]
@@ -46,4 +50,5 @@ apiEntries_TH' =
     , ApiPUT_TH ''UserRequest ''UserResponse
     , ApiDELETE_TH ''()
     ]
+
   ]
