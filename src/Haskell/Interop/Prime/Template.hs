@@ -393,8 +393,8 @@ tplRespondable_Record InteropOptions{..} base constr fields =
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (fieldNameTransform base n)
-      else printf "readProp \"%s\" json\n" (fieldNameTransform base n)
+      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform constr n)
+      else printf "readProp \"%s\" json\n" (jsonNameTransform constr n)
 
 
 
@@ -444,8 +444,8 @@ tplIsForeign_Record InteropOptions{..} base constr fields =
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (fieldNameTransform base n)
-      else printf "readProp \"%s\" json\n" (fieldNameTransform base n)
+      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform base n)
+      else printf "readProp \"%s\" json\n" (jsonNameTransform base n)
 
 
 
