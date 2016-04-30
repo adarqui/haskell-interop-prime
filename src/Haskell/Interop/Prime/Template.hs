@@ -250,7 +250,7 @@ tplFromJSON_SumType_Field InteropOptions{..} field vars =
      spaces si1 ++ printf "\"%s\" -> do\n" field
   ++
      (if null vars
-       then spaces si2 ++ printf "return $ %s\n" field
+       then spaces si2 ++ printf "return %s\n" field
        else
             spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- o .: \"contents\"\n"
          ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " ++) vars') ++ "\n")
@@ -354,7 +354,7 @@ tplDecodeJson_SumType_Field InteropOptions{..} field vars =
      spaces si1 ++ printf "\"%s\" -> do\n" field
   ++
      (if null vars
-       then spaces si2 ++ printf "return $ %s\n" field
+       then spaces si2 ++ printf "return %s\n" field
        else
             spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- obj .? \"contents\"\n"
          ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("decodeJson " ++) vars') ++ "\n")
@@ -398,18 +398,36 @@ tplRespondable_Record InteropOptions{..} base constr fields =
 
 
 
-
 tplRespondable_SumType :: InteropOptions -> String -> [(String, [String])] -> String
-tplRespondable_SumType InteropOptions{..} base vars =
+tplRespondable_SumType opts@InteropOptions{..} base vars =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
   ++ spaces si1 ++ "responseType =\n"
   ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse json =\n"
-  ++ spaces si2 ++ printf "mk%s\n" base
+  ++ spaces si1 ++ "fromResponse json = do\n"
+  ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
+  ++ spaces si2 ++ "case tag of\n"
+  ++ concatMap (\(f,vars) -> tplRespondable_SumType_Field opts f vars) vars
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
   si3 = spacingIndent*3
+
+
+
+tplRespondable_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplRespondable_SumType_Field InteropOptions{..} field vars =
+     spaces si1 ++ printf "\"%s\" -> do\n" field
+  ++
+     (if null vars
+       then spaces si2 ++ printf "return %s\n" field
+       else
+            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- readProp \"contents\" json\n"
+         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("read " ++) vars') ++ "\n")
+  ++ "\n"
+  where
+  si1 = spacingIndent*4
+  si2 = spacingIndent*5
+  vars' = vars_x $ length vars
 
 
 
@@ -432,16 +450,33 @@ tplIsForeign_Record InteropOptions{..} base constr fields =
 
 
 tplIsForeign_SumType :: InteropOptions -> String -> [(String, [String])] -> String
-tplIsForeign_SumType InteropOptions{..} base vars =
+tplIsForeign_SumType opts@InteropOptions{..} base vars =
      printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "responseType =\n"
-  ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse json =\n"
-  ++ spaces si2 ++ printf "mk%s\n" base
+  ++ spaces si1 ++ "read json = do\n"
+  ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
+  ++ spaces si2 ++ "case tag of\n"
+  ++ concatMap (\(f,vars) -> tplIsForeign_SumType_Field opts f vars) vars
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
   si3 = spacingIndent*3
+
+
+
+tplIsForeign_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplIsForeign_SumType_Field InteropOptions{..} field vars =
+     spaces si1 ++ printf "\"%s\" -> do\n" field
+  ++
+     (if null vars
+       then spaces si2 ++ printf "return %s\n" field
+       else
+            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- readProp \"contents\" json\n"
+         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("read " ++) vars') ++ "\n")
+  ++ "\n"
+  where
+  si1 = spacingIndent*4
+  si2 = spacingIndent*5
+  vars' = vars_x $ length vars
 
 
 
