@@ -81,11 +81,15 @@ instance sessionRequestable :: Requestable Session where
 instance sessionRespondable :: Respondable Session where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkSession
+      <$> readProp "unSession" json
 
 
 instance sessionIsForeign :: IsForeign Session where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkSession
+      <$> readProp "unSession" json
 
 
 instance sessionShow :: Show Session where
@@ -262,11 +266,15 @@ instance sumTypeRequestable :: Requestable SumType where
 instance sumTypeRespondable :: Respondable SumType where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+    mkSumType
 
 
 instance sumTypeIsForeign :: IsForeign SumType where
-  read = Right <<< unsafeFromForeign
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json =
+    mkSumType
 
 
 instance sumTypeShow :: Show SumType where
@@ -446,11 +454,39 @@ instance bigRecordRequestable :: Requestable BigRecord where
 instance bigRecordRespondable :: Respondable BigRecord where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkBigRecord
+      <$> readProp "bigRecordBool" json
+      <*> readProp "bigRecordInt" json
+      <*> (runNullOrUndefined <$> readProp "bigRecordMaybeInt" json)
+      <*> readProp "bigRecordInteger" json
+      <*> (runNullOrUndefined <$> readProp "bigRecordMaybeInteger" json)
+      <*> readProp "bigRecordString" json
+      <*> readProp "bigRecordString2" json
+      <*> readProp "bigRecordSumType" json
+      <*> readProp "bigRecordData" json
+      <*> readProp "bigRecordClass" json
+      <*> readProp "bigRecordLet" json
+      <*> readProp "bigRecordModule" json
+      <*> readProp "bigRecord" json
 
 
 instance bigRecordIsForeign :: IsForeign BigRecord where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkBigRecord
+      <$> readProp "bigRecordBool" json
+      <*> readProp "bigRecordInt" json
+      <*> (runNullOrUndefined <$> readProp "bigRecordMaybeInt" json)
+      <*> readProp "bigRecordInteger" json
+      <*> (runNullOrUndefined <$> readProp "bigRecordMaybeInteger" json)
+      <*> readProp "bigRecordString" json
+      <*> readProp "bigRecordString2" json
+      <*> readProp "bigRecordSumType" json
+      <*> readProp "bigRecordData" json
+      <*> readProp "bigRecordClass" json
+      <*> readProp "bigRecordLet" json
+      <*> readProp "bigRecordModule" json
+      <*> readProp "bigRecord" json
 
 
 instance bigRecordShow :: Show BigRecord where
@@ -537,11 +573,19 @@ instance userRequestable :: Requestable User where
 instance userRespondable :: Respondable User where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkUser
+      <$> readProp "userName" json
+      <*> readProp "userEmail" json
+      <*> readProp "userActive" json
 
 
 instance userIsForeign :: IsForeign User where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkUser
+      <$> readProp "userName" json
+      <*> readProp "userEmail" json
+      <*> readProp "userActive" json
 
 
 instance userShow :: Show User where
@@ -617,11 +661,17 @@ instance userRequestRequestable :: Requestable UserRequest where
 instance userRequestRespondable :: Respondable UserRequest where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkUserRequest
+      <$> readProp "userRequestName" json
+      <*> readProp "userRequestEmail" json
 
 
 instance userRequestIsForeign :: IsForeign UserRequest where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkUserRequest
+      <$> readProp "userRequestName" json
+      <*> readProp "userRequestEmail" json
 
 
 instance userRequestShow :: Show UserRequest where
@@ -729,11 +779,25 @@ instance userResponseRequestable :: Requestable UserResponse where
 instance userResponseRespondable :: Respondable UserResponse where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkUserResponse
+      <$> readProp "userResponseId" json
+      <*> readProp "userResponseName" json
+      <*> readProp "userResponseEmail" json
+      <*> readProp "userResponseActive" json
+      <*> (runNullOrUndefined <$> readProp "userResponseCreatedAt" json)
+      <*> (runNullOrUndefined <$> readProp "userResponseModifiedAt" json)
 
 
 instance userResponseIsForeign :: IsForeign UserResponse where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkUserResponse
+      <$> readProp "userResponseId" json
+      <*> readProp "userResponseName" json
+      <*> readProp "userResponseEmail" json
+      <*> readProp "userResponseActive" json
+      <*> (runNullOrUndefined <$> readProp "userResponseCreatedAt" json)
+      <*> (runNullOrUndefined <$> readProp "userResponseModifiedAt" json)
 
 
 instance userResponseShow :: Show UserResponse where
@@ -807,11 +871,15 @@ instance funkyRecordRequestable :: Requestable FunkyRecord where
 instance funkyRecordRespondable :: Respondable FunkyRecord where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse = Right <<< unsafeFromForeign
+  fromResponse json =
+      mkFunkyRecord
+      <$> readProp "boom1" json
 
 
 instance funkyRecordIsForeign :: IsForeign FunkyRecord where
-  read = Right <<< unsafeFromForeign
+  read json =
+      mkFunkyRecord
+      <$> readProp "boom1" json
 
 
 instance funkyRecordShow :: Show FunkyRecord where
