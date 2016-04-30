@@ -9,7 +9,7 @@ import Data.Argonaut.Encode
 import Data.Argonaut.Printer
 import Data.Date.Helpers
 import Data.Either
-import Data.Foreign (readString)
+import Data.Foreign (unsafeFromForeign)
 import Data.Foreign.Class
 import Data.JSON
 import Data.List (List ())
@@ -81,15 +81,11 @@ instance sessionRequestable :: Requestable Session where
 instance sessionRespondable :: Respondable Session where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance sessionIsForeign :: IsForeign Session where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance sessionShow :: Show Session where
@@ -266,15 +262,11 @@ instance sumTypeRequestable :: Requestable SumType where
 instance sumTypeRespondable :: Respondable SumType where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance sumTypeIsForeign :: IsForeign SumType where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance sumTypeShow :: Show SumType where
@@ -454,15 +446,11 @@ instance bigRecordRequestable :: Requestable BigRecord where
 instance bigRecordRespondable :: Respondable BigRecord where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance bigRecordIsForeign :: IsForeign BigRecord where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance bigRecordShow :: Show BigRecord where
@@ -549,15 +537,11 @@ instance userRequestable :: Requestable User where
 instance userRespondable :: Respondable User where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance userIsForeign :: IsForeign User where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance userShow :: Show User where
@@ -633,15 +617,11 @@ instance userRequestRequestable :: Requestable UserRequest where
 instance userRequestRespondable :: Respondable UserRequest where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance userRequestIsForeign :: IsForeign UserRequest where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance userRequestShow :: Show UserRequest where
@@ -749,15 +729,11 @@ instance userResponseRequestable :: Requestable UserResponse where
 instance userResponseRespondable :: Respondable UserResponse where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance userResponseIsForeign :: IsForeign UserResponse where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance userResponseShow :: Show UserResponse where
@@ -831,15 +807,11 @@ instance funkyRecordRequestable :: Requestable FunkyRecord where
 instance funkyRecordRespondable :: Respondable FunkyRecord where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  fromResponse = Right <<< unsafeFromForeign
 
 
 instance funkyRecordIsForeign :: IsForeign FunkyRecord where
-  read f = case readString f of
-    Right s -> readJSON s
-    Left er -> Left er
+  read = Right <<< unsafeFromForeign
 
 
 instance funkyRecordShow :: Show FunkyRecord where
