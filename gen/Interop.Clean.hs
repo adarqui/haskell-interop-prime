@@ -194,33 +194,18 @@ instance FromJSON UserRequest where
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
-instance ToJSON UserResponse where
-  toJSON UserResponse{..} = object $
-    [ "tag" .= "UserResponse"
-    , "id" .= id
-    , "name" .= name
-    , "email" .= email
-    , "active" .= active
-    , "created_at" .= createdAt
-    , "modified_at" .= modifiedAt
+instance ToJSON UserResponses where
+  toJSON UserResponses{..} = object $
+    [ "tag" .= "UserResponses"
+    , "user_responses" .= userResponses
     ]
 
 
-instance FromJSON UserResponse where
+instance FromJSON UserResponses where
   parseJSON (Object o) = do
-    id <- o .: "id"
-    name <- o .: "name"
-    email <- o .: "email"
-    active <- o .: "active"
-    createdAt <- o .: "created_at"
-    modifiedAt <- o .: "modified_at"
-    return $ UserResponse {
-      id = id,
-      name = name,
-      email = email,
-      active = active,
-      createdAt = createdAt,
-      modifiedAt = modifiedAt
+    userResponses <- o .: "user_responses"
+    return $ UserResponses {
+      userResponses = userResponses
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 

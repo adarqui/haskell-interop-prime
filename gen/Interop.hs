@@ -225,6 +225,22 @@ instance FromJSON UserResponse where
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
+instance ToJSON UserResponses where
+  toJSON UserResponses{..} = object $
+    [ "tag" .= "UserResponses"
+    , "userResponses" .= userResponses
+    ]
+
+
+instance FromJSON UserResponses where
+  parseJSON (Object o) = do
+    userResponses <- o .: "userResponses"
+    return $ UserResponses {
+      userResponses = userResponses
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
 instance ToJSON FunkyRecord where
   toJSON Boom1{..} = object $
     [ "tag" .= "FunkyRecord"

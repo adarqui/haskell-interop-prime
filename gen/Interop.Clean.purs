@@ -84,13 +84,13 @@ instance sessionRespondable :: Respondable Session where
     Tuple Nothing JSONResponse
   fromResponse json =
       mkSession
-      <$> readProp "unSession" json
+      <$> readProp "un_session" json
 
 
 instance sessionIsForeign :: IsForeign Session where
   read json =
       mkSession
-      <$> readProp "unSession" json
+      <$> readProp "un_session" json
 
 
 instance sessionShow :: Show Session where
@@ -521,17 +521,17 @@ instance bigRecordRespondable :: Respondable BigRecord where
       mkBigRecord
       <$> readProp "bool" json
       <*> readProp "int" json
-      <*> (runNullOrUndefined <$> readProp "maybeInt" json)
+      <*> (runNullOrUndefined <$> readProp "maybe_int" json)
       <*> readProp "integer" json
-      <*> (runNullOrUndefined <$> readProp "maybeInteger" json)
+      <*> (runNullOrUndefined <$> readProp "maybe_integer" json)
       <*> readProp "string" json
       <*> readProp "string2" json
-      <*> readProp "sumType" json
-      <*> readProp "dataP" json
-      <*> readProp "classP" json
-      <*> readProp "letP" json
-      <*> readProp "moduleP" json
-      <*> readProp "bigRecord" json
+      <*> readProp "sum_type" json
+      <*> readProp "data_p" json
+      <*> readProp "class_p" json
+      <*> readProp "let_p" json
+      <*> readProp "module_p" json
+      <*> readProp "big_record" json
 
 
 instance bigRecordIsForeign :: IsForeign BigRecord where
@@ -539,17 +539,17 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
       mkBigRecord
       <$> readProp "bool" json
       <*> readProp "int" json
-      <*> (runNullOrUndefined <$> readProp "maybeInt" json)
+      <*> (runNullOrUndefined <$> readProp "maybe_int" json)
       <*> readProp "integer" json
-      <*> (runNullOrUndefined <$> readProp "maybeInteger" json)
+      <*> (runNullOrUndefined <$> readProp "maybe_integer" json)
       <*> readProp "string" json
       <*> readProp "string2" json
-      <*> readProp "sumType" json
-      <*> readProp "dataP" json
-      <*> readProp "classP" json
-      <*> readProp "letP" json
-      <*> readProp "moduleP" json
-      <*> readProp "bigRecord" json
+      <*> readProp "sum_type" json
+      <*> readProp "data_p" json
+      <*> readProp "class_p" json
+      <*> readProp "let_p" json
+      <*> readProp "module_p" json
+      <*> readProp "big_record" json
 
 
 instance bigRecordShow :: Show BigRecord where
@@ -743,131 +743,81 @@ instance userRequestShow :: Show UserRequest where
 instance userRequestEq :: Eq UserRequest where
   eq (UserRequest a) (UserRequest b) = a.name == b.name && a.email == b.email
 
-newtype UserResponse = UserResponse {
-  id :: Int,
-  name :: String,
-  email :: String,
-  active :: Boolean,
-  createdAt :: (Maybe FakeUTCTime),
-  modifiedAt :: (Maybe FakeUTCTime)
+newtype UserResponses = UserResponses {
+  userResponses :: (Array  UserResponse)
 }
 
 
-_UserResponse :: LensP UserResponse {
-  id :: Int,
-  name :: String,
-  email :: String,
-  active :: Boolean,
-  createdAt :: (Maybe FakeUTCTime),
-  modifiedAt :: (Maybe FakeUTCTime)
+_UserResponses :: LensP UserResponses {
+  userResponses :: (Array  UserResponse)
 }
-_UserResponse f (UserResponse o) = UserResponse <$> f o
+_UserResponses f (UserResponses o) = UserResponses <$> f o
 
 
-mkUserResponse :: Int -> String -> String -> Boolean -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
-mkUserResponse id name email active createdAt modifiedAt =
-  UserResponse{id, name, email, active, createdAt, modifiedAt}
+mkUserResponses :: (Array  UserResponse) -> UserResponses
+mkUserResponses userResponses =
+  UserResponses{userResponses}
 
 
-unwrapUserResponse (UserResponse r) = r
+unwrapUserResponses (UserResponses r) = r
 
-instance userResponseToJson :: ToJSON UserResponse where
-  toJSON (UserResponse v) = object $
-    [ "tag" .= "UserResponse"
-    , "id" .= v.id
-    , "name" .= v.name
-    , "email" .= v.email
-    , "active" .= v.active
-    , "created_at" .= v.createdAt
-    , "modified_at" .= v.modifiedAt
+instance userResponsesToJson :: ToJSON UserResponses where
+  toJSON (UserResponses v) = object $
+    [ "tag" .= "UserResponses"
+    , "user_responses" .= v.userResponses
     ]
 
 
-instance userResponseFromJSON :: FromJSON UserResponse where
+instance userResponsesFromJSON :: FromJSON UserResponses where
   parseJSON (JObject o) = do
-    id <- o .: "id"
-    name <- o .: "name"
-    email <- o .: "email"
-    active <- o .: "active"
-    createdAt <- o .: "created_at"
-    modifiedAt <- o .: "modified_at"
-    return $ UserResponse {
-      id : id,
-      name : name,
-      email : email,
-      active : active,
-      createdAt : createdAt,
-      modifiedAt : modifiedAt
+    userResponses <- o .: "user_responses"
+    return $ UserResponses {
+      userResponses : userResponses
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
 
-instance userResponseEncodeJson :: EncodeJson UserResponse where
-  encodeJson (UserResponse o) =
-       "tag" := "UserResponse"
-    ~> "id" := o.id
-    ~> "name" := o.name
-    ~> "email" := o.email
-    ~> "active" := o.active
-    ~> "created_at" := o.createdAt
-    ~> "modified_at" := o.modifiedAt
+instance userResponsesEncodeJson :: EncodeJson UserResponses where
+  encodeJson (UserResponses o) =
+       "tag" := "UserResponses"
+    ~> "user_responses" := o.userResponses
     ~> jsonEmptyObject
 
 
-instance userResponseDecodeJson :: DecodeJson UserResponse where
+instance userResponsesDecodeJson :: DecodeJson UserResponses where
   decodeJson o = do
     obj <- decodeJson o
-    id <- obj .? "id"
-    name <- obj .? "name"
-    email <- obj .? "email"
-    active <- obj .? "active"
-    createdAt <- obj .? "created_at"
-    modifiedAt <- obj .? "modified_at"
-    pure $ UserResponse {
-      id,
-      name,
-      email,
-      active,
-      createdAt,
-      modifiedAt
+    userResponses <- obj .? "user_responses"
+    pure $ UserResponses {
+      userResponses
     }
 
 
-instance userResponseRequestable :: Requestable UserResponse where
+instance userResponsesRequestable :: Requestable UserResponses where
   toRequest s =
     let str = printJson (encodeJson s) :: String
     in toRequest str
 
 
-instance userResponseRespondable :: Respondable UserResponse where
+instance userResponsesRespondable :: Respondable UserResponses where
   responseType =
     Tuple Nothing JSONResponse
   fromResponse json =
-      mkUserResponse
-      <$> readProp "id" json
-      <*> readProp "name" json
-      <*> readProp "email" json
-      <*> readProp "active" json
-      <*> (runNullOrUndefined <$> readProp "createdAt" json)
-      <*> (runNullOrUndefined <$> readProp "modifiedAt" json)
+      mkUserResponses
+      <$> readProp "user_responses" json
 
 
-instance userResponseIsForeign :: IsForeign UserResponse where
+instance userResponsesIsForeign :: IsForeign UserResponses where
   read json =
-      mkUserResponse
-      <$> readProp "id" json
-      <*> readProp "name" json
-      <*> readProp "email" json
-      <*> readProp "active" json
-      <*> (runNullOrUndefined <$> readProp "createdAt" json)
-      <*> (runNullOrUndefined <$> readProp "modifiedAt" json)
+      mkUserResponses
+      <$> readProp "user_responses" json
 
 
-instance userResponseShow :: Show UserResponse where
-    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
+instance userResponsesShow :: Show UserResponses where
+    show (UserResponses o) = show "userResponses: " ++ show o.userResponses
 
-instance userResponseEq :: Eq UserResponse where
-  eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.active == b.active && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
+instance userResponsesEq :: Eq UserResponses where
+  eq (UserResponses a) (UserResponses b) = a.userResponses == b.userResponses
 
 type Text = String
 
@@ -971,20 +921,12 @@ classP_ :: forall b a r. Lens { classP :: a | r } { classP :: b | r } a b
 classP_ f o = o { classP = _ } <$> f o.classP
 
 
-createdAt_ :: forall b a r. Lens { createdAt :: a | r } { createdAt :: b | r } a b
-createdAt_ f o = o { createdAt = _ } <$> f o.createdAt
-
-
 dataP_ :: forall b a r. Lens { dataP :: a | r } { dataP :: b | r } a b
 dataP_ f o = o { dataP = _ } <$> f o.dataP
 
 
 email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
 email_ f o = o { email = _ } <$> f o.email
-
-
-id_ :: forall b a r. Lens { id :: a | r } { id :: b | r } a b
-id_ f o = o { id = _ } <$> f o.id
 
 
 int_ :: forall b a r. Lens { int :: a | r } { int :: b | r } a b
@@ -1005,10 +947,6 @@ maybeInt_ f o = o { maybeInt = _ } <$> f o.maybeInt
 
 maybeInteger_ :: forall b a r. Lens { maybeInteger :: a | r } { maybeInteger :: b | r } a b
 maybeInteger_ f o = o { maybeInteger = _ } <$> f o.maybeInteger
-
-
-modifiedAt_ :: forall b a r. Lens { modifiedAt :: a | r } { modifiedAt :: b | r } a b
-modifiedAt_ f o = o { modifiedAt = _ } <$> f o.modifiedAt
 
 
 moduleP_ :: forall b a r. Lens { moduleP :: a | r } { moduleP :: b | r } a b
@@ -1033,5 +971,9 @@ sumType_ f o = o { sumType = _ } <$> f o.sumType
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
 unSession_ f o = o { unSession = _ } <$> f o.unSession
+
+
+userResponses_ :: forall b a r. Lens { userResponses :: a | r } { userResponses :: b | r } a b
+userResponses_ f o = o { userResponses = _ } <$> f o.userResponses
 
 -- footer

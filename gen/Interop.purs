@@ -869,6 +869,82 @@ instance userResponseShow :: Show UserResponse where
 instance userResponseEq :: Eq UserResponse where
   eq (UserResponse a) (UserResponse b) = a.userResponseId == b.userResponseId && a.userResponseName == b.userResponseName && a.userResponseEmail == b.userResponseEmail && a.userResponseActive == b.userResponseActive && a.userResponseCreatedAt == b.userResponseCreatedAt && a.userResponseModifiedAt == b.userResponseModifiedAt
 
+newtype UserResponses = UserResponses {
+  userResponses :: (Array  UserResponse)
+}
+
+
+_UserResponses :: LensP UserResponses {
+  userResponses :: (Array  UserResponse)
+}
+_UserResponses f (UserResponses o) = UserResponses <$> f o
+
+
+mkUserResponses :: (Array  UserResponse) -> UserResponses
+mkUserResponses userResponses =
+  UserResponses{userResponses}
+
+
+unwrapUserResponses (UserResponses r) = r
+
+instance userResponsesToJson :: ToJSON UserResponses where
+  toJSON (UserResponses v) = object $
+    [ "tag" .= "UserResponses"
+    , "userResponses" .= v.userResponses
+    ]
+
+
+instance userResponsesFromJSON :: FromJSON UserResponses where
+  parseJSON (JObject o) = do
+    userResponses <- o .: "userResponses"
+    return $ UserResponses {
+      userResponses : userResponses
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance userResponsesEncodeJson :: EncodeJson UserResponses where
+  encodeJson (UserResponses o) =
+       "tag" := "UserResponses"
+    ~> "userResponses" := o.userResponses
+    ~> jsonEmptyObject
+
+
+instance userResponsesDecodeJson :: DecodeJson UserResponses where
+  decodeJson o = do
+    obj <- decodeJson o
+    userResponses <- obj .? "userResponses"
+    pure $ UserResponses {
+      userResponses
+    }
+
+
+instance userResponsesRequestable :: Requestable UserResponses where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance userResponsesRespondable :: Respondable UserResponses where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json =
+      mkUserResponses
+      <$> readProp "userResponses" json
+
+
+instance userResponsesIsForeign :: IsForeign UserResponses where
+  read json =
+      mkUserResponses
+      <$> readProp "userResponses" json
+
+
+instance userResponsesShow :: Show UserResponses where
+    show (UserResponses o) = show "userResponses: " ++ show o.userResponses
+
+instance userResponsesEq :: Eq UserResponses where
+  eq (UserResponses a) (UserResponses b) = a.userResponses == b.userResponses
+
 type Text = String
 
 
@@ -1053,5 +1129,9 @@ userResponseModifiedAt_ f o = o { userResponseModifiedAt = _ } <$> f o.userRespo
 
 userResponseName_ :: forall b a r. Lens { userResponseName :: a | r } { userResponseName :: b | r } a b
 userResponseName_ f o = o { userResponseName = _ } <$> f o.userResponseName
+
+
+userResponses_ :: forall b a r. Lens { userResponses :: a | r } { userResponses :: b | r } a b
+userResponses_ f o = o { userResponses = _ } <$> f o.userResponses
 
 -- footer
