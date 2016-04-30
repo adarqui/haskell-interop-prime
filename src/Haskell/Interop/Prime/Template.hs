@@ -21,11 +21,13 @@ module Haskell.Interop.Prime.Template (
   tplEncodeJson_SumType,
   tplDecodeJson_SumType,
   tplRequestable,
-  tplRespondable,
-  tplIsForeign,
-  tplShow_Rec,
+  tplRespondable_Record,
+  tplRespondable_SumType,
+  tplIsForeign_Record,
+  tplIsForeign_SumType,
+  tplShow_Record,
   tplShow_SumType,
-  tplEq_Rec,
+  tplEq_Record,
   tplEq_SumType,
   tplImports,
   tplPurescriptImports,
@@ -376,29 +378,75 @@ tplRequestable InteropOptions{..} base =
 
 
 
-tplRespondable :: InteropOptions -> String -> String
-tplRespondable InteropOptions{..} base =
+tplRespondable_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplRespondable_Record InteropOptions{..} base constr fields =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
   ++ spaces si1 ++ "responseType =\n"
   ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse = Right <<< unsafeFromForeign\n"
+  ++ spaces si1 ++ "fromResponse json =\n"
+  ++ spaces si3 ++ printf "mk%s\n" base
+  ++ spaces si4 ++ "<$> " ++ intercalateMap (spaces si4 ++ "<*> ") (\(n,t) -> readProp n t) fields
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+  si3 = spacingIndent*3
+  si4 = spacingIndent*3
+  readProp n t =
+    if isMaybe t
+      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (fieldNameTransform base n)
+      else printf "readProp \"%s\" json\n" (fieldNameTransform base n)
 
 
 
-tplIsForeign :: InteropOptions -> String -> String
-tplIsForeign InteropOptions{..} base =
-     printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "read = Right <<< unsafeFromForeign\n"
+
+tplRespondable_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplRespondable_SumType InteropOptions{..} base vars =
+     printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
+  ++ spaces si1 ++ "responseType =\n"
+  ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
+  ++ spaces si1 ++ "fromResponse json =\n"
+  ++ spaces si2 ++ printf "mk%s\n" base
   where
   si1 = spacingIndent
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
 
 
 
-tplShow_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplShow_Rec InteropOptions{..} base constr fields =
+tplIsForeign_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplIsForeign_Record InteropOptions{..} base constr fields =
+     printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
+  ++ spaces si1 ++ "read json =\n"
+  ++ spaces si3 ++ printf "mk%s\n" base
+  ++ spaces si4 ++ "<$> " ++ intercalateMap (spaces si4 ++ "<*> ") (\(n,t) -> readProp n t) fields
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
+  si4 = spacingIndent*3
+  readProp n t =
+    if isMaybe t
+      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (fieldNameTransform base n)
+      else printf "readProp \"%s\" json\n" (fieldNameTransform base n)
+
+
+
+tplIsForeign_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplIsForeign_SumType InteropOptions{..} base vars =
+     printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
+  ++ spaces si1 ++ "responseType =\n"
+  ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
+  ++ spaces si1 ++ "fromResponse json =\n"
+  ++ spaces si2 ++ printf "mk%s\n" base
+  where
+  si1 = spacingIndent
+  si2 = spacingIndent*2
+  si3 = spacingIndent*3
+
+
+
+tplShow_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplShow_Record InteropOptions{..} base constr fields =
      instance_decl
   ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s: \" ++ show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
@@ -438,8 +486,8 @@ tplShow_SumType_Field InteropOptions{..} field vars =
 
 
 
-tplEq_Rec :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplEq_Rec InteropOptions{..} base constr fields =
+tplEq_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplEq_Record InteropOptions{..} base constr fields =
      instance_decl
   ++ intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
@@ -840,3 +888,8 @@ tplArrows = intercalate " -> " . filter (/= "")
 
 tplArguments :: [String] -> String
 tplArguments = intercalate " " . filter (/= "")
+
+
+
+isMaybe :: String -> Bool
+isMaybe s = any (\p -> isPrefixOf p s) ["(Maybe", "DateMaybe"]

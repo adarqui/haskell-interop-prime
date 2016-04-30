@@ -156,9 +156,9 @@ buildRespondable = do
   (opts, ir) <- opts_ir
   return $
     case ir of
-      NewtypeRecIR base _ _ -> Just $ tplRespondable opts base
-      DataRecIR base _ _    -> Just $ tplRespondable opts base
-      DataNormalIR base _   -> Just $ tplRespondable opts base
+      NewtypeRecIR base constr fields -> Just $ tplRespondable_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplRespondable_Record opts base constr fields
+      DataNormalIR base vars          -> Just $ tplRespondable_SumType opts base vars
       _                     -> Nothing
 
 
@@ -168,10 +168,10 @@ buildIsForeign = do
   (opts, ir) <- opts_ir
   return $
     case ir of
-      NewtypeRecIR base _ _ -> Just $ tplIsForeign opts base
-      DataRecIR base _ _    -> Just $ tplIsForeign opts base
-      DataNormalIR base _   -> Just $ tplIsForeign opts base
-      _                     -> Nothing
+      NewtypeRecIR base constr fields -> Just $ tplIsForeign_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplIsForeign_Record opts base constr fields
+      DataNormalIR base vars          -> Just $ tplIsForeign_SumType opts base vars
+      _                               -> Nothing
 
 
 
@@ -180,8 +180,8 @@ buildShow = do
   (opts, ir) <- opts_ir
   return $
     case ir of
-      NewtypeRecIR base constr fields -> Just $ tplShow_Rec opts base constr fields
-      DataRecIR base constr fields    -> Just $ tplShow_Rec opts base constr fields
+      NewtypeRecIR base constr fields -> Just $ tplShow_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplShow_Record opts base constr fields
       DataNormalIR base fields        -> Just $ tplShow_SumType opts base fields
       _                               -> Nothing
 
@@ -192,8 +192,8 @@ buildEq = do
   (opts, ir) <- opts_ir
   return $
     case ir of
-      NewtypeRecIR base constr fields -> Just $ tplEq_Rec opts base constr fields
-      DataRecIR base constr fields    -> Just $ tplEq_Rec opts base constr fields
+      NewtypeRecIR base constr fields -> Just $ tplEq_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplEq_Record opts base constr fields
       DataNormalIR base fields        -> Just $ tplEq_SumType opts base fields
       _                               -> Nothing
 
