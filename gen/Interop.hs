@@ -68,7 +68,7 @@ instance FromJSON SumType where
     tag <- o .: "tag"
     case tag of
       "A" -> do
-        return $ A
+        return A
 
       "B" -> do
         x0 <- o .: "contents"

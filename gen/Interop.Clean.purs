@@ -151,7 +151,7 @@ instance sumTypeFromJSON :: FromJSON SumType where
     tag <- o .: "tag"
     case tag of
       "A" -> do
-        return $ A
+        return A
 
       "B" -> do
         x0 <- o .: "contents"
@@ -225,7 +225,7 @@ instance sumTypeDecodeJson :: DecodeJson SumType where
     tag <- obj .? "tag"
     case tag of
         "A" -> do
-          return $ A
+          return A
 
         "B" -> do
           x0 <- obj .? "contents"
@@ -267,15 +267,77 @@ instance sumTypeRequestable :: Requestable SumType where
 instance sumTypeRespondable :: Respondable SumType where
   responseType =
     Tuple Nothing JSONResponse
-  fromResponse json =
-    mkSumType
+  fromResponse json = do
+    tag <- readProp "tag" json
+    case tag of
+        "A" -> do
+          return A
+
+        "B" -> do
+          x0 <- readProp "contents" json
+          B <$> read x0
+
+        "C" -> do
+          x0 <- readProp "contents" json
+          C <$> read x0
+
+        "D" -> do
+          x0 <- readProp "contents" json
+          D <$> read x0
+
+        "E" -> do
+          x0 <- readProp "contents" json
+          E <$> read x0
+
+        "F" -> do
+          x0 <- readProp "contents" json
+          F <$> read x0
+
+        "G" -> do
+          x0 <- readProp "contents" json
+          G <$> read x0
+
+        "H" -> do
+          [x0, x1, x2, x3] <- readProp "contents" json
+          H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+
 
 
 instance sumTypeIsForeign :: IsForeign SumType where
-  responseType =
-    Tuple Nothing JSONResponse
-  fromResponse json =
-    mkSumType
+  read json = do
+    tag <- readProp "tag" json
+    case tag of
+        "A" -> do
+          return A
+
+        "B" -> do
+          x0 <- readProp "contents" json
+          B <$> read x0
+
+        "C" -> do
+          x0 <- readProp "contents" json
+          C <$> read x0
+
+        "D" -> do
+          x0 <- readProp "contents" json
+          D <$> read x0
+
+        "E" -> do
+          x0 <- readProp "contents" json
+          E <$> read x0
+
+        "F" -> do
+          x0 <- readProp "contents" json
+          F <$> read x0
+
+        "G" -> do
+          x0 <- readProp "contents" json
+          G <$> read x0
+
+        "H" -> do
+          [x0, x1, x2, x3] <- readProp "contents" json
+          H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+
 
 
 instance sumTypeShow :: Show SumType where
