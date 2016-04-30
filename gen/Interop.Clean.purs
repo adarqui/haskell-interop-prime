@@ -9,7 +9,8 @@ import Data.Argonaut.Encode
 import Data.Argonaut.Printer
 import Data.Date.Helpers
 import Data.Either
-import Data.Foreign (unsafeFromForeign)
+import Data.Foreign
+import Data.Foreign.NullOrUndefined
 import Data.Foreign.Class
 import Data.JSON
 import Data.List (List ())
