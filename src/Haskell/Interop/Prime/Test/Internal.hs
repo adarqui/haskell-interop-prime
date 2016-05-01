@@ -51,7 +51,7 @@ apiEntries_TH' =
     , ApiDELETE_TH ''()
     ]
 
-  , ApiEntry_TH "UserStr"
+  , ApiEntry_TH "UserText"
     [ Par_TH [("user_name", ''Text)] ]
     [ ApiGET_TH ''UserResponse
     , ApiPUT_TH ''UserRequest ''UserResponse

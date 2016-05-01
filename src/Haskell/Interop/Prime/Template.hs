@@ -853,7 +853,7 @@ tplApiParam_Arguments_Show _ param =
     ParNone          -> []
   where
   go (n,t) =
-    if t == "String"
+    if isString t
       then n
       else "show " ++ n
 
@@ -929,3 +929,8 @@ tplArguments = intercalate " " . filter (/= "")
 
 isMaybe :: String -> Bool
 isMaybe s = any (\p -> isPrefixOf p s) ["(Maybe", "DateMaybe"]
+
+
+
+isString :: String -> Bool
+isString s = any (\p -> isPrefixOf p s) ["String", "Text"]
