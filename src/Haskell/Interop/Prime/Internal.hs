@@ -53,7 +53,7 @@ buildType = do
       NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord opts base constr fields
       DataRecIR base constr fields    -> Just $ tplDataRecord opts base constr fields
       DataNormalIR base fields        -> Just $ tplDataNormal opts base fields
-      TypeIR base type_               -> Just $ tplType opts base type_
+      TypeIR base vars type_          -> Just $ tplType opts base vars type_
       _                               -> Nothing
 
 
@@ -290,7 +290,7 @@ buildInternalRep opts@InteropOptions{..} dec =
       (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
       (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
       _              -> EmptyIR
-  parseInternalRep (TySynD n _ t) = TypeIR (nameBase n) (mkTypeIR opts t)
+  parseInternalRep (TySynD n vars t) = TypeIR (nameBase n) (tyVarBndrToList vars) (mkTypeIR opts t)
   parseInternalRep _ = EmptyIR
 
   mkConNewtypeIR nb (RecC n vars) = NewtypeRecIR nb (nameBase n) (map (mkVarIR nb) vars)
@@ -303,3 +303,8 @@ buildInternalRep opts@InteropOptions{..} dec =
   mkVarIR nb (n, _, t) = (tplBuildField opts nb (nameBase n), mkTypeIR opts t)
 
   mkVarIR' (_, t) = mkTypeIR opts t
+
+  tyVarBndrToList vars = catMaybes $ map (\var -> go var) vars
+    where
+    go (PlainTV n)    = Just $ nameBase n
+    go (KindedTV n _) = Just $ nameBase n

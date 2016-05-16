@@ -10,6 +10,7 @@ module Haskell.Interop.Prime.Test.Types (
   DateMaybe (..),
   Text,
   TextMaybe,
+  NestedList,
   FunkyRecord (..),
   Param (..)
 ) where
@@ -99,6 +100,10 @@ type Text = String
 
 
 type TextMaybe = Maybe Text
+
+
+
+type NestedList a = [[a]]
 
 
 

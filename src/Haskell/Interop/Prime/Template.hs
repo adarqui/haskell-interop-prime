@@ -68,9 +68,9 @@ default (String)
 
 
 
-tplType :: InteropOptions -> String -> String -> String
-tplType InteropOptions{..} base type_ =
-  printf "type %s = %s\n" base type_
+tplType :: InteropOptions -> String -> [String] -> String -> String
+tplType InteropOptions{..} base vars type_ =
+  printf "type %s %s = %s\n" base (intercalate " " vars) type_
 
 
 

@@ -104,7 +104,7 @@ data InternalRep
   | NewtypeNormalIR String String
   | DataRecIR String String [(String, String)]
   | DataNormalIR String [(String, [String])]
-  | TypeIR String String
+  | TypeIR String [String] String
   | EmptyIR
   deriving (Show)
 

@@ -27,6 +27,7 @@ mkExports
   , (''DateMaybe,     defaultPurescriptMks, defaultHaskellMks)
   , (''Text,          defaultPurescriptMks, defaultHaskellMks)
   , (''TextMaybe,     defaultPurescriptMks, defaultHaskellMks)
+  , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
   ]
 
@@ -48,6 +49,7 @@ mkExports
   , (''DateMaybe,     defaultPurescriptMks, defaultHaskellMks)
   , (''Text,          defaultPurescriptMks, defaultHaskellMks)
   , (''TextMaybe,     defaultPurescriptMks, defaultHaskellMks)
+  , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
   ]
 
