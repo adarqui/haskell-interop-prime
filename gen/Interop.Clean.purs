@@ -558,7 +558,7 @@ instance bigRecordShow :: Show BigRecord where
 instance bigRecordEq :: Eq BigRecord where
   eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.dataP == b.dataP && a.classP == b.classP && a.letP == b.letP && a.moduleP == b.moduleP && a.bigRecord == b.bigRecord
 
-type FakeUTCTime = Int
+type FakeUTCTime  = Int
 
 
 newtype User = User {
@@ -819,10 +819,13 @@ instance userResponsesShow :: Show UserResponses where
 instance userResponsesEq :: Eq UserResponses where
   eq (UserResponses a) (UserResponses b) = a.userResponses == b.userResponses
 
-type Text = String
+type Text  = String
 
 
-type TextMaybe = (Maybe String)
+type TextMaybe  = (Maybe String)
+
+
+type NestedList a = (Array  (Array  a))
 
 
 newtype FunkyRecord = Boom1 {
