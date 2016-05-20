@@ -28,6 +28,12 @@ newtype Session = Session {
 }
 
 
+type SessionR = forall eff. {
+  unSession :: String
+  | eff
+}
+
+
 _Session :: LensP Session {
   unSession :: String
 }
@@ -379,6 +385,24 @@ newtype BigRecord = BigRecord {
 }
 
 
+type BigRecordR = forall eff. {
+  bool :: Boolean,
+  int :: Int,
+  maybeInt :: (Maybe Int),
+  integer :: Int,
+  maybeInteger :: (Maybe Int),
+  string :: String,
+  string2 :: (Array  Char),
+  sumType :: SumType,
+  dataP :: String,
+  classP :: String,
+  letP :: String,
+  moduleP :: String,
+  bigRecord :: Boolean
+  | eff
+}
+
+
 _BigRecord :: LensP BigRecord {
   bool :: Boolean,
   int :: Int,
@@ -568,6 +592,14 @@ newtype User = User {
 }
 
 
+type UserR = forall eff. {
+  name :: String,
+  email :: String,
+  active :: Boolean
+  | eff
+}
+
+
 _User :: LensP User {
   name :: String,
   email :: String,
@@ -663,6 +695,13 @@ newtype UserRequest = UserRequest {
 }
 
 
+type UserRequestR = forall eff. {
+  name :: String,
+  email :: String
+  | eff
+}
+
+
 _UserRequest :: LensP UserRequest {
   name :: String,
   email :: String
@@ -743,8 +782,151 @@ instance userRequestShow :: Show UserRequest where
 instance userRequestEq :: Eq UserRequest where
   eq (UserRequest a) (UserRequest b) = a.name == b.name && a.email == b.email
 
+newtype UserResponse = UserResponse {
+  id :: Int,
+  name :: String,
+  email :: String,
+  active :: Boolean,
+  createdAt :: (Maybe FakeUTCTime),
+  modifiedAt :: (Maybe FakeUTCTime)
+}
+
+
+type UserResponseR = forall eff. {
+  id :: Int,
+  name :: String,
+  email :: String,
+  active :: Boolean,
+  createdAt :: (Maybe FakeUTCTime),
+  modifiedAt :: (Maybe FakeUTCTime)
+  | eff
+}
+
+
+_UserResponse :: LensP UserResponse {
+  id :: Int,
+  name :: String,
+  email :: String,
+  active :: Boolean,
+  createdAt :: (Maybe FakeUTCTime),
+  modifiedAt :: (Maybe FakeUTCTime)
+}
+_UserResponse f (UserResponse o) = UserResponse <$> f o
+
+
+mkUserResponse :: Int -> String -> String -> Boolean -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserResponse
+mkUserResponse id name email active createdAt modifiedAt =
+  UserResponse{id, name, email, active, createdAt, modifiedAt}
+
+
+unwrapUserResponse (UserResponse r) = r
+
+instance userResponseToJson :: ToJSON UserResponse where
+  toJSON (UserResponse v) = object $
+    [ "tag" .= "UserResponse"
+    , "id" .= v.id
+    , "name" .= v.name
+    , "email" .= v.email
+    , "active" .= v.active
+    , "created_at" .= v.createdAt
+    , "modified_at" .= v.modifiedAt
+    ]
+
+
+instance userResponseFromJSON :: FromJSON UserResponse where
+  parseJSON (JObject o) = do
+    id <- o .: "id"
+    name <- o .: "name"
+    email <- o .: "email"
+    active <- o .: "active"
+    createdAt <- o .: "created_at"
+    modifiedAt <- o .: "modified_at"
+    return $ UserResponse {
+      id : id,
+      name : name,
+      email : email,
+      active : active,
+      createdAt : createdAt,
+      modifiedAt : modifiedAt
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance userResponseEncodeJson :: EncodeJson UserResponse where
+  encodeJson (UserResponse o) =
+       "tag" := "UserResponse"
+    ~> "id" := o.id
+    ~> "name" := o.name
+    ~> "email" := o.email
+    ~> "active" := o.active
+    ~> "created_at" := o.createdAt
+    ~> "modified_at" := o.modifiedAt
+    ~> jsonEmptyObject
+
+
+instance userResponseDecodeJson :: DecodeJson UserResponse where
+  decodeJson o = do
+    obj <- decodeJson o
+    id <- obj .? "id"
+    name <- obj .? "name"
+    email <- obj .? "email"
+    active <- obj .? "active"
+    createdAt <- obj .? "created_at"
+    modifiedAt <- obj .? "modified_at"
+    pure $ UserResponse {
+      id,
+      name,
+      email,
+      active,
+      createdAt,
+      modifiedAt
+    }
+
+
+instance userResponseRequestable :: Requestable UserResponse where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance userResponseRespondable :: Respondable UserResponse where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json =
+      mkUserResponse
+      <$> readProp "id" json
+      <*> readProp "name" json
+      <*> readProp "email" json
+      <*> readProp "active" json
+      <*> (runNullOrUndefined <$> readProp "created_at" json)
+      <*> (runNullOrUndefined <$> readProp "modified_at" json)
+
+
+instance userResponseIsForeign :: IsForeign UserResponse where
+  read json =
+      mkUserResponse
+      <$> readProp "id" json
+      <*> readProp "name" json
+      <*> readProp "email" json
+      <*> readProp "active" json
+      <*> (runNullOrUndefined <$> readProp "created_at" json)
+      <*> (runNullOrUndefined <$> readProp "modified_at" json)
+
+
+instance userResponseShow :: Show UserResponse where
+    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
+
+instance userResponseEq :: Eq UserResponse where
+  eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.active == b.active && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
+
 newtype UserResponses = UserResponses {
   userResponses :: (Array  UserResponse)
+}
+
+
+type UserResponsesR = forall eff. {
+  userResponses :: (Array  UserResponse)
+  | eff
 }
 
 
@@ -833,6 +1015,12 @@ newtype FunkyRecord = Boom1 {
 }
 
 
+type FunkyRecordR = forall eff. {
+  boom1 :: Boolean
+  | eff
+}
+
+
 _FunkyRecord :: LensP FunkyRecord {
   boom1 :: Boolean
 }
@@ -906,6 +1094,12 @@ instance funkyRecordEq :: Eq FunkyRecord where
 
 newtype FUnkyRecordP = FUnkyRecordP {
   field :: Boolean
+}
+
+
+type FUnkyRecordPR = forall eff. {
+  field :: Boolean
+  | eff
 }
 
 
@@ -1000,6 +1194,10 @@ classP_ :: forall b a r. Lens { classP :: a | r } { classP :: b | r } a b
 classP_ f o = o { classP = _ } <$> f o.classP
 
 
+createdAt_ :: forall b a r. Lens { createdAt :: a | r } { createdAt :: b | r } a b
+createdAt_ f o = o { createdAt = _ } <$> f o.createdAt
+
+
 dataP_ :: forall b a r. Lens { dataP :: a | r } { dataP :: b | r } a b
 dataP_ f o = o { dataP = _ } <$> f o.dataP
 
@@ -1010,6 +1208,10 @@ email_ f o = o { email = _ } <$> f o.email
 
 field_ :: forall b a r. Lens { field :: a | r } { field :: b | r } a b
 field_ f o = o { field = _ } <$> f o.field
+
+
+id_ :: forall b a r. Lens { id :: a | r } { id :: b | r } a b
+id_ f o = o { id = _ } <$> f o.id
 
 
 int_ :: forall b a r. Lens { int :: a | r } { int :: b | r } a b
@@ -1030,6 +1232,10 @@ maybeInt_ f o = o { maybeInt = _ } <$> f o.maybeInt
 
 maybeInteger_ :: forall b a r. Lens { maybeInteger :: a | r } { maybeInteger :: b | r } a b
 maybeInteger_ f o = o { maybeInteger = _ } <$> f o.maybeInteger
+
+
+modifiedAt_ :: forall b a r. Lens { modifiedAt :: a | r } { modifiedAt :: b | r } a b
+modifiedAt_ f o = o { modifiedAt = _ } <$> f o.modifiedAt
 
 
 moduleP_ :: forall b a r. Lens { moduleP :: a | r } { moduleP :: b | r } a b

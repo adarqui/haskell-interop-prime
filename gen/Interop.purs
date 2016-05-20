@@ -28,6 +28,12 @@ newtype Session = Session {
 }
 
 
+type SessionR = forall eff. {
+  unSession :: String
+  | eff
+}
+
+
 _Session :: LensP Session {
   unSession :: String
 }
@@ -379,6 +385,24 @@ newtype BigRecord = BigRecord {
 }
 
 
+type BigRecordR = forall eff. {
+  bigRecordBool :: Boolean,
+  bigRecordInt :: Int,
+  bigRecordMaybeInt :: (Maybe Int),
+  bigRecordInteger :: Int,
+  bigRecordMaybeInteger :: (Maybe Int),
+  bigRecordString :: String,
+  bigRecordString2 :: (Array  Char),
+  bigRecordSumType :: SumType,
+  bigRecordData :: String,
+  bigRecordClass :: String,
+  bigRecordLet :: String,
+  bigRecordModule :: String,
+  bigRecord :: Boolean
+  | eff
+}
+
+
 _BigRecord :: LensP BigRecord {
   bigRecordBool :: Boolean,
   bigRecordInt :: Int,
@@ -568,6 +592,14 @@ newtype User = User {
 }
 
 
+type UserR = forall eff. {
+  userName :: String,
+  userEmail :: String,
+  userActive :: Boolean
+  | eff
+}
+
+
 _User :: LensP User {
   userName :: String,
   userEmail :: String,
@@ -663,6 +695,13 @@ newtype UserRequest = UserRequest {
 }
 
 
+type UserRequestR = forall eff. {
+  userRequestName :: String,
+  userRequestEmail :: String
+  | eff
+}
+
+
 _UserRequest :: LensP UserRequest {
   userRequestName :: String,
   userRequestEmail :: String
@@ -750,6 +789,17 @@ newtype UserResponse = UserResponse {
   userResponseActive :: Boolean,
   userResponseCreatedAt :: (Maybe FakeUTCTime),
   userResponseModifiedAt :: (Maybe FakeUTCTime)
+}
+
+
+type UserResponseR = forall eff. {
+  userResponseId :: Int,
+  userResponseName :: String,
+  userResponseEmail :: String,
+  userResponseActive :: Boolean,
+  userResponseCreatedAt :: (Maybe FakeUTCTime),
+  userResponseModifiedAt :: (Maybe FakeUTCTime)
+  | eff
 }
 
 
@@ -874,6 +924,12 @@ newtype UserResponses = UserResponses {
 }
 
 
+type UserResponsesR = forall eff. {
+  userResponses :: (Array  UserResponse)
+  | eff
+}
+
+
 _UserResponses :: LensP UserResponses {
   userResponses :: (Array  UserResponse)
 }
@@ -959,6 +1015,12 @@ newtype FunkyRecord = Boom1 {
 }
 
 
+type FunkyRecordR = forall eff. {
+  boom1 :: Boolean
+  | eff
+}
+
+
 _FunkyRecord :: LensP FunkyRecord {
   boom1 :: Boolean
 }
@@ -1032,6 +1094,12 @@ instance funkyRecordEq :: Eq FunkyRecord where
 
 newtype FUnkyRecordP = FUnkyRecordP {
   funkyrecordpField :: Boolean
+}
+
+
+type FUnkyRecordPR = forall eff. {
+  funkyrecordpField :: Boolean
+  | eff
 }
 
 
