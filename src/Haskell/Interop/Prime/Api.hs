@@ -59,7 +59,7 @@ buildParam opts@InteropOptions{..} api_param_th =
       return $ ParBy p t
     ParBoth_TH args (p,t) ->
       ParBoth
-      <$> mapM (\(p,t) -> nameAndType opts p t) args
+      <$> mapM (\(p',t') -> nameAndType opts p' t') args
       <*> nameAndType opts p t
     ParNone_TH            -> return ParNone
 

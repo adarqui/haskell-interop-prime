@@ -9,6 +9,7 @@ module Haskell.Interop.Prime.Template (
   tplNewtypeRecord,
   tplDataRecord,
   tplRecord,
+  tplRows,
   tplDataNormal,
   tplMk,
   tplUnwrap,
@@ -114,6 +115,24 @@ tplRecord type_ InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
   ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
   ++ "\n}\n"
+
+
+
+-- | tplRows creates row records of the form:
+--
+-- type Rec = forall eff. {
+--  row1 :: Type1,
+--  rowN :: TypeN
+--  | eff
+-- }
+--
+tplRows :: InteropOptions -> String ->  String -> [(String, String)] -> String
+tplRows InteropOptions{..} suffix base fields =
+     printf "type %s%s = forall eff. {\n" base suffix
+  ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
+  ++ "\n"
+  ++ spaces spacingIndent ++ "| eff\n"
+  ++ "}\n"
 
 
 
@@ -406,11 +425,10 @@ tplRespondable_SumType opts@InteropOptions{..} base vars =
   ++ spaces si1 ++ "fromResponse json = do\n"
   ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
   ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars) -> tplRespondable_SumType_Field opts f vars) vars
+  ++ concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
-  si3 = spacingIndent*3
 
 
 
@@ -432,14 +450,13 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
 
 
 tplIsForeign_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplIsForeign_Record InteropOptions{..} base constr fields =
+tplIsForeign_Record InteropOptions{..} base _ fields =
      printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
   ++ spaces si1 ++ "read json =\n"
   ++ spaces si3 ++ printf "mk%s\n" base
   ++ spaces si4 ++ "<$> " ++ intercalateMap (spaces si4 ++ "<*> ") (\(n,t) -> readProp n t) fields
   where
   si1 = spacingIndent
-  si2 = spacingIndent*2
   si3 = spacingIndent*3
   si4 = spacingIndent*3
   readProp n t =
@@ -455,7 +472,7 @@ tplIsForeign_SumType opts@InteropOptions{..} base vars =
   ++ spaces si1 ++ "read json = do\n"
   ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
   ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars) -> tplIsForeign_SumType_Field opts f vars) vars
+  ++ concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
   where
   si1 = spacingIndent
   si2 = spacingIndent*2

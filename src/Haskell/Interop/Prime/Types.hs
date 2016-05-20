@@ -42,6 +42,7 @@ data Lang
 
 data Mk
   = MkType
+  | MkTypeRows String
   | MkToJSON
   | MkFromJSON
   | MkUnwrap
@@ -54,7 +55,7 @@ data Mk
   | MkIsForeign
   | MkShow
   | MkEq
-  deriving (Show, Eq, Ord, Enum)
+  deriving (Show, Eq, Ord)
 
 
 

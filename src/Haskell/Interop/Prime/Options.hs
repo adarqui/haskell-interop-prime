@@ -201,6 +201,7 @@ defaultReservedMap =
 defaultPurescriptMks :: [Mk]
 defaultPurescriptMks =
   [ MkType
+  , MkTypeRows "R"
   , MkLens
   , MkMk
   , MkUnwrap

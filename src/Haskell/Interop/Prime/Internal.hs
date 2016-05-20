@@ -58,6 +58,17 @@ buildType = do
 
 
 
+buildTypeRows :: String -> ExportT (Maybe String)
+buildTypeRows suffix = do
+  (opts, ir) <- opts_ir
+  return $
+    case ir of
+      NewtypeRecIR base _ fields -> Just $ tplRows opts suffix base fields
+      DataRecIR base _ fields    -> Just $ tplRows opts suffix base fields
+      _                          -> Nothing
+
+
+
 buildLens :: ExportT (Maybe String)
 buildLens = do
   (opts, ir) <- opts_ir
@@ -203,6 +214,7 @@ runMk :: Mk -> ExportT (Maybe String)
 runMk mk = do
   case mk of
     MkType              -> buildType
+    MkTypeRows suffix   -> buildTypeRows suffix
     MkLens              -> buildLens
     MkMk                -> buildMk
     MkUnwrap            -> buildUnwrap
