@@ -120,19 +120,16 @@ tplRecord type_ InteropOptions{..} base constr fields =
 
 -- | tplRows creates row records of the form:
 --
--- type Rec = forall eff. {
+-- type RecR = {
 --  row1 :: Type1,
 --  rowN :: TypeN
---  | eff
 -- }
 --
 tplRows :: InteropOptions -> String ->  String -> [(String, String)] -> String
 tplRows InteropOptions{..} suffix base fields =
-     printf "type %s%s = forall eff. {\n" base suffix
+     printf "type %s%s = {\n" base suffix
   ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
-  ++ "\n"
-  ++ spaces spacingIndent ++ "| eff\n"
-  ++ "}\n"
+  ++ "\n}\n"
 
 
 
