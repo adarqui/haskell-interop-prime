@@ -125,8 +125,8 @@ defaultFieldNameTransformClean nb s =
 defaultJsonNameTransformClean :: StringTransformFn
 defaultJsonNameTransformClean nb s =
   if isPrefixOf ftl s
-    then map toLower $ unCamelSource '_' fixed
-    else map toLower $ unCamelSource '_' s
+    then dropSuffix $ map toLower $ unCamelSource '_' fixed
+    else dropSuffix $ map toLower $ unCamelSource '_' s
   where
   ftl = firstToLower nb
   stripped = stripPrefix ftl s
@@ -135,6 +135,15 @@ defaultJsonNameTransformClean nb s =
       Nothing -> s
       Just "" -> s
       Just v  -> v
+  -- this is somewhat hacky:
+  -- if a json tag ends in _p, we assume it's part of the reserved map, ie, "data_p" == dataP
+  -- so trim the _p off of the end so that we don't have to send json tags with _p from the server side
+  -- this could be done in Template.hs, but i'd rather just make it user customizable for now.
+  -- thnx.
+  dropSuffix s =
+    if isSuffixOf "_p" s
+      then take (length s - 2) s
+      else s
 
 defaultJsonTagNameTransformClean :: StringTransformFn
 defaultJsonTagNameTransformClean _ s = s
