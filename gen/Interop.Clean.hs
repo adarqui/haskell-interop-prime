@@ -112,10 +112,10 @@ instance ToJSON BigRecord where
     , "string" .= string
     , "string2" .= string2
     , "sum_type" .= sumType
-    , "data_p" .= dataP
-    , "class_p" .= classP
-    , "let_p" .= letP
-    , "module_p" .= moduleP
+    , "data" .= dataP
+    , "class" .= classP
+    , "let" .= letP
+    , "module" .= moduleP
     , "big_record" .= bigRecord
     ]
 
@@ -130,10 +130,10 @@ instance FromJSON BigRecord where
     string <- o .: "string"
     string2 <- o .: "string2"
     sumType <- o .: "sum_type"
-    dataP <- o .: "data_p"
-    classP <- o .: "class_p"
-    letP <- o .: "let_p"
-    moduleP <- o .: "module_p"
+    dataP <- o .: "data"
+    classP <- o .: "class"
+    letP <- o .: "let"
+    moduleP <- o .: "module"
     bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool = bool,

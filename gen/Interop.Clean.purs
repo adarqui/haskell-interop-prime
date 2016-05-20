@@ -415,10 +415,10 @@ instance bigRecordToJson :: ToJSON BigRecord where
     , "string" .= v.string
     , "string2" .= v.string2
     , "sum_type" .= v.sumType
-    , "data_p" .= v.dataP
-    , "class_p" .= v.classP
-    , "let_p" .= v.letP
-    , "module_p" .= v.moduleP
+    , "data" .= v.dataP
+    , "class" .= v.classP
+    , "let" .= v.letP
+    , "module" .= v.moduleP
     , "big_record" .= v.bigRecord
     ]
 
@@ -433,10 +433,10 @@ instance bigRecordFromJSON :: FromJSON BigRecord where
     string <- o .: "string"
     string2 <- o .: "string2"
     sumType <- o .: "sum_type"
-    dataP <- o .: "data_p"
-    classP <- o .: "class_p"
-    letP <- o .: "let_p"
-    moduleP <- o .: "module_p"
+    dataP <- o .: "data"
+    classP <- o .: "class"
+    letP <- o .: "let"
+    moduleP <- o .: "module"
     bigRecord <- o .: "big_record"
     return $ BigRecord {
       bool : bool,
@@ -467,10 +467,10 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "string" := o.string
     ~> "string2" := o.string2
     ~> "sum_type" := o.sumType
-    ~> "data_p" := o.dataP
-    ~> "class_p" := o.classP
-    ~> "let_p" := o.letP
-    ~> "module_p" := o.moduleP
+    ~> "data" := o.dataP
+    ~> "class" := o.classP
+    ~> "let" := o.letP
+    ~> "module" := o.moduleP
     ~> "big_record" := o.bigRecord
     ~> jsonEmptyObject
 
@@ -486,10 +486,10 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     string <- obj .? "string"
     string2 <- obj .? "string2"
     sumType <- obj .? "sum_type"
-    dataP <- obj .? "data_p"
-    classP <- obj .? "class_p"
-    letP <- obj .? "let_p"
-    moduleP <- obj .? "module_p"
+    dataP <- obj .? "data"
+    classP <- obj .? "class"
+    letP <- obj .? "let"
+    moduleP <- obj .? "module"
     bigRecord <- obj .? "big_record"
     pure $ BigRecord {
       bool,
@@ -527,10 +527,10 @@ instance bigRecordRespondable :: Respondable BigRecord where
       <*> readProp "string" json
       <*> readProp "string2" json
       <*> readProp "sum_type" json
-      <*> readProp "data_p" json
-      <*> readProp "class_p" json
-      <*> readProp "let_p" json
-      <*> readProp "module_p" json
+      <*> readProp "data" json
+      <*> readProp "class" json
+      <*> readProp "let" json
+      <*> readProp "module" json
       <*> readProp "big_record" json
 
 
@@ -545,10 +545,10 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
       <*> readProp "string" json
       <*> readProp "string2" json
       <*> readProp "sum_type" json
-      <*> readProp "data_p" json
-      <*> readProp "class_p" json
-      <*> readProp "let_p" json
-      <*> readProp "module_p" json
+      <*> readProp "data" json
+      <*> readProp "class" json
+      <*> readProp "let" json
+      <*> readProp "module" json
       <*> readProp "big_record" json
 
 
