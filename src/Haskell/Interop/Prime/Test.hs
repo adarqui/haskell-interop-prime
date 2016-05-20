@@ -46,6 +46,7 @@ mkExports
   , (''FakeUTCTime,   defaultPurescriptMks, defaultHaskellMks)
   , (''User,          defaultPurescriptMks, defaultHaskellMks)
   , (''UserRequest,   defaultPurescriptMks, defaultHaskellMks)
+  , (''UserResponse,  defaultPurescriptMks, defaultHaskellMks)
   , (''UserResponses, defaultPurescriptMks, defaultHaskellMks)
   , (''DateMaybe,     defaultPurescriptMks, defaultHaskellMks)
   , (''Text,          defaultPurescriptMks, defaultHaskellMks)
