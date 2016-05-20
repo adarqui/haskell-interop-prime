@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards    #-}
+{-# LANGUAGE FlexibleContexts   #-}
 
 module Haskell.Interop.Prime.Options (
   defaultOptions,
