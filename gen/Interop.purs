@@ -1030,6 +1030,82 @@ instance funkyRecordShow :: Show FunkyRecord where
 instance funkyRecordEq :: Eq FunkyRecord where
   eq (Boom1 a) (Boom1 b) = a.boom1 == b.boom1
 
+newtype FUnkyRecordP = FUnkyRecordP {
+  funkyrecordpField :: Boolean
+}
+
+
+_FUnkyRecordP :: LensP FUnkyRecordP {
+  funkyrecordpField :: Boolean
+}
+_FUnkyRecordP f (FUnkyRecordP o) = FUnkyRecordP <$> f o
+
+
+mkFUnkyRecordP :: Boolean -> FUnkyRecordP
+mkFUnkyRecordP funkyrecordpField =
+  FUnkyRecordP{funkyrecordpField}
+
+
+unwrapFUnkyRecordP (FUnkyRecordP r) = r
+
+instance fUnkyRecordPToJson :: ToJSON FUnkyRecordP where
+  toJSON (FUnkyRecordP v) = object $
+    [ "tag" .= "FUnkyRecordP"
+    , "funkyrecordpField" .= v.funkyrecordpField
+    ]
+
+
+instance fUnkyRecordPFromJSON :: FromJSON FUnkyRecordP where
+  parseJSON (JObject o) = do
+    funkyrecordpField <- o .: "funkyrecordpField"
+    return $ FUnkyRecordP {
+      funkyrecordpField : funkyrecordpField
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance fUnkyRecordPEncodeJson :: EncodeJson FUnkyRecordP where
+  encodeJson (FUnkyRecordP o) =
+       "tag" := "FUnkyRecordP"
+    ~> "funkyrecordpField" := o.funkyrecordpField
+    ~> jsonEmptyObject
+
+
+instance fUnkyRecordPDecodeJson :: DecodeJson FUnkyRecordP where
+  decodeJson o = do
+    obj <- decodeJson o
+    funkyrecordpField <- obj .? "funkyrecordpField"
+    pure $ FUnkyRecordP {
+      funkyrecordpField
+    }
+
+
+instance fUnkyRecordPRequestable :: Requestable FUnkyRecordP where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance fUnkyRecordPRespondable :: Respondable FUnkyRecordP where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json =
+      mkFUnkyRecordP
+      <$> readProp "funkyrecordpField" json
+
+
+instance fUnkyRecordPIsForeign :: IsForeign FUnkyRecordP where
+  read json =
+      mkFUnkyRecordP
+      <$> readProp "funkyrecordpField" json
+
+
+instance fUnkyRecordPShow :: Show FUnkyRecordP where
+    show (FUnkyRecordP o) = show "funkyrecordpField: " ++ show o.funkyrecordpField
+
+instance fUnkyRecordPEq :: Eq FUnkyRecordP where
+  eq (FUnkyRecordP a) (FUnkyRecordP b) = a.funkyrecordpField == b.funkyrecordpField
+
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
@@ -1084,6 +1160,10 @@ bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
 
 boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b
 boom1_ f o = o { boom1 = _ } <$> f o.boom1
+
+
+funkyrecordpField_ :: forall b a r. Lens { funkyrecordpField :: a | r } { funkyrecordpField :: b | r } a b
+funkyrecordpField_ f o = o { funkyrecordpField = _ } <$> f o.funkyrecordpField
 
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b

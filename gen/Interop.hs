@@ -256,4 +256,20 @@ instance FromJSON FunkyRecord where
     }
   parseJSON x = fail $ "Could not parse object: " ++ show x
 
+
+instance ToJSON FUnkyRecordP where
+  toJSON FUnkyRecordP{..} = object $
+    [ "tag" .= "FUnkyRecordP"
+    , "funkyrecordpField" .= funkyrecordpField
+    ]
+
+
+instance FromJSON FUnkyRecordP where
+  parseJSON (Object o) = do
+    funkyrecordpField <- o .: "funkyrecordpField"
+    return $ FUnkyRecordP {
+      funkyrecordpField = funkyrecordpField
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
 -- footer

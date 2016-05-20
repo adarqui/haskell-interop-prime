@@ -904,6 +904,82 @@ instance funkyRecordShow :: Show FunkyRecord where
 instance funkyRecordEq :: Eq FunkyRecord where
   eq (Boom1 a) (Boom1 b) = a.boom1 == b.boom1
 
+newtype FUnkyRecordP = FUnkyRecordP {
+  field :: Boolean
+}
+
+
+_FUnkyRecordP :: LensP FUnkyRecordP {
+  field :: Boolean
+}
+_FUnkyRecordP f (FUnkyRecordP o) = FUnkyRecordP <$> f o
+
+
+mkFUnkyRecordP :: Boolean -> FUnkyRecordP
+mkFUnkyRecordP field =
+  FUnkyRecordP{field}
+
+
+unwrapFUnkyRecordP (FUnkyRecordP r) = r
+
+instance fUnkyRecordPToJson :: ToJSON FUnkyRecordP where
+  toJSON (FUnkyRecordP v) = object $
+    [ "tag" .= "FUnkyRecordP"
+    , "field" .= v.field
+    ]
+
+
+instance fUnkyRecordPFromJSON :: FromJSON FUnkyRecordP where
+  parseJSON (JObject o) = do
+    field <- o .: "field"
+    return $ FUnkyRecordP {
+      field : field
+    }
+  parseJSON x = fail $ "Could not parse object: " ++ show x
+
+
+instance fUnkyRecordPEncodeJson :: EncodeJson FUnkyRecordP where
+  encodeJson (FUnkyRecordP o) =
+       "tag" := "FUnkyRecordP"
+    ~> "field" := o.field
+    ~> jsonEmptyObject
+
+
+instance fUnkyRecordPDecodeJson :: DecodeJson FUnkyRecordP where
+  decodeJson o = do
+    obj <- decodeJson o
+    field <- obj .? "field"
+    pure $ FUnkyRecordP {
+      field
+    }
+
+
+instance fUnkyRecordPRequestable :: Requestable FUnkyRecordP where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance fUnkyRecordPRespondable :: Respondable FUnkyRecordP where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json =
+      mkFUnkyRecordP
+      <$> readProp "field" json
+
+
+instance fUnkyRecordPIsForeign :: IsForeign FUnkyRecordP where
+  read json =
+      mkFUnkyRecordP
+      <$> readProp "field" json
+
+
+instance fUnkyRecordPShow :: Show FUnkyRecordP where
+    show (FUnkyRecordP o) = show "field: " ++ show o.field
+
+instance fUnkyRecordPEq :: Eq FUnkyRecordP where
+  eq (FUnkyRecordP a) (FUnkyRecordP b) = a.field == b.field
+
 active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
 active_ f o = o { active = _ } <$> f o.active
 
@@ -930,6 +1006,10 @@ dataP_ f o = o { dataP = _ } <$> f o.dataP
 
 email_ :: forall b a r. Lens { email :: a | r } { email :: b | r } a b
 email_ f o = o { email = _ } <$> f o.email
+
+
+field_ :: forall b a r. Lens { field :: a | r } { field :: b | r } a b
+field_ f o = o { field = _ } <$> f o.field
 
 
 int_ :: forall b a r. Lens { int :: a | r } { int :: b | r } a b

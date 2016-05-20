@@ -29,6 +29,7 @@ mkExports
   , (''TextMaybe,     defaultPurescriptMks, defaultHaskellMks)
   , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
+  , (''FUnkyRecordP,  defaultPurescriptMks, defaultHaskellMks)
   ]
 
 
@@ -51,6 +52,7 @@ mkExports
   , (''TextMaybe,     defaultPurescriptMks, defaultHaskellMks)
   , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
+  , (''FUnkyRecordP,  defaultPurescriptMks, defaultHaskellMks)
   ]
 
 

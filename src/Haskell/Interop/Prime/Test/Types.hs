@@ -12,6 +12,7 @@ module Haskell.Interop.Prime.Test.Types (
   TextMaybe,
   NestedList,
   FunkyRecord (..),
+  FUnkyRecordP (..),
   Param (..)
 ) where
 
@@ -112,6 +113,12 @@ data FunkyRecord
   | Boom2 { boom2 :: Bool }
   | Boom3 { boom3a :: Bool, boom3b :: Bool, boom3c :: Bool }
   | Boom4
+
+
+
+data FUnkyRecordP = FUnkyRecordP {
+  funkyrecordpField :: Bool
+}
 
 
 

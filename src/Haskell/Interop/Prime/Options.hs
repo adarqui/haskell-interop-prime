@@ -111,31 +111,33 @@ defaultOptionsClean lang path = InteropOptions {
 
 defaultFieldNameTransformClean :: StringTransformFn
 defaultFieldNameTransformClean nb s =
-  if isPrefixOf ftl s
+  if isPrefixOf lower_nb lower_s
     then firstToLower fixed
     else s
   where
-  ftl = firstToLower nb
-  stripped = stripPrefix ftl s
-  fixed =
+  lower_nb = map toLower nb
+  lower_s  = map toLower s
+  ftl      = firstToLower nb
+  stripped = drop (length lower_nb) s
+  fixed    =
     case stripped of
-      Nothing -> s
-      Just "" -> s
-      Just v  -> v
+      "" -> s
+      v  -> v
 
 defaultJsonNameTransformClean :: StringTransformFn
 defaultJsonNameTransformClean nb s =
-  if isPrefixOf ftl s
+  if isPrefixOf lower_nb lower_s
     then dropSuffix $ map toLower $ unCamelSource '_' fixed
     else dropSuffix $ map toLower $ unCamelSource '_' s
   where
-  ftl = firstToLower nb
-  stripped = stripPrefix ftl s
-  fixed =
+  lower_nb = map toLower nb
+  lower_s  = map toLower s
+  ftl      = firstToLower nb
+  stripped = drop (length lower_nb) s
+  fixed    =
     case stripped of
-      Nothing -> s
-      Just "" -> s
-      Just v  -> v
+      "" -> s
+      v  -> v
   -- this is somewhat hacky:
   -- if a json tag ends in _p, we assume it's part of the reserved map, ie, "data_p" == dataP
   -- so trim the _p off of the end so that we don't have to send json tags with _p from the server side
