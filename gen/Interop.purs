@@ -28,9 +28,8 @@ newtype Session = Session {
 }
 
 
-type SessionR = forall eff. {
+type SessionR = {
   unSession :: String
-  | eff
 }
 
 
@@ -385,7 +384,7 @@ newtype BigRecord = BigRecord {
 }
 
 
-type BigRecordR = forall eff. {
+type BigRecordR = {
   bigRecordBool :: Boolean,
   bigRecordInt :: Int,
   bigRecordMaybeInt :: (Maybe Int),
@@ -399,7 +398,6 @@ type BigRecordR = forall eff. {
   bigRecordLet :: String,
   bigRecordModule :: String,
   bigRecord :: Boolean
-  | eff
 }
 
 
@@ -592,11 +590,10 @@ newtype User = User {
 }
 
 
-type UserR = forall eff. {
+type UserR = {
   userName :: String,
   userEmail :: String,
   userActive :: Boolean
-  | eff
 }
 
 
@@ -695,10 +692,9 @@ newtype UserRequest = UserRequest {
 }
 
 
-type UserRequestR = forall eff. {
+type UserRequestR = {
   userRequestName :: String,
   userRequestEmail :: String
-  | eff
 }
 
 
@@ -792,14 +788,13 @@ newtype UserResponse = UserResponse {
 }
 
 
-type UserResponseR = forall eff. {
+type UserResponseR = {
   userResponseId :: Int,
   userResponseName :: String,
   userResponseEmail :: String,
   userResponseActive :: Boolean,
   userResponseCreatedAt :: (Maybe FakeUTCTime),
   userResponseModifiedAt :: (Maybe FakeUTCTime)
-  | eff
 }
 
 
@@ -924,9 +919,8 @@ newtype UserResponses = UserResponses {
 }
 
 
-type UserResponsesR = forall eff. {
+type UserResponsesR = {
   userResponses :: (Array  UserResponse)
-  | eff
 }
 
 
@@ -1015,9 +1009,8 @@ newtype FunkyRecord = Boom1 {
 }
 
 
-type FunkyRecordR = forall eff. {
+type FunkyRecordR = {
   boom1 :: Boolean
-  | eff
 }
 
 
@@ -1097,9 +1090,8 @@ newtype FUnkyRecordP = FUnkyRecordP {
 }
 
 
-type FUnkyRecordPR = forall eff. {
+type FUnkyRecordPR = {
   funkyrecordpField :: Boolean
-  | eff
 }
 
 
