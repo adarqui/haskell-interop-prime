@@ -11,13 +11,16 @@ module Haskell.Interop.Prime.Shared (
   mkTypeIR,
   runMkG,
   persistResults,
-  runDebug
+  runDebug,
+  buildInternalRep
 ) where
 
 
 
 import           Control.Monad
 import           Control.Monad.Trans.RWS
+import           Data.List                      (intercalate)
+import           Data.Maybe                     (catMaybes)
 import           Language.Haskell.TH
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
@@ -106,3 +109,39 @@ runDebug InteropOptions{..} f = do
   if debug
     then void $ runIO $ f
     else return ()
+
+
+
+-- | Build the internel representation of a type
+--
+buildInternalRep :: InteropOptions -> Dec -> InternalRep
+buildInternalRep opts@InteropOptions{..} dec =
+
+  parseInternalRep dec
+
+  where
+
+  parseInternalRep (NewtypeD _ n _ con _) = mkConNewtypeIR (nameBase n) con
+  parseInternalRep (DataD _ n _ cons _) =
+    case (head cons) of
+      (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
+      (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
+      _              -> EmptyIR
+  parseInternalRep (TySynD n vars t) = TypeIR (nameBase n) (tyVarBndrToList vars) (mkTypeIR opts t)
+  parseInternalRep _ = EmptyIR
+
+  mkConNewtypeIR nb (RecC n vars) = NewtypeRecIR nb (nameBase n) (map (mkVarIR nb) vars)
+  mkConNewtypeIR _ (NormalC n vars) = NewtypeNormalIR (nameBase n) (intercalate " " (map mkVarIR' vars))
+  mkConNewtypeIR _ _ = EmptyIR
+
+  mkConDataIR' _ (NormalC n vars) = (nameBase n, map mkVarIR' vars)
+  mkConDataIR' _ _ = ("",[])
+
+  mkVarIR nb (n, _, t) = (tplBuildField opts nb (nameBase n), mkTypeIR opts t)
+
+  mkVarIR' (_, t) = mkTypeIR opts t
+
+  tyVarBndrToList vars = catMaybes $ map (\var -> go var) vars
+    where
+    go (PlainTV n)    = Just $ nameBase n
+    go (KindedTV n _) = Just $ nameBase n
