@@ -21,6 +21,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Haskell.Interop.Prime
                      , Haskell.Interop.Prime.Api
+                     , Haskell.Interop.Prime.Convert
                      , Haskell.Interop.Prime.Internal
                      , Haskell.Interop.Prime.Misc
                      , Haskell.Interop.Prime.Options
