@@ -34,6 +34,20 @@ mkExports
 
 
 
+mkConvert
+  (Options
+    (defaultOptionsPurescript "/tmp/Interop.Convert.purs")
+    (defaultPurescriptMkGs "module Interop.Convert where")
+    (defaultOptionsHaskell "/tmp/Interop.Convert.hs")
+    (defaultHaskellMkGs $ tplTestHeader "Interop.Convert"))
+  [ (''UserRequest, ''UserResponse) ]
+
+
+
+--
+-- Clean
+--
+
 mkExports
   (Options
     (defaultOptionsCleanPurescript "/tmp/Interop.Clean.purs")
@@ -55,6 +69,16 @@ mkExports
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
   , (''FUnkyRecordP,  defaultPurescriptMks, defaultHaskellMks)
   ]
+
+
+
+mkConvert
+  (Options
+    (defaultOptionsCleanPurescript "/tmp/Interop.Convert.Clean.purs")
+    (defaultPurescriptMkGs "module Interop.Convert.Clean where")
+    (defaultOptionsCleanHaskell "/tmp/Interop.Convert.Clean.hs")
+    (defaultHaskellMkGs $ tplTestHeader "Interop.Convert.Clean"))
+  [ (''UserRequest, ''UserResponse) ]
 
 
 
