@@ -69,12 +69,21 @@ mkConvert Options{..} nn = do
 -- and leaves us with a string representation of a module.
 --
 mkConvert' :: InteropOptions -> [MkG] -> [(InternalRep, InternalRep)] -> ExportT String
-mkConvert' InteropOptions{..} mkgs xs = do
+mkConvert' opts@InteropOptions{..} mkgs xs = do
 
   -- build a list of results of applying each mk to each Dec (type)
   converts <-
     mapM (\(ir1,ir2) -> do
-      return $ [Just "hi"]
+
+      let r = case (ir1,ir2) of
+                (NewtypeRecIR base1 constr1 fields1, NewtypeRecIR base2 constr2 fields2) ->
+                  Just $ tplConvertRecord opts (base1,constr1,fields1) (base2,constr2,fields2)
+                (DataRecIR base1 constr1 fields1, DataRecIR base2 constr2 fields2)       ->
+                  Just $ tplConvertRecord opts (base1,constr1,fields1) (base2,constr2,fields2)
+                _                               -> Nothing
+
+      return [r]
+
     ) xs
 
   -- fold over the stringified module, adding imports, headers, footers etc

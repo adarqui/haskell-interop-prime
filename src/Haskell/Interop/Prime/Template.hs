@@ -9,6 +9,9 @@ module Haskell.Interop.Prime.Template (
   tplNewtypeRecord,
   tplDataRecord,
   tplRecord,
+  tplConvertRecord,
+  tplConvertRecord_Purescript,
+  tplConvertRecord_Haskell,
   tplRows,
   tplDataNormal,
   tplMk,
@@ -115,6 +118,63 @@ tplRecord type_ InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
   ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
   ++ "\n}\n"
+
+
+
+-- | Converts 1 to 2
+--
+tplConvertRecord :: InteropOptions -> (String, String, [(String, String)]) -> (String, String, [(String, String)]) -> String
+tplConvertRecord opts@InteropOptions{..} one two =
+  case lang of
+    LangPurescript -> tplConvertRecord_Purescript opts one two
+    LangHaskell    -> tplConvertRecord_Haskell opts one two
+    _              -> "tplConvertRecord not supported"
+
+
+
+-- | Converts 1 to 2
+--
+tplConvertRecord_Purescript :: InteropOptions -> (String, String, [(String, String)]) -> (String, String, [(String, String)]) -> String
+tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
+     printf "%s :: %s\n" fn_name (tplArrows arrows)
+  ++ printf "%s %s (%s o) =\n" fn_name (tplArguments args_diff) constr1
+  ++ spaces spacingIndent ++ printf "%s {\n" constr2
+  ++ intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) ++ printf "%s: %s" (fieldNameTransform constr2 n) (proper constr1 n)) fields2
+  ++ "\n"
+  ++ spaces spacingIndent ++ "}\n"
+  where
+  fn_name          = firstToLower constr1 <> "To" <> constr2
+  fields_union     = union fields1 fields2
+  fields_intersect = intersect fields1 fields2
+  fields_diff      = fields2 \\ fields1
+  types_diff       = map snd fields_diff
+  args_diff        = map fst fields_diff
+  arrows           = types_diff ++ [base1, base2]
+  proper constr name =
+    (if name `elem` args_diff
+      then ""
+      else "o.") <> fieldNameTransform constr name
+
+
+
+-- | Converts 1 to 2
+--
+tplConvertRecord_Haskell :: InteropOptions -> (String, String, [(String, String)]) -> (String, string, [(String, String)]) -> String
+tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
+     printf "%s :: %s\n" fn_name (tplArrows arrows)
+  ++ printf "%s %s %s{..} =\n" fn_name (tplArguments args_diff) base1
+  ++ spaces spacingIndent ++ printf "%s {\n" base2
+  ++ intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) ++ printf "%s = %s" (fieldNameTransform base2 n) (fieldNameTransform base1 n)) fields2
+  ++ "\n"
+  ++ spaces spacingIndent ++ "}\n"
+  where
+  fn_name          = firstToLower base1 <> "To" <> base2
+  fields_union     = union fields1 fields2
+  fields_intersect = intersect fields1 fields2
+  fields_diff      = fields2 \\ fields1
+  types_diff       = map snd fields_diff
+  args_diff        = map fst fields_diff
+  arrows           = types_diff ++ [base1, base2]
 
 
 

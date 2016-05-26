@@ -40,7 +40,8 @@ mkConvert
     (defaultPurescriptMkGs "module Interop.Convert where")
     (defaultOptionsHaskell "/tmp/Interop.Convert.hs")
     (defaultHaskellMkGs $ tplTestHeader "Interop.Convert"))
-  [ (''UserRequest, ''UserResponse) ]
+  [ (''UserRequest, ''UserResponse)
+  , (''UserResponse, ''UserRequest) ]
 
 
 
@@ -78,7 +79,8 @@ mkConvert
     (defaultPurescriptMkGs "module Interop.Convert.Clean where")
     (defaultOptionsCleanHaskell "/tmp/Interop.Convert.Clean.hs")
     (defaultHaskellMkGs $ tplTestHeader "Interop.Convert.Clean"))
-  [ (''UserRequest, ''UserResponse) ]
+  [ (''UserRequest, ''UserResponse)
+  , (''UserResponse, ''UserRequest) ]
 
 
 
