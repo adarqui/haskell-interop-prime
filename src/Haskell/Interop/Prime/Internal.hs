@@ -231,7 +231,7 @@ runMk mk = do
 
 
 
--- | This is the meat and potatoes. It exports types to a files
+-- | This is the meat and potatoes. It exports types to a file
 --
 mkExports :: Options -> [(Name, [Mk], [Mk])] -> Q [Dec]
 mkExports Options{..} nmm = do
