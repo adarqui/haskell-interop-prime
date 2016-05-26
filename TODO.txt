@@ -5,5 +5,7 @@ generate:
 - persistent config models
 - request to response?
 
-fixes:
-- Array Char -> String
+converters:
+- haskell converts don't work yet: userRequestName <-> userResponseName
+- needs some extra logic in order to work
+- though I only need purescript for now
