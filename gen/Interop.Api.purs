@@ -79,21 +79,21 @@ deleteUserText' :: String -> ApiEff (Either ApiError Unit)
 deleteUserText' user_name = handleError <$> deleteAt ([] :: Array Boolean) ["user_text", user_name]
 
 getUserString :: forall qp. QueryParam qp => Array qp -> String -> ApiEff (Either ApiError UserResponse)
-getUserString params user_name = handleError <$> getAt params ["user_string", show user_name]
+getUserString params user_name = handleError <$> getAt params ["user_string", user_name]
 
 getUserString' :: String -> ApiEff (Either ApiError UserResponse)
-getUserString' user_name = handleError <$> getAt ([] :: Array Boolean) ["user_string", show user_name]
+getUserString' user_name = handleError <$> getAt ([] :: Array Boolean) ["user_string", user_name]
 
 putUserString :: forall qp. QueryParam qp => Array qp -> String -> UserRequest -> ApiEff (Either ApiError UserResponse)
-putUserString params user_name user_request = handleError <$> putAt params ["user_string", show user_name] user_request
+putUserString params user_name user_request = handleError <$> putAt params ["user_string", user_name] user_request
 
 putUserString' :: String -> UserRequest -> ApiEff (Either ApiError UserResponse)
-putUserString' user_name user_request = handleError <$> putAt ([] :: Array Boolean) ["user_string", show user_name] user_request
+putUserString' user_name user_request = handleError <$> putAt ([] :: Array Boolean) ["user_string", user_name] user_request
 
 deleteUserString :: forall qp. QueryParam qp => Array qp -> String -> ApiEff (Either ApiError Unit)
-deleteUserString params user_name = handleError <$> deleteAt params ["user_string", show user_name]
+deleteUserString params user_name = handleError <$> deleteAt params ["user_string", user_name]
 
 deleteUserString' :: String -> ApiEff (Either ApiError Unit)
-deleteUserString' user_name = handleError <$> deleteAt ([] :: Array Boolean) ["user_string", show user_name]
+deleteUserString' user_name = handleError <$> deleteAt ([] :: Array Boolean) ["user_string", user_name]
 
 -- footer

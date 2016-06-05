@@ -109,9 +109,9 @@ data SumType
   | B Int
   | C Boolean
   | D String
-  | E (Array  Int)
+  | E (Array Int)
   | F SumType
-  | G (Array  SumType)
+  | G (Array SumType)
   | H Boolean Int String (Maybe Boolean)
 
 
@@ -374,7 +374,7 @@ newtype BigRecord = BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
-  bigRecordString2 :: (Array  Char),
+  bigRecordString2 :: String,
   bigRecordSumType :: SumType,
   bigRecordData :: String,
   bigRecordClass :: String,
@@ -391,7 +391,7 @@ type BigRecordR = {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
-  bigRecordString2 :: (Array  Char),
+  bigRecordString2 :: String,
   bigRecordSumType :: SumType,
   bigRecordData :: String,
   bigRecordClass :: String,
@@ -408,7 +408,7 @@ _BigRecord :: LensP BigRecord {
   bigRecordInteger :: Int,
   bigRecordMaybeInteger :: (Maybe Int),
   bigRecordString :: String,
-  bigRecordString2 :: (Array  Char),
+  bigRecordString2 :: String,
   bigRecordSumType :: SumType,
   bigRecordData :: String,
   bigRecordClass :: String,
@@ -419,7 +419,7 @@ _BigRecord :: LensP BigRecord {
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> (Array  Char) -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
 mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordString2 bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecord =
   BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordString2, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecord}
 
@@ -915,22 +915,22 @@ instance userResponseEq :: Eq UserResponse where
   eq (UserResponse a) (UserResponse b) = a.userResponseId == b.userResponseId && a.userResponseName == b.userResponseName && a.userResponseEmail == b.userResponseEmail && a.userResponseActive == b.userResponseActive && a.userResponseCreatedAt == b.userResponseCreatedAt && a.userResponseModifiedAt == b.userResponseModifiedAt
 
 newtype UserResponses = UserResponses {
-  userResponses :: (Array  UserResponse)
+  userResponses :: (Array UserResponse)
 }
 
 
 type UserResponsesR = {
-  userResponses :: (Array  UserResponse)
+  userResponses :: (Array UserResponse)
 }
 
 
 _UserResponses :: LensP UserResponses {
-  userResponses :: (Array  UserResponse)
+  userResponses :: (Array UserResponse)
 }
 _UserResponses f (UserResponses o) = UserResponses <$> f o
 
 
-mkUserResponses :: (Array  UserResponse) -> UserResponses
+mkUserResponses :: (Array UserResponse) -> UserResponses
 mkUserResponses userResponses =
   UserResponses{userResponses}
 
@@ -1001,7 +1001,7 @@ type Text  = String
 type TextMaybe  = (Maybe String)
 
 
-type NestedList a = (Array  (Array  a))
+type NestedList a = (Array (Array a))
 
 
 newtype FunkyRecord = Boom1 {
