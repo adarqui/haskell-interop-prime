@@ -84,4 +84,22 @@ deleteUserText params user_name = handleError <$> deleteAt params ["user_text", 
 deleteUserText' :: String -> ApiEff (Either ApiError ())
 deleteUserText' user_name = handleError <$> deleteAt ([] :: [(String, String)]) ["user_text", user_name]
 
+getUserString :: forall qp. QueryParam qp => [qp] -> [Char] -> ApiEff (Either ApiError UserResponse)
+getUserString params user_name = handleError <$> getAt params ["user_string", show user_name]
+
+getUserString' :: [Char] -> ApiEff (Either ApiError UserResponse)
+getUserString' user_name = handleError <$> getAt ([] :: [(String, String)]) ["user_string", show user_name]
+
+putUserString :: forall qp. QueryParam qp => [qp] -> [Char] -> UserRequest -> ApiEff (Either ApiError UserResponse)
+putUserString params user_name user_request = handleError <$> putAt params ["user_string", show user_name] user_request
+
+putUserString' :: [Char] -> UserRequest -> ApiEff (Either ApiError UserResponse)
+putUserString' user_name user_request = handleError <$> putAt ([] :: [(String, String)]) ["user_string", show user_name] user_request
+
+deleteUserString :: forall qp. QueryParam qp => [qp] -> [Char] -> ApiEff (Either ApiError ())
+deleteUserString params user_name = handleError <$> deleteAt params ["user_string", show user_name]
+
+deleteUserString' :: [Char] -> ApiEff (Either ApiError ())
+deleteUserString' user_name = handleError <$> deleteAt ([] :: [(String, String)]) ["user_string", show user_name]
+
 -- footer
