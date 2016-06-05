@@ -36,7 +36,7 @@ nameAndType opts param_name name = do
   TyConI dec <- reify name
   case dec of
     (TySynD _ _ t)         -> return (param_name, mkTypeIR opts t)
-    _                      -> return (param_name, nameBase name)
+    _                      -> return (param_name, tplBuildType opts $ nameBase name)
 
 
 
@@ -56,11 +56,11 @@ mkTypeIR_Purescript opts (VarT a) =
   in
     tplBuildType opts v
 mkTypeIR_Purescript opts (AppT f x) = "(" ++ mkTypeIR_Purescript opts f ++ " " ++ mkTypeIR_Purescript opts x ++ ")"
-mkTypeIR_Purescript _ (TupleT 0) = "Unit "
-mkTypeIR_Purescript _ (TupleT 2) = "Tuple "
-mkTypeIR_Purescript _ (TupleT n) = "Tuple" ++ show n ++ " "
-mkTypeIR_Purescript _ ListT = "Array "
-mkTypeIR_Purescript _ x     = show x
+mkTypeIR_Purescript _ (TupleT 0)    = "Unit "
+mkTypeIR_Purescript _ (TupleT 2)    = "Tuple "
+mkTypeIR_Purescript _ (TupleT n)    = "Tuple" ++ show n ++ " "
+mkTypeIR_Purescript _ ListT         = "Array "
+mkTypeIR_Purescript _ x             = show x
 
 
 
@@ -72,11 +72,11 @@ mkTypeIR_Haskell opts (VarT a) =
   in
     tplBuildType opts v
 mkTypeIR_Haskell opts (AppT ListT x) = "[" ++ mkTypeIR_Haskell opts x ++ "]"
-mkTypeIR_Haskell opts (AppT f x) = "(" ++ mkTypeIR_Haskell opts f ++ " " ++ mkTypeIR_Haskell opts x ++ ")"
-mkTypeIR_Haskell _ (TupleT 0) = "() "
-mkTypeIR_Haskell _ (TupleT 2) = "Tuple "
-mkTypeIR_Haskell _ (TupleT n) = "Tuple" ++ show n ++ " "
-mkTypeIR_Haskell _ x     = show x
+mkTypeIR_Haskell opts (AppT f x)     = "(" ++ mkTypeIR_Haskell opts f ++ " " ++ mkTypeIR_Haskell opts x ++ ")"
+mkTypeIR_Haskell _ (TupleT 0)        = "() "
+mkTypeIR_Haskell _ (TupleT 2)        = "Tuple "
+mkTypeIR_Haskell _ (TupleT n)        = "Tuple" ++ show n ++ " "
+mkTypeIR_Haskell _ x                 = show x
 
 
 

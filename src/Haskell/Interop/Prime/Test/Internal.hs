@@ -57,4 +57,11 @@ apiEntries_TH' =
     , ApiPUT_TH ''UserRequest ''UserResponse
     , ApiDELETE_TH ''()
     ]
+
+  , ApiEntry_TH "UserString"
+    [ Par_TH [("user_name", ''String)] ]
+    [ ApiGET_TH ''UserResponse
+    , ApiPUT_TH ''UserRequest ''UserResponse
+    , ApiDELETE_TH ''()
+    ]
   ]

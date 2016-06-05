@@ -1,5 +1,5 @@
 name:                haskell-interop-prime
-version:             0.1.2.0
+version:             0.1.3.0
 synopsis:            Experimental tool to help me serialize data types between haskell and other languages
 description:
   This library is based heavily off of https://github.com/pkamenarsky/purescript-interop. A great many

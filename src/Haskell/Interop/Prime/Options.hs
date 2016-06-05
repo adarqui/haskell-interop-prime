@@ -182,6 +182,11 @@ defaultTypeMap =
     , ("Text", "String")
     , ("ByteString", "String")
     , ("UTCTime", "Date")
+    , ("Array Char", "String")
+    -- instead of adding in a bunch of logic into the internals, for now let's just
+    -- be explicit about it in the user-supplyable type map
+    -- this can be controlled entirely by the user, in the call to mkExport, mkApi, mkConvert etc.
+    , ("(Array Char)", "String")
     ]
 
 

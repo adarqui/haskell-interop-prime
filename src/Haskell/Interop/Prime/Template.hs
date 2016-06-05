@@ -55,6 +55,7 @@ module Haskell.Interop.Prime.Template (
   tplBuildType,
   tplArrows,
   tplArguments,
+  trim
 ) where
 
 
@@ -985,9 +986,11 @@ tplBuildField InteropOptions{..} base field =
 
 tplBuildType :: InteropOptions -> String -> String
 tplBuildType InteropOptions{..} name =
-  case M.lookup name typeMap of
-    Nothing -> name
+  case M.lookup name_sanitized typeMap of
+    Nothing -> name_sanitized
     Just t  -> t
+  where
+  name_sanitized = trim name
 
 
 
@@ -1008,3 +1011,8 @@ isMaybe s = any (\p -> isPrefixOf p s) ["(Maybe", "DateMaybe"]
 
 isString :: String -> Bool
 isString s = any (\p -> isPrefixOf p s) ["String", "Text"]
+
+
+
+trim :: String -> String
+trim = unwords . words
