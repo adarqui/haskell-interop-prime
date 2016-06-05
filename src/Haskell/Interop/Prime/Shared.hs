@@ -49,35 +49,32 @@ mkTypeIR opts@InteropOptions{..} type_ =
 
 
 mkTypeIR_Purescript :: InteropOptions -> Type -> String
-mkTypeIR_Purescript opts (ConT n) = tplBuildType opts (nameBase n)
-mkTypeIR_Purescript opts (VarT a) =
-  let
-    v = takeWhile (/= '_') $ nameBase a
-  in
-    tplBuildType opts v
-mkTypeIR_Purescript opts (AppT f x) = "(" ++ mkTypeIR_Purescript opts f ++ " " ++ mkTypeIR_Purescript opts x ++ ")"
-mkTypeIR_Purescript _ (TupleT 0)    = "Unit "
-mkTypeIR_Purescript _ (TupleT 2)    = "Tuple "
-mkTypeIR_Purescript _ (TupleT n)    = "Tuple" ++ show n ++ " "
-mkTypeIR_Purescript _ ListT         = "Array "
-mkTypeIR_Purescript _ x             = show x
+mkTypeIR_Purescript opts ty =
+  tplBuildType opts $
+    case ty of
+      ConT n   -> nameBase n
+      VarT a   -> takeWhile (/= '_') $ nameBase a
+      AppT f x -> "(" ++ mkTypeIR_Purescript opts f ++ " " ++ mkTypeIR_Purescript opts x ++ ")"
+      TupleT 0 -> "Unit "
+      TupleT 2 -> "Tuple "
+      TupleT n -> "Tuple" ++ show n ++ " "
+      ListT    -> "Array "
+      x        -> show x
 
 
 
 mkTypeIR_Haskell :: InteropOptions -> Type -> String
-mkTypeIR_Haskell opts (ConT n) = tplBuildType opts (nameBase n)
-mkTypeIR_Haskell opts (VarT a) =
-  let
-    v = takeWhile (/= '_') $ nameBase a
-  in
-    tplBuildType opts v
-mkTypeIR_Haskell opts (AppT ListT x) = "[" ++ mkTypeIR_Haskell opts x ++ "]"
-mkTypeIR_Haskell opts (AppT f x)     = "(" ++ mkTypeIR_Haskell opts f ++ " " ++ mkTypeIR_Haskell opts x ++ ")"
-mkTypeIR_Haskell _ (TupleT 0)        = "() "
-mkTypeIR_Haskell _ (TupleT 2)        = "Tuple "
-mkTypeIR_Haskell _ (TupleT n)        = "Tuple" ++ show n ++ " "
-mkTypeIR_Haskell _ x                 = show x
-
+mkTypeIR_Haskell opts ty =
+  tplBuildType opts $
+    case ty of
+      ConT n       -> nameBase n
+      VarT a       -> takeWhile (/= '_') $ nameBase a
+      AppT ListT x -> "[" ++ mkTypeIR_Haskell opts x ++ "]"
+      AppT f x     -> "(" ++ mkTypeIR_Haskell opts f ++ " " ++ mkTypeIR_Haskell opts x ++ ")"
+      TupleT 0     -> "() "
+      TupleT 2     -> "Tuple "
+      TupleT n     -> "Tuple" ++ show n ++ " "
+      x            -> show x
 
 
 
