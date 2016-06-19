@@ -5,4 +5,4 @@ packages:
     git: https://github.com/adarqui/restyle.git
     commit: 0ce227f4140ccd6e9151847927c6d7ac191aa994
 extra-deps: [restyle-0.1.0]
-resolver: lts-5.8
+resolver: lts-6.4
