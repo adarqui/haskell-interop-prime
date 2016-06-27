@@ -727,6 +727,8 @@ tplHaskellApiImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Haskell.Api.Helpers"
+  , "import Data.Text (Text)"
+  , "import qualified Data.Text as T"
   , "import Data.Int"
   , ""
   , ""
@@ -844,7 +846,7 @@ tplEmptyQueryParams :: InteropOptions -> String
 tplEmptyQueryParams InteropOptions{..} =
   case lang of
     LangPurescript -> "([] :: Array Boolean)"
-    LangHaskell    -> "([] :: [(String, String)])"
+    LangHaskell    -> "([] :: [(Text, Text)])"
 
 
 
@@ -920,7 +922,7 @@ tplApiParam_Arguments _ param =
 
 
 tplApiParam_Arguments_Show :: InteropOptions -> ApiParam -> [String]
-tplApiParam_Arguments_Show _ param =
+tplApiParam_Arguments_Show InteropOptions{..} param =
   case param of
     Par params       -> map go params
     ParBy _ _        -> []
@@ -930,7 +932,10 @@ tplApiParam_Arguments_Show _ param =
   go (n,t) =
     if isString t
       then n
-      else "show " ++ n
+      else
+        case lang of
+          LangPurescript -> "show " <> n
+          LangHaskell    -> "T.pack $ show " <> n
 
 
 
