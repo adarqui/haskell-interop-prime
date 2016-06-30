@@ -210,8 +210,6 @@ defaultPurescriptMks =
   , MkLens
   , MkMk
   , MkUnwrap
-  , MkToJSON
-  , MkFromJSON
   , MkEncodeJson
   , MkDecodeJson
   , MkRequestable

@@ -81,23 +81,23 @@ tplType InteropOptions{..} base vars type_ =
 
 tplLensP :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplLensP InteropOptions{..} base constr fields =
-     printf "_%s :: LensP %s {\n" base base
-  ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
-  ++ "\n}\n"
-  ++ printf "_%s f (%s o) = %s <$> f o\n" base constr constr
+     printf "_%s :: Lens' %s {\n" base base
+  <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
+  <> "\n}\n"
+  <> printf "_%s f (%s o) = %s <$> f o\n" base constr constr
 
 
 
 tplLensFields :: InteropOptions -> [String] -> String -> String
 tplLensFields InteropOptions{..} fields s =
-  s ++ (newlines spacingNL) ++ (intercalateMap (newlines spacingNL) tplLensField fields)
+  s <> (newlines spacingNL) <> (intercalateMap (newlines spacingNL) tplLensField fields)
 
 
 
 tplLensField :: String -> String
 tplLensField field =
      printf "%s_ :: forall b a r. Lens { %s :: a | r } { %s :: b | r } a b\n" field field field
-  ++ printf "%s_ f o = o { %s = _ } <$> f o.%s\n" field field field
+  <> printf "%s_ f o = o { %s = _ } <$> f o.%s\n" field field field
 
 
 
@@ -117,8 +117,8 @@ tplDataRecord opts@InteropOptions{..} =
 tplRecord :: String -> InteropOptions -> String -> String -> [(String, String)] -> String
 tplRecord type_ InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
-  ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
-  ++ "\n}\n"
+  <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
+  <> "\n}\n"
 
 
 
@@ -138,11 +138,11 @@ tplConvertRecord opts@InteropOptions{..} one two =
 tplConvertRecord_Purescript :: InteropOptions -> (String, String, [(String, String)]) -> (String, String, [(String, String)]) -> String
 tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
      printf "%s :: %s\n" fn_name (tplArrows arrows)
-  ++ printf "%s %s (%s o) =\n" fn_name (tplArguments args_diff) constr1
-  ++ spaces spacingIndent ++ printf "%s {\n" constr2
-  ++ intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) ++ printf "%s: %s" (fieldNameTransform constr2 n) (proper constr1 n)) fields2
-  ++ "\n"
-  ++ spaces spacingIndent ++ "}\n"
+  <> printf "%s %s (%s o) =\n" fn_name (tplArguments args_diff) constr1
+  <> spaces spacingIndent <> printf "%s {\n" constr2
+  <> intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) <> printf "%s: %s" (fieldNameTransform constr2 n) (proper constr1 n)) fields2
+  <> "\n"
+  <> spaces spacingIndent <> "}\n"
   where
   fn_name          = firstToLower constr1 <> "To" <> constr2
   fields_union     = union fields1 fields2
@@ -150,7 +150,7 @@ tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,co
   fields_diff      = fields2 \\ fields1
   types_diff       = map snd fields_diff
   args_diff        = map fst fields_diff
-  arrows           = types_diff ++ [base1, base2]
+  arrows           = types_diff <> [base1, base2]
   proper constr name =
     (if name `elem` args_diff
       then ""
@@ -163,11 +163,11 @@ tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,co
 tplConvertRecord_Haskell :: InteropOptions -> (String, String, [(String, String)]) -> (String, string, [(String, String)]) -> String
 tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
      printf "%s :: %s\n" fn_name (tplArrows arrows)
-  ++ printf "%s %s %s{..} =\n" fn_name (tplArguments args_diff) base1
-  ++ spaces spacingIndent ++ printf "%s {\n" base2
-  ++ intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) ++ printf "%s = %s" (fieldNameTransform base2 n) (fieldNameTransform base1 n)) fields2
-  ++ "\n"
-  ++ spaces spacingIndent ++ "}\n"
+  <> printf "%s %s %s{..} =\n" fn_name (tplArguments args_diff) base1
+  <> spaces spacingIndent <> printf "%s {\n" base2
+  <> intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) <> printf "%s = %s" (fieldNameTransform base2 n) (fieldNameTransform base1 n)) fields2
+  <> "\n"
+  <> spaces spacingIndent <> "}\n"
   where
   fn_name          = firstToLower base1 <> "To" <> base2
   fields_union     = union fields1 fields2
@@ -175,7 +175,7 @@ tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,const
   fields_diff      = fields2 \\ fields1
   types_diff       = map snd fields_diff
   args_diff        = map fst fields_diff
-  arrows           = types_diff ++ [base1, base2]
+  arrows           = types_diff <> [base1, base2]
 
 
 
@@ -189,29 +189,29 @@ tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,const
 tplRows :: InteropOptions -> String ->  String -> [(String, String)] -> String
 tplRows InteropOptions{..} suffix base fields =
      printf "type %s%s = {\n" base suffix
-  ++ intercalateMap ",\n" (\(n,t) -> spaces spacingIndent ++ printf "%s :: %s" (fieldNameTransform base n) t) fields
-  ++ "\n}\n"
+  <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
+  <> "\n}\n"
 
 
 
 tplDataNormal :: InteropOptions -> String -> [(String, [String])] -> String
 tplDataNormal InteropOptions{..} base fields =
      printf "data %s\n" base
-  ++ spaces spacingIndent ++ "= "
-  ++ intercalateMap (spaces spacingIndent ++ "| ") (\(n,t) -> printf "%s %s\n" n (intercalate " " t)) fields
-  ++ "\n"
+  <> spaces spacingIndent <> "= "
+  <> intercalateMap (spaces spacingIndent <> "| ") (\(n,t) -> printf "%s %s\n" n (intercalate " " t)) fields
+  <> "\n"
 
 
 
 tplMk :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplMk InteropOptions{..} base constr fields =
      printf "mk%s :: " base
-  ++ intercalateMap " -> " (\(_,t) -> t) (fields ++ [("tmp",base)]) ++ "\n"
-  ++ printf "mk%s " base
-  ++ intercalateMap " " (\(n,_) -> fieldNameTransform base n) fields ++ " =\n"
-  ++ (spaces spacingIndent) ++ constr ++ "{"
-  ++ intercalateMap ", " (\(n,_) -> fieldNameTransform base n) fields
-  ++ "}\n"
+  <> intercalateMap " -> " (\(_,t) -> t) (fields <> [("tmp",base)]) <> "\n"
+  <> printf "mk%s " base
+  <> intercalateMap " " (\(n,_) -> fieldNameTransform base n) fields <> " =\n"
+  <> (spaces spacingIndent) <> constr <> "{"
+  <> intercalateMap ", " (\(n,_) -> fieldNameTransform base n) fields
+  <> "}\n"
 
 
 
@@ -226,10 +226,10 @@ tplUnwrap InteropOptions{..} base constr =
 tplToJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplToJSON_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ tojson_decl
-  ++ spaces si2 ++ printf "[ \"tag\" .= \"%s\"\n" base
-  ++ concatMap (\(n,_) -> spaces si2 ++ printf ", \"%s\" .= %s\n" (jsonNameTransform base n) (fieldref_decl n)) fields
-  ++ spaces si2 ++ printf "]\n"
+  <> spaces si1 <> tojson_decl
+  <> spaces si2 <> printf "[ \"tag\" .= \"%s\"\n" base
+  <> concatMap (\(n,_) -> spaces si2 <> printf ", \"%s\" .= %s\n" (jsonNameTransform base n) (fieldref_decl n)) fields
+  <> spaces si2 <> printf "]\n"
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
@@ -251,12 +251,12 @@ tplToJSON_Record InteropOptions{..} base constr fields =
 tplFromJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplFromJSON_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ parsejson_decl
-  ++ concatMap (\(n,_) -> spaces si2 ++ printf "%s <- o .: \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
-  ++ spaces si2 ++ printf "return $ %s {\n" constr
-  ++ intercalateMap ",\n" (\(n,_) -> spaces si3 ++ printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields
-  ++ "\n" ++ spaces si2 ++ "}\n"
-  ++ spaces spacingIndent ++ printf "parseJSON x = fail $ \"Could not parse object: \" ++ show x\n"
+  <> spaces si1 <> parsejson_decl
+  <> concatMap (\(n,_) -> spaces si2 <> printf "%s <- o .: \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
+  <> spaces si2 <> printf "pure $ %s {\n" constr
+  <> intercalateMap ",\n" (\(n,_) -> spaces si3 <> printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields
+  <> "\n" <> spaces si2 <> "}\n"
+  <> spaces spacingIndent <> printf "parseJSON x = fail $ \"Could not parse object: \" <> show x\n"
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
@@ -279,7 +279,7 @@ tplFromJSON_Record InteropOptions{..} base constr fields =
 tplToJSON_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplToJSON_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ concatMap (\(f,vars) -> tplToJSON_SumType_Field opts f vars) fields
+  <> concatMap (\(f,vars) -> tplToJSON_SumType_Field opts f vars) fields
   where
   instance_decl =
     case lang of
@@ -290,13 +290,13 @@ tplToJSON_SumType opts@InteropOptions{..} base fields =
 
 tplToJSON_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplToJSON_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "toJSON (%s %s) = object $\n" field (intercalate " " vars')
-  ++ spaces si2 ++ printf "[ \"tag\" .= \"%s\"\n" field
-  ++
+     spaces si1 <> printf "toJSON (%s %s) = object $\n" field (intercalate " " vars')
+  <> spaces si2 <> printf "[ \"tag\" .= \"%s\"\n" field
+  <>
      (if null vars
-        then spaces si2 ++ printf ", \"contents\" .= %s\n" (tplArrayString lang)
-        else spaces si2 ++ printf ", \"contents\" .= " ++ wrapContent vars (intercalateMap ", " ("toJSON " ++) vars') ++ "\n")
-  ++ spaces si2 ++ "]\n"
+        then spaces si2 <> printf ", \"contents\" .= %s\n" (tplArrayString lang)
+        else spaces si2 <> printf ", \"contents\" .= " <> wrapContent vars (intercalateMap ", " ("toJSON " <>) vars') <> "\n")
+  <> spaces si2 <> "]\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -307,11 +307,11 @@ tplToJSON_SumType_Field InteropOptions{..} field vars =
 tplFromJSON_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplFromJSON_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ spaces si1 ++ printf "parseJSON (%s o) = do\n" (tplJObject lang)
-  ++ spaces si2 ++ "tag <- o .: \"tag\"\n"
-  ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields
-  ++ spaces si1 ++ printf "parseJSON x = fail $ \"Could not parse object: \" ++ show x\n"
+  <> spaces si1 <> printf "parseJSON (%s o) = do\n" (tplJObject lang)
+  <> spaces si2 <> "tag <- o .: \"tag\"\n"
+  <> spaces si2 <> "case tag of\n"
+  <> concatMap (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields
+  <> spaces si1 <> printf "parseJSON x = fail $ \"Could not parse object: \" <> show x\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -324,14 +324,14 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
 
 tplFromJSON_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplFromJSON_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "\"%s\" -> do\n" field
-  ++
+     spaces si1 <> printf "\"%s\" -> do\n" field
+  <>
      (if null vars
-       then spaces si2 ++ printf "return %s\n" field
+       then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- o .: \"contents\"\n"
-         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " ++) vars') ++ "\n")
-  ++ "\n"
+            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- o .: \"contents\"\n"
+         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " <>) vars') <> "\n")
+  <> "\n"
   where
   si1 = spacingIndent*3
   si2 = spacingIndent*4
@@ -343,10 +343,10 @@ tplFromJSON_SumType_Field InteropOptions{..} field vars =
 tplEncodeJson_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplEncodeJson_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ printf "encodeJson (%s o) =\n" constr
-  ++ spaces si3 ++ printf " \"tag\" := \"%s\"\n" base
-  ++ concatMap (\(n,_) -> spaces si2 ++ printf "~> \"%s\" := o.%s\n" (jsonNameTransform base n) (fieldNameTransform base n)) fields
-  ++ spaces si2 ++ "~> jsonEmptyObject\n"
+  <> spaces si1 <> printf "encodeJson (%s o) =\n" constr
+  <> spaces si3 <> printf " \"tag\" := \"%s\"\n" base
+  <> concatMap (\(n,_) -> spaces si2 <> printf "~> \"%s\" := o.%s\n" (jsonNameTransform base n) (fieldNameTransform base n)) fields
+  <> spaces si2 <> "~> jsonEmptyObject\n"
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
@@ -361,12 +361,12 @@ tplEncodeJson_Record InteropOptions{..} base constr fields =
 tplDecodeJson_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplDecodeJson_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ spaces si1 ++ "decodeJson o = do\n"
-  ++ spaces si2 ++ "obj <- decodeJson o\n"
-  ++ concatMap (\(n,_) -> spaces si2 ++ printf "%s <- obj .? \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
-  ++ spaces si2 ++ printf "pure $ %s {\n" constr
-  ++ intercalateMap ",\n" (\(n,_) -> spaces si3 ++ (fieldNameTransform base n)) fields
-  ++ "\n" ++ spaces si2 ++ "}\n"
+  <> spaces si1 <> "decodeJson o = do\n"
+  <> spaces si2 <> "obj <- decodeJson o\n"
+  <> concatMap (\(n,_) -> spaces si2 <> printf "%s <- obj .? \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
+  <> spaces si2 <> printf "pure $ %s {\n" constr
+  <> intercalateMap ",\n" (\(n,_) -> spaces si3 <> (fieldNameTransform base n)) fields
+  <> "\n" <> spaces si2 <> "}\n"
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
@@ -381,7 +381,7 @@ tplDecodeJson_Record InteropOptions{..} base constr fields =
 tplEncodeJson_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplEncodeJson_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ concatMap (\(f,vars) -> tplEncodeJson_SumType_Field opts f vars) fields
+  <> concatMap (\(f,vars) -> tplEncodeJson_SumType_Field opts f vars) fields
   where
   instance_decl =
     case lang of
@@ -392,13 +392,13 @@ tplEncodeJson_SumType opts@InteropOptions{..} base fields =
 
 tplEncodeJson_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplEncodeJson_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "encodeJson (%s %s) =\n" field (intercalate " " vars')
-  ++ spaces si3 ++ printf " \"tag\" := \"%s\"\n" field
-  ++
+     spaces si1 <> printf "encodeJson (%s %s) =\n" field (intercalate " " vars')
+  <> spaces si3 <> printf " \"tag\" := \"%s\"\n" field
+  <>
      (if null vars
-        then spaces si2 ++ printf "~> \"contents\" := %s\n" (tplArrayString lang)
-        else spaces si2 ++ printf "~> \"contents\" := " ++ wrapContent vars (intercalateMap ", " ("encodeJson " ++) vars') ++ "\n")
-  ++ spaces si2 ++ "~> jsonEmptyObject\n"
+        then spaces si2 <> printf "~> \"contents\" := %s\n" (tplArrayString lang)
+        else spaces si2 <> printf "~> \"contents\" := " <> wrapContent vars (intercalateMap ", " ("encodeJson " <>) vars') <> "\n")
+  <> spaces si2 <> "~> jsonEmptyObject\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -410,15 +410,17 @@ tplEncodeJson_SumType_Field InteropOptions{..} field vars =
 tplDecodeJson_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplDecodeJson_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ spaces si1 ++ "decodeJson json = do\n"
-  ++ spaces si2 ++ "obj <- decodeJson json\n"
-  ++ spaces si2 ++ "tag <- obj .? \"tag\"\n"
-  ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars) -> tplDecodeJson_SumType_Field opts f vars) fields
-  ++ spaces si1 ++ printf "decodeJson x = fail $ \"Could not parse object: \" ++ show x\n"
+  <> spaces si1 <> "decodeJson json = do\n"
+  <> spaces si2 <> "obj <- decodeJson json\n"
+  <> spaces si2 <> "tag <- obj .? \"tag\"\n"
+  <> spaces si2 <> "case tag of\n"
+  <> concatMap (\(f,vars) -> tplDecodeJson_SumType_Field opts f vars) fields
+  <> spaces si3 <> printf "_ -> Left $ \"TypeMismatch for %s\"\n\n" base
+  <> spaces si1 <> printf "decodeJson x = Left $ \"Could not parse object: \" <> show x"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+  si3 = spacingIndent*3
   instance_decl =
     case lang of
       LangPurescript -> printf "instance %sDecodeJson :: DecodeJson %s where\n" (firstToLower base) base
@@ -428,17 +430,17 @@ tplDecodeJson_SumType opts@InteropOptions{..} base fields =
 
 tplDecodeJson_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplDecodeJson_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "\"%s\" -> do\n" field
-  ++
+     spaces si1 <> printf "\"%s\" -> do\n" field
+  <>
      (if null vars
-       then spaces si2 ++ printf "return %s\n" field
+       then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- obj .? \"contents\"\n"
-         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("decodeJson " ++) vars') ++ "\n")
-  ++ "\n"
+            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- obj .? \"contents\"\n"
+         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("decodeJson " <>) vars') <> "\n")
+  <> "\n"
   where
-  si1 = spacingIndent*4
-  si2 = spacingIndent*5
+  si1 = spacingIndent*3
+  si2 = spacingIndent*4
   vars' = vars_x $ length vars
 
 
@@ -446,9 +448,9 @@ tplDecodeJson_SumType_Field InteropOptions{..} field vars =
 tplRequestable :: InteropOptions -> String -> String
 tplRequestable InteropOptions{..} base =
      printf "instance %sRequestable :: Requestable %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "toRequest s =\n"
-  ++ spaces si2 ++ "let str = printJson (encodeJson s) :: String\n"
-  ++ spaces si2 ++ "in toRequest str\n"
+  <> spaces si1 <> "toRequest s =\n"
+  <> spaces si2 <> "let str = printJson (encodeJson s) :: String\n"
+  <> spaces si2 <> "in toRequest str\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -458,11 +460,11 @@ tplRequestable InteropOptions{..} base =
 tplRespondable_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplRespondable_Record InteropOptions{..} base constr fields =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "responseType =\n"
-  ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse json =\n"
-  ++ spaces si3 ++ printf "mk%s\n" base
-  ++ spaces si4 ++ "<$> " ++ intercalateMap (spaces si4 ++ "<*> ") (\(n,t) -> readProp n t) fields
+  <> spaces si1 <> "responseType =\n"
+  <> spaces si2 <> "Tuple Nothing JSONResponse\n"
+  <> spaces si1 <> "fromResponse json =\n"
+  <> spaces si3 <> printf "mk%s\n" base
+  <> spaces si4 <> "<$> " <> intercalateMap (spaces si4 <> "<*> ") (\(n,t) -> readProp n t) fields
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -470,7 +472,7 @@ tplRespondable_Record InteropOptions{..} base constr fields =
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform constr n)
+      then printf "(unNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform constr n)
       else printf "readProp \"%s\" json\n" (jsonNameTransform constr n)
 
 
@@ -478,31 +480,33 @@ tplRespondable_Record InteropOptions{..} base constr fields =
 tplRespondable_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplRespondable_SumType opts@InteropOptions{..} base vars =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "responseType =\n"
-  ++ spaces si2 ++ "Tuple Nothing JSONResponse\n"
-  ++ spaces si1 ++ "fromResponse json = do\n"
-  ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
-  ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
+  <> spaces si1 <> "responseType =\n"
+  <> spaces si2 <> "Tuple Nothing JSONResponse\n"
+  <> spaces si1 <> "fromResponse json = do\n"
+  <> spaces si2 <> "tag <- readProp \"tag\" json\n"
+  <> spaces si2 <> "case tag of\n"
+  <> concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
+  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"error\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+  si3 = spacingIndent*3
 
 
 
 tplRespondable_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplRespondable_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "\"%s\" -> do\n" field
-  ++
+     spaces si1 <> printf "\"%s\" -> do\n" field
+  <>
      (if null vars
-       then spaces si2 ++ printf "return %s\n" field
+       then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- readProp \"contents\" json\n"
-         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("read " ++) vars') ++ "\n")
-  ++ "\n"
+            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- readProp \"contents\" json\n"
+         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n")
+  <> "\n"
   where
-  si1 = spacingIndent*4
-  si2 = spacingIndent*5
+  si1 = spacingIndent*3
+  si2 = spacingIndent*4
   vars' = vars_x $ length vars
 
 
@@ -510,16 +514,16 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
 tplIsForeign_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplIsForeign_Record InteropOptions{..} base _ fields =
      printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "read json =\n"
-  ++ spaces si3 ++ printf "mk%s\n" base
-  ++ spaces si4 ++ "<$> " ++ intercalateMap (spaces si4 ++ "<*> ") (\(n,t) -> readProp n t) fields
+  <> spaces si1 <> "read json =\n"
+  <> spaces si3 <> printf "mk%s\n" base
+  <> spaces si4 <> "<$> " <> intercalateMap (spaces si4 <> "<*> ") (\(n,t) -> readProp n t) fields
   where
   si1 = spacingIndent
   si3 = spacingIndent*3
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(runNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform base n)
+      then printf "(unNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform base n)
       else printf "readProp \"%s\" json\n" (jsonNameTransform base n)
 
 
@@ -527,10 +531,11 @@ tplIsForeign_Record InteropOptions{..} base _ fields =
 tplIsForeign_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplIsForeign_SumType opts@InteropOptions{..} base vars =
      printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  ++ spaces si1 ++ "read json = do\n"
-  ++ spaces si2 ++ "tag <- readProp \"tag\" json\n"
-  ++ spaces si2 ++ "case tag of\n"
-  ++ concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
+  <> spaces si1 <> "read json = do\n"
+  <> spaces si2 <> "tag <- readProp \"tag\" json\n"
+  <> spaces si2 <> "case tag of\n"
+  <> concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
+  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"error\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -540,17 +545,17 @@ tplIsForeign_SumType opts@InteropOptions{..} base vars =
 
 tplIsForeign_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplIsForeign_SumType_Field InteropOptions{..} field vars =
-     spaces si1 ++ printf "\"%s\" -> do\n" field
-  ++
+     spaces si1 <> printf "\"%s\" -> do\n" field
+  <>
      (if null vars
-       then spaces si2 ++ printf "return %s\n" field
+       then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 ++ wrapContent vars (intercalate ", " vars') ++ " <- readProp \"contents\" json\n"
-         ++ spaces si2 ++ printf "%s <$> %s" field (intercalateMap " <*> " ("read " ++) vars') ++ "\n")
-  ++ "\n"
+            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- readProp \"contents\" json\n"
+         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n")
+  <> "\n"
   where
-  si1 = spacingIndent*4
-  si2 = spacingIndent*5
+  si1 = spacingIndent*3
+  si2 = spacingIndent*4
   vars' = vars_x $ length vars
 
 
@@ -558,14 +563,14 @@ tplIsForeign_SumType_Field InteropOptions{..} field vars =
 tplShow_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplShow_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ intercalateMap " ++ \", \" ++ " (\(f,_) -> printf "show \"%s: \" ++ show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  <> intercalateMap " <> \", \" <> " (\(f,_) -> printf "show \"%s: \" <> show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si2 = spacingIndent*2
   instance_decl =
     case lang of
       LangPurescript ->
            printf "instance %sShow :: Show %s where\n" (firstToLower base) base
-        ++ spaces si2 ++ printf "show (%s o) = " constr
+        <> spaces si2 <> printf "show (%s o) = " constr
       LangHaskell    -> haskellNotSupported
 
 
@@ -573,7 +578,7 @@ tplShow_Record InteropOptions{..} base constr fields =
 tplShow_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplShow_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ concatMap (\(f,vars) -> tplShow_SumType_Field opts f vars) fields
+  <> concatMap (\(f,vars) -> tplShow_SumType_Field opts f vars) fields
   where
   instance_decl =
     case lang of
@@ -586,10 +591,10 @@ tplShow_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplShow_SumType_Field InteropOptions{..} field vars =
  (if null vars
     then
-      spaces si1 ++ printf "show (%s) = \"%s\"" field field
+      spaces si1 <> printf "show (%s) = \"%s\"" field field
     else
-      spaces si1 ++ printf "show (%s %s) = \"%s: \" ++ " field (intercalate " " vars') field ++ (intercalateMap " ++ \" \" ++ " (printf "show %s") vars'))
-  ++ "\n"
+      spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') field <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
+  <> "\n"
   where
   si1 = spacingIndent
   vars' = vars_x $ length vars
@@ -599,14 +604,14 @@ tplShow_SumType_Field InteropOptions{..} field vars =
 tplEq_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
 tplEq_Record InteropOptions{..} base constr fields =
      instance_decl
-  ++ intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  <> intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si1 = spacingIndent
   instance_decl =
     case lang of
       LangPurescript ->
            printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
-        ++ spaces si1 ++ printf "eq (%s a) (%s b) = " constr constr
+        <> spaces si1 <> printf "eq (%s a) (%s b) = " constr constr
       LangHaskell    -> haskellNotSupported
 
 
@@ -614,8 +619,8 @@ tplEq_Record InteropOptions{..} base constr fields =
 tplEq_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplEq_SumType opts@InteropOptions{..} base fields =
      instance_decl
-  ++ concatMap (\(f,vars) -> tplEq_SumType_Field opts f vars) fields
-  ++ spaces si1 ++ "eq _ _ = false"
+  <> concatMap (\(f,vars) -> tplEq_SumType_Field opts f vars) fields
+  <> spaces si1 <> "eq _ _ = false"
   where
   si1 = spacingIndent
   instance_decl =
@@ -630,22 +635,22 @@ tplEq_SumType_Field InteropOptions{..} field vars =
  (if null vars
     then
       spaces si1
-      ++
+      <>
       printf "eq (%s) (%s) = true" field field
     else
       spaces si1
-      ++
+      <>
       printf "eq (%s %s) (%s %s) = %s"
         field (intercalate " " vars'a)
         field (intercalate " " vars'b)
         (intercalateMap (" && " :: String) (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))
   )
-  ++ "\n"
+  <> "\n"
   where
   si1 = spacingIndent
   vars'  = vars_x $ length vars
-  vars'a = map (++"a") vars'
-  vars'b = map (++"b") vars'
+  vars'a = map (<>"a") vars'
+  vars'b = map (<>"b") vars'
 
 
 
@@ -661,30 +666,30 @@ tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Control.Monad.Aff"
-  , "import Data.Argonaut.Combinators"
-  , "import Data.Argonaut.Core"
-  , "import Data.Argonaut.Decode"
-  , "import Data.Argonaut.Encode"
-  , "import Data.Argonaut.Printer"
-  , "import Data.Date.Helpers"
-  , "import Data.Either"
-  , "import Data.Foreign"
-  , "import Data.Foreign.NullOrUndefined"
-  , "import Data.Foreign.Class"
-  , "import Data.JSON"
-  , "import Data.List (List ())"
-  , "import Data.Maybe"
-  , "import Data.Set (Set ())"
-  , "import Data.Tuple"
-  , "import Network.HTTP.Affjax.Request"
-  , "import Network.HTTP.Affjax.Response"
-  , "import Optic.Lens"
-  , "import Optic.Core"
-  , "import Prelude"
+  , "import Control.Monad.Aff                ()"
+  , "import Data.Argonaut.Core               (jsonEmptyObject)"
+  , "import Data.Argonaut.Decode             (class DecodeJson, decodeJson)"
+  , "import Data.Argonaut.Decode.Combinators ((.?))"
+  , "import Data.Argonaut.Encode             (class EncodeJson, encodeJson)"
+  , "import Data.Argonaut.Encode.Combinators ((~>), (:=))"
+  , "import Data.Argonaut.Printer            (printJson)"
+  , "import Data.Date.Helpers                (Date(..))"
+  , "import Data.Either                      (Either(..))"
+  , "import Data.Foreign                     (ForeignError(..))"
+  , "import Data.Foreign.NullOrUndefined     (unNullOrUndefined)"
+  , "import Data.Foreign.Class               (class IsForeign, read, readProp)"
+  , "import Data.List                        (List ())"
+  , "import Data.Maybe                       (Maybe(..))"
+  , "import Data.Set                         (Set ())"
+  , "import Data.Tuple                       (Tuple(..))"
+  , "import Network.HTTP.Affjax.Request      (class Requestable, toRequest)"
+  , "import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))"
+  , "import Optic.Core                       ((^.), (..))"
+  , "import Optic.Types                      (Lens, Lens')"
+  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==))"
   , ""
   , ""
-  ]) ++ s
+  ]) <> s
 
 
 
@@ -694,9 +699,10 @@ tplHaskellImports s = (intercalate "\n"
   , ""
   , "import Data.Aeson"
   , "import Data.Text   (Text)"
+  , "import Data.Monoid ((<>))"
   , ""
   , ""
-  ]) ++ s
+  ]) <> s
 
 
 
@@ -718,7 +724,7 @@ tplPurescriptApiImports s = (intercalate "\n"
   , "import Data.Tuple"
   , ""
   , ""
-  ]) ++ s
+  ]) <> s
 
 
 
@@ -732,17 +738,17 @@ tplHaskellApiImports s = (intercalate "\n"
   , "import Data.Int"
   , ""
   , ""
-  ]) ++ s
+  ]) <> s
 
 
 
 tplHeader :: String -> String -> String
-tplHeader header s = header ++ "\n" ++ s
+tplHeader header s = header <> "\n" <> s
 
 
 
 tplFooter :: String -> String -> String
-tplFooter footer s = s ++ "\n" ++ footer
+tplFooter footer s = s <> "\n" <> footer
 
 
 
@@ -767,7 +773,7 @@ tplTestHeader module_name =
   , "{-# LANGUAGE ExplicitForAll       #-}"
   , "{-# LANGUAGE RankNTypes           #-}"
   , ""
-  , "module " ++ module_name ++ " where"
+  , "module " <> module_name <> " where"
   , ""
   , ""
   ]
@@ -788,7 +794,7 @@ tplApiEntry' opts@InteropOptions{..} (ApiEntry route params methods) =
     "\n"
     (\(param, method) ->
       tplApiEntry'' opts False route param method
-      ++ "\n" ++
+      <> "\n" <>
       tplApiEntry'' opts True route param method
     )
     [ (param, method) | param <- params, method <- methods ]
@@ -801,7 +807,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
        fn_name'
        prolog
        (tplArrows typesig')
-  ++ printf "%s %s = handleError <$> %s\n"
+  <> printf "%s %s = handleError <$> %s\n"
        fn_name'
        (tplArguments args')
        action
@@ -814,7 +820,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
     (tplApiParam_TypeSig opts param) <>
     [tplApiParam_ByType opts param] <>
     [tplApiMethod_RequestType opts method] <>
-    [printf "ApiEff (Either ApiError " ++ tplApiMethod_ResultType opts method ++ ")"]
+    [printf "ApiEff (Either ApiError " <> tplApiMethod_ResultType opts method <> ")"]
   typesig' =
     if simplified
       then typesig
@@ -833,7 +839,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
       else ["params"] <> args
   method'  = tplApiMethod_Prefix opts method
   byname   = tplApiParam_ByName opts param
-  fn_name  = fieldNameTransform "" (method' ++ route ++ byname)
+  fn_name  = fieldNameTransform "" (method' <> route <> byname)
   fn_name' =
     if simplified
       then fn_name <> "'"
@@ -865,15 +871,15 @@ tplApiAction opts@InteropOptions{..} simplified route api_method api_param args 
   (by, by') =
     case (tplApiParam_By opts api_param) of
       "" -> ("[]", False)
-      v  -> ("[" ++ v ++ "]", True)
-  paths    = "[" ++ (intercalate ", " $ ["\"" ++ route' ++ "\""] ++ tplApiParam_Arguments_Show opts api_param) ++ "]"
+      v  -> ("[" <> v <> "]", True)
+  paths    = "[" <> (intercalate ", " $ ["\"" <> route' <> "\""] <> tplApiParam_Arguments_Show opts api_param) <> "]"
   route'   = jsonNameTransform "" route
   params =
     case (firstarg', by') of
       (False, False) -> tplEmptyQueryParams opts
       (False, _)     -> by
       (_, False)     -> firstarg
-      (_, _)         -> (printf "(map qp %s ++ map qp %s)" firstarg by) :: String
+      (_, _)         -> (printf "(map qp %s <> map qp %s)" firstarg by) :: String
 
 
 
