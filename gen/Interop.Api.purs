@@ -1,10 +1,9 @@
 module Interop.Api where
 
 
-import Purescript.Api.Helpers
-import Prelude
-import Data.Either
-import Data.Tuple
+import Purescript.Api.Helpers (class QueryParam, ApiError, ApiEff, getAt, handleError, qp, deleteAt, putAt, postAt)
+import Prelude                (Unit, show, map, (<$>), (<>))
+import Data.Either            (Either)
 
 getUsers :: forall qp. QueryParam qp => Array qp -> ApiEff (Either ApiError UserResponses)
 getUsers params = handleError <$> getAt params ["users"]
