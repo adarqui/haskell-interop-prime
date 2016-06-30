@@ -329,12 +329,15 @@ tplFromJSON_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- o .: \"contents\"\n"
-         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " <>) vars') <> "\n")
+            spaces si2 <> "r <- o .: \"contents\"\n"
+         <> spaces si2 <> "case r of\n"
+         <> spaces si3 <> wrapContent vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " <>) vars') <> "\n"
+         <> spaces si3 <> printf "_ -> fail \"FromJON Typemismatch: %s\"\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
   si2 = spacingIndent*4
+  si3 = spacingIndent*5
   vars' = vars_x $ length vars
 
 
@@ -415,7 +418,7 @@ tplDecodeJson_SumType opts@InteropOptions{..} base fields =
   <> spaces si2 <> "tag <- obj .? \"tag\"\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars) -> tplDecodeJson_SumType_Field opts f vars) fields
-  <> spaces si3 <> printf "_ -> Left $ \"TypeMismatch for %s\"\n\n" base
+  <> spaces si3 <> printf "_ -> Left $ \"DecodeJson TypeMismatch for %s\"\n\n" base
   <> spaces si1 <> printf "decodeJson x = Left $ \"Could not parse object: \" <> show x"
   where
   si1 = spacingIndent
@@ -435,12 +438,15 @@ tplDecodeJson_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- obj .? \"contents\"\n"
-         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("decodeJson " <>) vars') <> "\n")
+            spaces si2 <> "r <- obj .? \"contents\"\n"
+         <> spaces si2 <> "case r of\n"
+         <> spaces si3 <> wrapContent vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("decodeJson " <>) vars') <> "\n"
+         <> spaces si3 <> printf "_ -> Left $ \"DecodeJson TypeMismatch for %s\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
   si2 = spacingIndent*4
+  si3 = spacingIndent*5
   vars' = vars_x $ length vars
 
 
@@ -486,7 +492,7 @@ tplRespondable_SumType opts@InteropOptions{..} base vars =
   <> spaces si2 <> "tag <- readProp \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
-  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"error\"\n\n" base
+  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"Respondable\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -501,12 +507,15 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- readProp \"contents\" json\n"
-         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n")
+            spaces si2 <> "r <- readProp \"contents\" json\n"
+         <> spaces si2 <> "case r of\n"
+         <> spaces si3 <> wrapContent vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
+         <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"Respondable\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
   si2 = spacingIndent*4
+  si3 = spacingIndent*5
   vars' = vars_x $ length vars
 
 
@@ -535,7 +544,7 @@ tplIsForeign_SumType opts@InteropOptions{..} base vars =
   <> spaces si2 <> "tag <- readProp \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
-  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"error\"\n\n" base
+  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"IsForeign\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -550,12 +559,15 @@ tplIsForeign_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> wrapContent vars (intercalate ", " vars') <> " <- readProp \"contents\" json\n"
-         <> spaces si2 <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n")
+            spaces si2 <> "r <- readProp \"contents\" json\n"
+         <> spaces si2 <> "case r of\n"
+         <> spaces si3 <> wrapContent vars (intercalate ", " vars') <> " -> " <>  printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
+         <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"IsForeign\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
   si2 = spacingIndent*4
+  si3 = spacingIndent*5
   vars' = vars_x $ length vars
 
 
