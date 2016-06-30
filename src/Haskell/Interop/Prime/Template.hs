@@ -230,7 +230,7 @@ tplToJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -> 
 tplToJSON_Record InteropOptions{..} base constr fields =
      instance_decl
   <> spaces si1 <> tojson_decl
-  <> spaces si2 <> printf "[ \"tag\" .= \"%s\"\n" base
+  <> spaces si2 <> printf "[ \"tag\" .= (\"%s\" :: Text)\n" base
   <> concatMap (\(n,_) -> spaces si2 <> printf ", \"%s\" .= %s\n" (jsonNameTransform base n) (fieldref_decl n)) fields
   <> spaces si2 <> printf "]\n"
   where
@@ -255,7 +255,7 @@ tplFromJSON_Record :: InteropOptions -> String -> String -> [(String, String)] -
 tplFromJSON_Record InteropOptions{..} base constr fields =
      instance_decl
   <> spaces si1 <> parsejson_decl
-  <> concatMap (\(n,_) -> spaces si2 <> printf "%s <- o .: \"%s\"\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
+  <> concatMap (\(n,_) -> spaces si2 <> printf "%s <- o .: (\"%s\" :: Text)\n" (fieldNameTransform base n) (jsonNameTransform base n)) fields
   <> spaces si2 <> printf "pure $ %s {\n" constr
   <> intercalateMap ",\n" (\(n,_) -> spaces si3 <> printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields
   <> "\n" <> spaces si2 <> "}\n"
@@ -294,7 +294,7 @@ tplToJSON_SumType opts@InteropOptions{..} base fields =
 tplToJSON_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplToJSON_SumType_Field InteropOptions{..} field vars =
      spaces si1 <> printf "toJSON (%s %s) = object $\n" field (intercalate " " vars')
-  <> spaces si2 <> printf "[ \"tag\" .= \"%s\"\n" field
+  <> spaces si2 <> printf "[ \"tag\" .= (\"%s\" :: Text)\n" field
   <>
      (if null vars
         then spaces si2 <> printf ", \"contents\" .= %s\n" (tplArrayString lang)
@@ -311,13 +311,15 @@ tplFromJSON_SumType :: InteropOptions -> String -> [(String, [String])] -> Strin
 tplFromJSON_SumType opts@InteropOptions{..} base fields =
      instance_decl
   <> spaces si1 <> printf "parseJSON (%s o) = do\n" (tplJObject lang)
-  <> spaces si2 <> "tag <- o .: \"tag\"\n"
+  <> spaces si2 <> "tag <- o .: (\"tag\" :: Text)\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields
+  <> spaces si3 <> printf "_ -> fail \"Could not parse %s\"\n\n" base
   <> spaces si1 <> printf "parseJSON x = fail $ \"Could not parse object: \" <> show x\n"
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
+  si3 = spacingIndent*3
   instance_decl =
     case lang of
       LangPurescript -> printf "instance %sFromJSON :: FromJSON %s where\n" (firstToLower base) base
@@ -327,7 +329,7 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
 
 tplFromJSON_SumType_Field :: InteropOptions -> String -> [String] -> String
 tplFromJSON_SumType_Field InteropOptions{..} field vars =
-     spaces si1 <> printf "\"%s\" -> do\n" field
+     spaces si1 <> printf "(\"%s\" :: Text) -> do\n" field
   <>
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
@@ -749,7 +751,6 @@ tplHaskellApiImports s = (intercalate "\n"
   , "import Haskell.Api.Helpers"
   , "import Data.Text (Text)"
   , "import qualified Data.Text as T"
-  , "import Data.Int"
   , ""
   , ""
   ]) <> s
@@ -786,6 +787,7 @@ tplTestHeader module_name =
   , "{-# LANGUAGE RecordWildCards      #-}"
   , "{-# LANGUAGE ExplicitForAll       #-}"
   , "{-# LANGUAGE RankNTypes           #-}"
+  , "{-# LANGUAGE ScopedTypeVariables  #-}"
   , ""
   , "module " <> module_name <> " where"
   , ""
