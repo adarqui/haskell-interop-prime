@@ -298,7 +298,7 @@ tplToJSON_SumType_Field InteropOptions{..} field vars =
   <>
      (if null vars
         then spaces si2 <> printf ", \"contents\" .= %s\n" (tplArrayString lang)
-        else spaces si2 <> printf ", \"contents\" .= " <> wrapContent vars (intercalateMap ", " ("toJSON " <>) vars') <> "\n")
+        else spaces si2 <> printf ", \"contents\" .= " <> wrapContent' vars (intercalateMap ", " ("toJSON " <>) vars') <> "\n")
   <> spaces si2 <> "]\n"
   where
   si1 = spacingIndent
@@ -334,7 +334,7 @@ tplFromJSON_SumType_Field InteropOptions{..} field vars =
        else
             spaces si2 <> "r <- o .: \"contents\"\n"
          <> spaces si2 <> "case r of\n"
-         <> spaces si3 <> wrapContent vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " <>) vars') <> "\n"
+         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("parseJSON " <>) vars') <> "\n"
          <> spaces si3 <> printf "_ -> fail \"FromJON Typemismatch: %s\"\n" field)
   <> "\n"
   where
