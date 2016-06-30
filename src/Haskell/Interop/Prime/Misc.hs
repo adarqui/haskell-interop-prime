@@ -4,6 +4,7 @@ module Haskell.Interop.Prime.Misc (
   spaces,
   vars_x,
   wrapContent,
+  wrapContent',
   intercalateMap,
   haskellNotSupported,
   purescriptNotSupported
@@ -13,6 +14,7 @@ module Haskell.Interop.Prime.Misc (
 
 import           Data.Char
 import           Data.List
+import           Data.Monoid ((<>))
 
 
 
@@ -32,13 +34,18 @@ spaces = flip replicate ' '
 
 
 vars_x :: Int -> [String]
-vars_x n = map (("x" ++) . show) [0..n - 1]
+vars_x n = map (("x" <>) . show) [0..n - 1]
 
 
 
 wrapContent :: [a] -> String -> String
 wrapContent vars str | length vars == 1 = str
-                     | otherwise        = "[" ++ str ++ "]"
+                     | otherwise        = "[" <> str <> "]"
+
+
+
+wrapContent' :: [a] -> String -> String
+wrapContent' _ str = "[" <> str <> "]"
 
 
 

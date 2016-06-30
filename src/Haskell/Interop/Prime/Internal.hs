@@ -41,14 +41,14 @@ opts_ir :: ExportT (InteropOptions, InternalRep)
 opts_ir = do
   opts <- asks irInterop
   ir   <- gets isRep
-  return (opts, ir)
+  pure (opts, ir)
 
 
 
 buildType :: ExportT (Maybe String)
 buildType = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord opts base constr fields
       DataRecIR base constr fields    -> Just $ tplDataRecord opts base constr fields
@@ -61,7 +61,7 @@ buildType = do
 buildTypeRows :: String -> ExportT (Maybe String)
 buildTypeRows suffix = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base _ fields -> Just $ tplRows opts suffix base fields
       DataRecIR base _ fields    -> Just $ tplRows opts suffix base fields
@@ -72,7 +72,7 @@ buildTypeRows suffix = do
 buildLens :: ExportT (Maybe String)
 buildLens = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplLensP opts base constr fields
       DataRecIR base constr fields    -> Just $ tplLensP opts base constr fields
@@ -83,7 +83,7 @@ buildLens = do
 buildMk :: ExportT (Maybe String)
 buildMk = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplMk opts base constr fields
       DataRecIR base constr fields    -> Just $ tplMk opts base constr fields
@@ -94,18 +94,18 @@ buildMk = do
 buildUnwrap :: ExportT (Maybe String)
 buildUnwrap = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
-      NewtypeRecIR base constr _ -> Just $ tplUnwrap opts base constr
-      DataRecIR base constr _    -> Just $ tplUnwrap opts base constr
-      _                          -> Nothing
+      NewtypeRecIR base constr fields -> Just $ tplUnwrap opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplUnwrap opts base constr fields
+      _                               -> Nothing
 
 
 
 buildToJSON :: ExportT (Maybe String)
 buildToJSON = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplToJSON_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplToJSON_Record opts base constr fields
@@ -117,7 +117,7 @@ buildToJSON = do
 buildFromJSON :: ExportT (Maybe String)
 buildFromJSON = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplFromJSON_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplFromJSON_Record opts base constr fields
@@ -129,7 +129,7 @@ buildFromJSON = do
 buildEncodeJson :: ExportT (Maybe String)
 buildEncodeJson = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplEncodeJson_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplEncodeJson_Record opts base constr fields
@@ -141,7 +141,7 @@ buildEncodeJson = do
 buildDecodeJson :: ExportT (Maybe String)
 buildDecodeJson = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplDecodeJson_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplDecodeJson_Record opts base constr fields
@@ -153,7 +153,7 @@ buildDecodeJson = do
 buildRequestable :: ExportT (Maybe String)
 buildRequestable = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base _ _ -> Just $ tplRequestable opts base
       DataRecIR base _ _    -> Just $ tplRequestable opts base
@@ -165,7 +165,7 @@ buildRequestable = do
 buildRespondable :: ExportT (Maybe String)
 buildRespondable = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplRespondable_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplRespondable_Record opts base constr fields
@@ -177,7 +177,7 @@ buildRespondable = do
 buildIsForeign :: ExportT (Maybe String)
 buildIsForeign = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplIsForeign_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplIsForeign_Record opts base constr fields
@@ -189,7 +189,7 @@ buildIsForeign = do
 buildShow :: ExportT (Maybe String)
 buildShow = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplShow_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplShow_Record opts base constr fields
@@ -201,7 +201,7 @@ buildShow = do
 buildEq :: ExportT (Maybe String)
 buildEq = do
   (opts, ir) <- opts_ir
-  return $
+  pure $
     case ir of
       NewtypeRecIR base constr fields -> Just $ tplEq_Record opts base constr fields
       DataRecIR base constr fields    -> Just $ tplEq_Record opts base constr fields
@@ -238,12 +238,12 @@ mkExports Options{..} nmm = do
 
   ir_ps <- forM nmm $ (\(t, psMks, _) -> do
       TyConI dec <- reify t
-      return (buildInternalRep psInterop dec, psMks)
+      pure (buildInternalRep psInterop dec, psMks)
     )
 
   ir_hs <- forM nmm $ (\(t, _, hsMks) -> do
       TyConI dec <- reify t
-      return $ (buildInternalRep hsInterop dec, hsMks)
+      pure $ (buildInternalRep hsInterop dec, hsMks)
     )
 
   let
@@ -254,7 +254,7 @@ mkExports Options{..} nmm = do
   runIO $ persistResults psInterop ps
   runIO $ persistResults hsInterop hs
 
-  return []
+  pure []
 
 
 
@@ -279,8 +279,8 @@ mkExports' InteropOptions{..} mkgs xs = do
     (\acc mkg -> do
       r <- runMkG mkg acc
       case r of
-        Nothing -> return acc
-        Just r' -> return r'
+        Nothing -> pure acc
+        Just r' -> pure r'
     )
     (intercalate (newlines spacingNL) $ catMaybes $ concat mks)
     mkgs
