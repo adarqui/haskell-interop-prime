@@ -1,27 +1,27 @@
 module Interop.Clean where
 
 
-import Control.Monad.Aff
-import Data.Argonaut.Combinators
-import Data.Argonaut.Core
-import Data.Argonaut.Decode
-import Data.Argonaut.Encode
-import Data.Argonaut.Printer
-import Data.Date.Helpers
-import Data.Either
-import Data.Foreign
-import Data.Foreign.NullOrUndefined
-import Data.Foreign.Class
-import Data.JSON
-import Data.List (List ())
-import Data.Maybe
-import Data.Set (Set ())
-import Data.Tuple
-import Network.HTTP.Affjax.Request
-import Network.HTTP.Affjax.Response
-import Optic.Lens
-import Optic.Core
-import Prelude
+import Control.Monad.Aff                ()
+import Data.Argonaut.Core               (jsonEmptyObject)
+import Data.Argonaut.Decode             (class DecodeJson, decodeJson)
+import Data.Argonaut.Decode.Combinators ((.?))
+import Data.Argonaut.Encode             (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode.Combinators ((~>), (:=))
+import Data.Argonaut.Printer            (printJson)
+import Data.Date.Helpers                (Date(..))
+import Data.Either                      (Either(..))
+import Data.Foreign                     (ForeignError(..))
+import Data.Foreign.NullOrUndefined     (unNullOrUndefined)
+import Data.Foreign.Class               (class IsForeign, read, readProp)
+import Data.List                        (List ())
+import Data.Maybe                       (Maybe(..))
+import Data.Set                         (Set ())
+import Data.Tuple                       (Tuple(..))
+import Network.HTTP.Affjax.Request      (class Requestable, toRequest)
+import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))
+import Optic.Core                       ((^.), (..))
+import Optic.Types                      (Lens, Lens')
+import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==))
 
 newtype Session = Session {
   unSession :: String
@@ -33,7 +33,7 @@ type SessionR = {
 }
 
 
-_Session :: LensP Session {
+_Session :: Lens' Session {
   unSession :: String
 }
 _Session f (Session o) = Session <$> f o
@@ -44,23 +44,10 @@ mkSession unSession =
   Session{unSession}
 
 
+unwrapSession :: Session -> {
+  unSession :: String
+}
 unwrapSession (Session r) = r
-
-instance sessionToJson :: ToJSON Session where
-  toJSON (Session v) = object $
-    [ "tag" .= "Session"
-    , "un_session" .= v.unSession
-    ]
-
-
-instance sessionFromJSON :: FromJSON Session where
-  parseJSON (JObject o) = do
-    unSession <- o .: "un_session"
-    return $ Session {
-      unSession : unSession
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance sessionEncodeJson :: EncodeJson Session where
   encodeJson (Session o) =
@@ -99,7 +86,7 @@ instance sessionIsForeign :: IsForeign Session where
 
 
 instance sessionShow :: Show Session where
-    show (Session o) = show "unSession: " ++ show o.unSession
+    show (Session o) = show "unSession: " <> show o.unSession
 
 instance sessionEq :: Eq Session where
   eq (Session a) (Session b) = a.unSession == b.unSession
@@ -116,79 +103,6 @@ data SumType
 
 
 
-instance sumTypeToJSON :: ToJSON SumType where
-  toJSON (A ) = object $
-    [ "tag" .= "A"
-    , "contents" .= ([] :: Array String)
-    ]
-  toJSON (B x0) = object $
-    [ "tag" .= "B"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (C x0) = object $
-    [ "tag" .= "C"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (D x0) = object $
-    [ "tag" .= "D"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (E x0) = object $
-    [ "tag" .= "E"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (F x0) = object $
-    [ "tag" .= "F"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (G x0) = object $
-    [ "tag" .= "G"
-    , "contents" .= toJSON x0
-    ]
-  toJSON (H x0 x1 x2 x3) = object $
-    [ "tag" .= "H"
-    , "contents" .= [toJSON x0, toJSON x1, toJSON x2, toJSON x3]
-    ]
-
-
-instance sumTypeFromJSON :: FromJSON SumType where
-  parseJSON (JObject o) = do
-    tag <- o .: "tag"
-    case tag of
-      "A" -> do
-        return A
-
-      "B" -> do
-        x0 <- o .: "contents"
-        B <$> parseJSON x0
-
-      "C" -> do
-        x0 <- o .: "contents"
-        C <$> parseJSON x0
-
-      "D" -> do
-        x0 <- o .: "contents"
-        D <$> parseJSON x0
-
-      "E" -> do
-        x0 <- o .: "contents"
-        E <$> parseJSON x0
-
-      "F" -> do
-        x0 <- o .: "contents"
-        F <$> parseJSON x0
-
-      "G" -> do
-        x0 <- o .: "contents"
-        G <$> parseJSON x0
-
-      "H" -> do
-        [x0, x1, x2, x3] <- o .: "contents"
-        H <$> parseJSON x0 <*> parseJSON x1 <*> parseJSON x2 <*> parseJSON x3
-
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
-
 instance sumTypeEncodeJson :: EncodeJson SumType where
   encodeJson (A ) =
        "tag" := "A"
@@ -196,27 +110,27 @@ instance sumTypeEncodeJson :: EncodeJson SumType where
     ~> jsonEmptyObject
   encodeJson (B x0) =
        "tag" := "B"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (C x0) =
        "tag" := "C"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (D x0) =
        "tag" := "D"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (E x0) =
        "tag" := "E"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (F x0) =
        "tag" := "F"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (G x0) =
        "tag" := "G"
-    ~> "contents" := encodeJson x0
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (H x0 x1 x2 x3) =
        "tag" := "H"
@@ -229,38 +143,60 @@ instance sumTypeDecodeJson :: DecodeJson SumType where
     obj <- decodeJson json
     tag <- obj .? "tag"
     case tag of
-        "A" -> do
-          return A
+      "A" -> do
+        pure A
 
-        "B" -> do
-          x0 <- obj .? "contents"
-          B <$> decodeJson x0
+      "B" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> B <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for B"
 
-        "C" -> do
-          x0 <- obj .? "contents"
-          C <$> decodeJson x0
 
-        "D" -> do
-          x0 <- obj .? "contents"
-          D <$> decodeJson x0
+      "C" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> C <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for C"
 
-        "E" -> do
-          x0 <- obj .? "contents"
-          E <$> decodeJson x0
 
-        "F" -> do
-          x0 <- obj .? "contents"
-          F <$> decodeJson x0
+      "D" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> D <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for D"
 
-        "G" -> do
-          x0 <- obj .? "contents"
-          G <$> decodeJson x0
 
-        "H" -> do
-          [x0, x1, x2, x3] <- obj .? "contents"
-          H <$> decodeJson x0 <*> decodeJson x1 <*> decodeJson x2 <*> decodeJson x3
+      "E" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> E <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for E"
 
-  decodeJson x = fail $ "Could not parse object: " ++ show x
+
+      "F" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> F <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for F"
+
+
+      "G" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> G <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for G"
+
+
+      "H" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0, x1, x2, x3] -> H <$> decodeJson x0 <*> decodeJson x1 <*> decodeJson x2 <*> decodeJson x3
+          _ -> Left $ "DecodeJson TypeMismatch for H"
+
+
+      _ -> Left $ "DecodeJson TypeMismatch for SumType"
+
 
 
 instance sumTypeRequestable :: Requestable SumType where
@@ -275,36 +211,59 @@ instance sumTypeRespondable :: Respondable SumType where
   fromResponse json = do
     tag <- readProp "tag" json
     case tag of
-        "A" -> do
-          return A
+      "A" -> do
+        pure A
 
-        "B" -> do
-          x0 <- readProp "contents" json
-          B <$> read x0
+      "B" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> B <$> read x0
+          _ -> Left $ TypeMismatch "B" "Respondable"
 
-        "C" -> do
-          x0 <- readProp "contents" json
-          C <$> read x0
 
-        "D" -> do
-          x0 <- readProp "contents" json
-          D <$> read x0
+      "C" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> C <$> read x0
+          _ -> Left $ TypeMismatch "C" "Respondable"
 
-        "E" -> do
-          x0 <- readProp "contents" json
-          E <$> read x0
 
-        "F" -> do
-          x0 <- readProp "contents" json
-          F <$> read x0
+      "D" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> D <$> read x0
+          _ -> Left $ TypeMismatch "D" "Respondable"
 
-        "G" -> do
-          x0 <- readProp "contents" json
-          G <$> read x0
 
-        "H" -> do
-          [x0, x1, x2, x3] <- readProp "contents" json
-          H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+      "E" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> E <$> read x0
+          _ -> Left $ TypeMismatch "E" "Respondable"
+
+
+      "F" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> F <$> read x0
+          _ -> Left $ TypeMismatch "F" "Respondable"
+
+
+      "G" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> G <$> read x0
+          _ -> Left $ TypeMismatch "G" "Respondable"
+
+
+      "H" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0, x1, x2, x3] -> H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+          _ -> Left $ TypeMismatch "H" "Respondable"
+
+
+      _ -> Left $ TypeMismatch "SumType" "Respondable"
 
 
 
@@ -312,48 +271,71 @@ instance sumTypeIsForeign :: IsForeign SumType where
   read json = do
     tag <- readProp "tag" json
     case tag of
-        "A" -> do
-          return A
+      "A" -> do
+        pure A
 
-        "B" -> do
-          x0 <- readProp "contents" json
-          B <$> read x0
+      "B" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> B <$> read x0
+          _ -> Left $ TypeMismatch "B" "IsForeign"
 
-        "C" -> do
-          x0 <- readProp "contents" json
-          C <$> read x0
 
-        "D" -> do
-          x0 <- readProp "contents" json
-          D <$> read x0
+      "C" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> C <$> read x0
+          _ -> Left $ TypeMismatch "C" "IsForeign"
 
-        "E" -> do
-          x0 <- readProp "contents" json
-          E <$> read x0
 
-        "F" -> do
-          x0 <- readProp "contents" json
-          F <$> read x0
+      "D" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> D <$> read x0
+          _ -> Left $ TypeMismatch "D" "IsForeign"
 
-        "G" -> do
-          x0 <- readProp "contents" json
-          G <$> read x0
 
-        "H" -> do
-          [x0, x1, x2, x3] <- readProp "contents" json
-          H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+      "E" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> E <$> read x0
+          _ -> Left $ TypeMismatch "E" "IsForeign"
+
+
+      "F" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> F <$> read x0
+          _ -> Left $ TypeMismatch "F" "IsForeign"
+
+
+      "G" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> G <$> read x0
+          _ -> Left $ TypeMismatch "G" "IsForeign"
+
+
+      "H" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0, x1, x2, x3] -> H <$> read x0 <*> read x1 <*> read x2 <*> read x3
+          _ -> Left $ TypeMismatch "H" "IsForeign"
+
+
+      _ -> Left $ TypeMismatch "SumType" "IsForeign"
 
 
 
 instance sumTypeShow :: Show SumType where
   show (A) = "A"
-  show (B x0) = "B: " ++ show x0
-  show (C x0) = "C: " ++ show x0
-  show (D x0) = "D: " ++ show x0
-  show (E x0) = "E: " ++ show x0
-  show (F x0) = "F: " ++ show x0
-  show (G x0) = "G: " ++ show x0
-  show (H x0 x1 x2 x3) = "H: " ++ show x0 ++ " " ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3
+  show (B x0) = "B: " <> show x0
+  show (C x0) = "C: " <> show x0
+  show (D x0) = "D: " <> show x0
+  show (E x0) = "E: " <> show x0
+  show (F x0) = "F: " <> show x0
+  show (G x0) = "G: " <> show x0
+  show (H x0 x1 x2 x3) = "H: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
 
 
 instance sumTypeEq :: Eq SumType where
@@ -401,7 +383,7 @@ type BigRecordR = {
 }
 
 
-_BigRecord :: LensP BigRecord {
+_BigRecord :: Lens' BigRecord {
   bool :: Boolean,
   int :: Int,
   maybeInt :: (Maybe Int),
@@ -424,59 +406,22 @@ mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType dataP 
   BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, dataP, classP, letP, moduleP, bigRecord}
 
 
+unwrapBigRecord :: BigRecord -> {
+  bool :: Boolean,
+  int :: Int,
+  maybeInt :: (Maybe Int),
+  integer :: Int,
+  maybeInteger :: (Maybe Int),
+  string :: String,
+  string2 :: String,
+  sumType :: SumType,
+  dataP :: String,
+  classP :: String,
+  letP :: String,
+  moduleP :: String,
+  bigRecord :: Boolean
+}
 unwrapBigRecord (BigRecord r) = r
-
-instance bigRecordToJson :: ToJSON BigRecord where
-  toJSON (BigRecord v) = object $
-    [ "tag" .= "BigRecord"
-    , "bool" .= v.bool
-    , "int" .= v.int
-    , "maybe_int" .= v.maybeInt
-    , "integer" .= v.integer
-    , "maybe_integer" .= v.maybeInteger
-    , "string" .= v.string
-    , "string2" .= v.string2
-    , "sum_type" .= v.sumType
-    , "data" .= v.dataP
-    , "class" .= v.classP
-    , "let" .= v.letP
-    , "module" .= v.moduleP
-    , "big_record" .= v.bigRecord
-    ]
-
-
-instance bigRecordFromJSON :: FromJSON BigRecord where
-  parseJSON (JObject o) = do
-    bool <- o .: "bool"
-    int <- o .: "int"
-    maybeInt <- o .: "maybe_int"
-    integer <- o .: "integer"
-    maybeInteger <- o .: "maybe_integer"
-    string <- o .: "string"
-    string2 <- o .: "string2"
-    sumType <- o .: "sum_type"
-    dataP <- o .: "data"
-    classP <- o .: "class"
-    letP <- o .: "let"
-    moduleP <- o .: "module"
-    bigRecord <- o .: "big_record"
-    return $ BigRecord {
-      bool : bool,
-      int : int,
-      maybeInt : maybeInt,
-      integer : integer,
-      maybeInteger : maybeInteger,
-      string : string,
-      string2 : string2,
-      sumType : sumType,
-      dataP : dataP,
-      classP : classP,
-      letP : letP,
-      moduleP : moduleP,
-      bigRecord : bigRecord
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance bigRecordEncodeJson :: EncodeJson BigRecord where
   encodeJson (BigRecord o) =
@@ -543,9 +488,9 @@ instance bigRecordRespondable :: Respondable BigRecord where
       mkBigRecord
       <$> readProp "bool" json
       <*> readProp "int" json
-      <*> (runNullOrUndefined <$> readProp "maybe_int" json)
+      <*> (unNullOrUndefined <$> readProp "maybe_int" json)
       <*> readProp "integer" json
-      <*> (runNullOrUndefined <$> readProp "maybe_integer" json)
+      <*> (unNullOrUndefined <$> readProp "maybe_integer" json)
       <*> readProp "string" json
       <*> readProp "string2" json
       <*> readProp "sum_type" json
@@ -561,9 +506,9 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
       mkBigRecord
       <$> readProp "bool" json
       <*> readProp "int" json
-      <*> (runNullOrUndefined <$> readProp "maybe_int" json)
+      <*> (unNullOrUndefined <$> readProp "maybe_int" json)
       <*> readProp "integer" json
-      <*> (runNullOrUndefined <$> readProp "maybe_integer" json)
+      <*> (unNullOrUndefined <$> readProp "maybe_integer" json)
       <*> readProp "string" json
       <*> readProp "string2" json
       <*> readProp "sum_type" json
@@ -575,7 +520,7 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bool: " ++ show o.bool ++ ", " ++ show "int: " ++ show o.int ++ ", " ++ show "maybeInt: " ++ show o.maybeInt ++ ", " ++ show "integer: " ++ show o.integer ++ ", " ++ show "maybeInteger: " ++ show o.maybeInteger ++ ", " ++ show "string: " ++ show o.string ++ ", " ++ show "string2: " ++ show o.string2 ++ ", " ++ show "sumType: " ++ show o.sumType ++ ", " ++ show "dataP: " ++ show o.dataP ++ ", " ++ show "classP: " ++ show o.classP ++ ", " ++ show "letP: " ++ show o.letP ++ ", " ++ show "moduleP: " ++ show o.moduleP ++ ", " ++ show "bigRecord: " ++ show o.bigRecord
+    show (BigRecord o) = show "bool: " <> show o.bool <> ", " <> show "int: " <> show o.int <> ", " <> show "maybeInt: " <> show o.maybeInt <> ", " <> show "integer: " <> show o.integer <> ", " <> show "maybeInteger: " <> show o.maybeInteger <> ", " <> show "string: " <> show o.string <> ", " <> show "string2: " <> show o.string2 <> ", " <> show "sumType: " <> show o.sumType <> ", " <> show "dataP: " <> show o.dataP <> ", " <> show "classP: " <> show o.classP <> ", " <> show "letP: " <> show o.letP <> ", " <> show "moduleP: " <> show o.moduleP <> ", " <> show "bigRecord: " <> show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
   eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.dataP == b.dataP && a.classP == b.classP && a.letP == b.letP && a.moduleP == b.moduleP && a.bigRecord == b.bigRecord
@@ -597,7 +542,7 @@ type UserR = {
 }
 
 
-_User :: LensP User {
+_User :: Lens' User {
   name :: String,
   email :: String,
   active :: Boolean
@@ -610,29 +555,12 @@ mkUser name email active =
   User{name, email, active}
 
 
+unwrapUser :: User -> {
+  name :: String,
+  email :: String,
+  active :: Boolean
+}
 unwrapUser (User r) = r
-
-instance userToJson :: ToJSON User where
-  toJSON (User v) = object $
-    [ "tag" .= "User"
-    , "name" .= v.name
-    , "email" .= v.email
-    , "active" .= v.active
-    ]
-
-
-instance userFromJSON :: FromJSON User where
-  parseJSON (JObject o) = do
-    name <- o .: "name"
-    email <- o .: "email"
-    active <- o .: "active"
-    return $ User {
-      name : name,
-      email : email,
-      active : active
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance userEncodeJson :: EncodeJson User where
   encodeJson (User o) =
@@ -681,7 +609,7 @@ instance userIsForeign :: IsForeign User where
 
 
 instance userShow :: Show User where
-    show (User o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active
+    show (User o) = show "name: " <> show o.name <> ", " <> show "email: " <> show o.email <> ", " <> show "active: " <> show o.active
 
 instance userEq :: Eq User where
   eq (User a) (User b) = a.name == b.name && a.email == b.email && a.active == b.active
@@ -698,7 +626,7 @@ type UserRequestR = {
 }
 
 
-_UserRequest :: LensP UserRequest {
+_UserRequest :: Lens' UserRequest {
   name :: String,
   email :: String
 }
@@ -710,26 +638,11 @@ mkUserRequest name email =
   UserRequest{name, email}
 
 
+unwrapUserRequest :: UserRequest -> {
+  name :: String,
+  email :: String
+}
 unwrapUserRequest (UserRequest r) = r
-
-instance userRequestToJson :: ToJSON UserRequest where
-  toJSON (UserRequest v) = object $
-    [ "tag" .= "UserRequest"
-    , "name" .= v.name
-    , "email" .= v.email
-    ]
-
-
-instance userRequestFromJSON :: FromJSON UserRequest where
-  parseJSON (JObject o) = do
-    name <- o .: "name"
-    email <- o .: "email"
-    return $ UserRequest {
-      name : name,
-      email : email
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance userRequestEncodeJson :: EncodeJson UserRequest where
   encodeJson (UserRequest o) =
@@ -773,7 +686,7 @@ instance userRequestIsForeign :: IsForeign UserRequest where
 
 
 instance userRequestShow :: Show UserRequest where
-    show (UserRequest o) = show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email
+    show (UserRequest o) = show "name: " <> show o.name <> ", " <> show "email: " <> show o.email
 
 instance userRequestEq :: Eq UserRequest where
   eq (UserRequest a) (UserRequest b) = a.name == b.name && a.email == b.email
@@ -798,7 +711,7 @@ type UserResponseR = {
 }
 
 
-_UserResponse :: LensP UserResponse {
+_UserResponse :: Lens' UserResponse {
   id :: Int,
   name :: String,
   email :: String,
@@ -814,38 +727,15 @@ mkUserResponse id name email active createdAt modifiedAt =
   UserResponse{id, name, email, active, createdAt, modifiedAt}
 
 
+unwrapUserResponse :: UserResponse -> {
+  id :: Int,
+  name :: String,
+  email :: String,
+  active :: Boolean,
+  createdAt :: (Maybe FakeUTCTime),
+  modifiedAt :: (Maybe FakeUTCTime)
+}
 unwrapUserResponse (UserResponse r) = r
-
-instance userResponseToJson :: ToJSON UserResponse where
-  toJSON (UserResponse v) = object $
-    [ "tag" .= "UserResponse"
-    , "id" .= v.id
-    , "name" .= v.name
-    , "email" .= v.email
-    , "active" .= v.active
-    , "created_at" .= v.createdAt
-    , "modified_at" .= v.modifiedAt
-    ]
-
-
-instance userResponseFromJSON :: FromJSON UserResponse where
-  parseJSON (JObject o) = do
-    id <- o .: "id"
-    name <- o .: "name"
-    email <- o .: "email"
-    active <- o .: "active"
-    createdAt <- o .: "created_at"
-    modifiedAt <- o .: "modified_at"
-    return $ UserResponse {
-      id : id,
-      name : name,
-      email : email,
-      active : active,
-      createdAt : createdAt,
-      modifiedAt : modifiedAt
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance userResponseEncodeJson :: EncodeJson UserResponse where
   encodeJson (UserResponse o) =
@@ -893,8 +783,8 @@ instance userResponseRespondable :: Respondable UserResponse where
       <*> readProp "name" json
       <*> readProp "email" json
       <*> readProp "active" json
-      <*> (runNullOrUndefined <$> readProp "created_at" json)
-      <*> (runNullOrUndefined <$> readProp "modified_at" json)
+      <*> (unNullOrUndefined <$> readProp "created_at" json)
+      <*> (unNullOrUndefined <$> readProp "modified_at" json)
 
 
 instance userResponseIsForeign :: IsForeign UserResponse where
@@ -904,12 +794,12 @@ instance userResponseIsForeign :: IsForeign UserResponse where
       <*> readProp "name" json
       <*> readProp "email" json
       <*> readProp "active" json
-      <*> (runNullOrUndefined <$> readProp "created_at" json)
-      <*> (runNullOrUndefined <$> readProp "modified_at" json)
+      <*> (unNullOrUndefined <$> readProp "created_at" json)
+      <*> (unNullOrUndefined <$> readProp "modified_at" json)
 
 
 instance userResponseShow :: Show UserResponse where
-    show (UserResponse o) = show "id: " ++ show o.id ++ ", " ++ show "name: " ++ show o.name ++ ", " ++ show "email: " ++ show o.email ++ ", " ++ show "active: " ++ show o.active ++ ", " ++ show "createdAt: " ++ show o.createdAt ++ ", " ++ show "modifiedAt: " ++ show o.modifiedAt
+    show (UserResponse o) = show "id: " <> show o.id <> ", " <> show "name: " <> show o.name <> ", " <> show "email: " <> show o.email <> ", " <> show "active: " <> show o.active <> ", " <> show "createdAt: " <> show o.createdAt <> ", " <> show "modifiedAt: " <> show o.modifiedAt
 
 instance userResponseEq :: Eq UserResponse where
   eq (UserResponse a) (UserResponse b) = a.id == b.id && a.name == b.name && a.email == b.email && a.active == b.active && a.createdAt == b.createdAt && a.modifiedAt == b.modifiedAt
@@ -924,7 +814,7 @@ type UserResponsesR = {
 }
 
 
-_UserResponses :: LensP UserResponses {
+_UserResponses :: Lens' UserResponses {
   userResponses :: (Array UserResponse)
 }
 _UserResponses f (UserResponses o) = UserResponses <$> f o
@@ -935,23 +825,10 @@ mkUserResponses userResponses =
   UserResponses{userResponses}
 
 
+unwrapUserResponses :: UserResponses -> {
+  userResponses :: (Array UserResponse)
+}
 unwrapUserResponses (UserResponses r) = r
-
-instance userResponsesToJson :: ToJSON UserResponses where
-  toJSON (UserResponses v) = object $
-    [ "tag" .= "UserResponses"
-    , "user_responses" .= v.userResponses
-    ]
-
-
-instance userResponsesFromJSON :: FromJSON UserResponses where
-  parseJSON (JObject o) = do
-    userResponses <- o .: "user_responses"
-    return $ UserResponses {
-      userResponses : userResponses
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance userResponsesEncodeJson :: EncodeJson UserResponses where
   encodeJson (UserResponses o) =
@@ -990,7 +867,7 @@ instance userResponsesIsForeign :: IsForeign UserResponses where
 
 
 instance userResponsesShow :: Show UserResponses where
-    show (UserResponses o) = show "userResponses: " ++ show o.userResponses
+    show (UserResponses o) = show "userResponses: " <> show o.userResponses
 
 instance userResponsesEq :: Eq UserResponses where
   eq (UserResponses a) (UserResponses b) = a.userResponses == b.userResponses
@@ -1014,7 +891,7 @@ type FunkyRecordR = {
 }
 
 
-_FunkyRecord :: LensP FunkyRecord {
+_FunkyRecord :: Lens' FunkyRecord {
   boom1 :: Boolean
 }
 _FunkyRecord f (Boom1 o) = Boom1 <$> f o
@@ -1025,23 +902,10 @@ mkFunkyRecord boom1 =
   Boom1{boom1}
 
 
+unwrapFunkyRecord :: FunkyRecord -> {
+  boom1 :: Boolean
+}
 unwrapFunkyRecord (Boom1 r) = r
-
-instance funkyRecordToJson :: ToJSON FunkyRecord where
-  toJSON (Boom1 v) = object $
-    [ "tag" .= "FunkyRecord"
-    , "boom1" .= v.boom1
-    ]
-
-
-instance funkyRecordFromJSON :: FromJSON FunkyRecord where
-  parseJSON (JObject o) = do
-    boom1 <- o .: "boom1"
-    return $ Boom1 {
-      boom1 : boom1
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance funkyRecordEncodeJson :: EncodeJson FunkyRecord where
   encodeJson (Boom1 o) =
@@ -1080,7 +944,7 @@ instance funkyRecordIsForeign :: IsForeign FunkyRecord where
 
 
 instance funkyRecordShow :: Show FunkyRecord where
-    show (Boom1 o) = show "boom1: " ++ show o.boom1
+    show (Boom1 o) = show "boom1: " <> show o.boom1
 
 instance funkyRecordEq :: Eq FunkyRecord where
   eq (Boom1 a) (Boom1 b) = a.boom1 == b.boom1
@@ -1095,7 +959,7 @@ type FUnkyRecordPR = {
 }
 
 
-_FUnkyRecordP :: LensP FUnkyRecordP {
+_FUnkyRecordP :: Lens' FUnkyRecordP {
   field :: Boolean
 }
 _FUnkyRecordP f (FUnkyRecordP o) = FUnkyRecordP <$> f o
@@ -1106,23 +970,10 @@ mkFUnkyRecordP field =
   FUnkyRecordP{field}
 
 
+unwrapFUnkyRecordP :: FUnkyRecordP -> {
+  field :: Boolean
+}
 unwrapFUnkyRecordP (FUnkyRecordP r) = r
-
-instance fUnkyRecordPToJson :: ToJSON FUnkyRecordP where
-  toJSON (FUnkyRecordP v) = object $
-    [ "tag" .= "FUnkyRecordP"
-    , "field" .= v.field
-    ]
-
-
-instance fUnkyRecordPFromJSON :: FromJSON FUnkyRecordP where
-  parseJSON (JObject o) = do
-    field <- o .: "field"
-    return $ FUnkyRecordP {
-      field : field
-    }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
-
 
 instance fUnkyRecordPEncodeJson :: EncodeJson FUnkyRecordP where
   encodeJson (FUnkyRecordP o) =
@@ -1161,7 +1012,7 @@ instance fUnkyRecordPIsForeign :: IsForeign FUnkyRecordP where
 
 
 instance fUnkyRecordPShow :: Show FUnkyRecordP where
-    show (FUnkyRecordP o) = show "field: " ++ show o.field
+    show (FUnkyRecordP o) = show "field: " <> show o.field
 
 instance fUnkyRecordPEq :: Eq FUnkyRecordP where
   eq (FUnkyRecordP a) (FUnkyRecordP b) = a.field == b.field

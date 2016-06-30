@@ -11,6 +11,7 @@ module Interop.Clean where
 
 import Data.Aeson
 import Data.Text   (Text)
+import Data.Monoid ((<>))
 
 instance ToJSON Session where
   toJSON Session{..} = object $
@@ -22,10 +23,10 @@ instance ToJSON Session where
 instance FromJSON Session where
   parseJSON (Object o) = do
     unSession <- o .: "un_session"
-    return $ Session {
+    pure $ Session {
       unSession = unSession
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON SumType where
@@ -68,37 +69,51 @@ instance FromJSON SumType where
     tag <- o .: "tag"
     case tag of
       "A" -> do
-        return A
+        pure A
 
       "B" -> do
-        x0 <- o .: "contents"
-        B <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> B <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: B"
 
       "C" -> do
-        x0 <- o .: "contents"
-        C <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> C <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: C"
 
       "D" -> do
-        x0 <- o .: "contents"
-        D <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> D <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: D"
 
       "E" -> do
-        x0 <- o .: "contents"
-        E <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> E <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: E"
 
       "F" -> do
-        x0 <- o .: "contents"
-        F <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> F <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: F"
 
       "G" -> do
-        x0 <- o .: "contents"
-        G <$> parseJSON x0
+        r <- o .: "contents"
+        case r of
+          x0 -> G <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: G"
 
       "H" -> do
-        [x0, x1, x2, x3] <- o .: "contents"
-        H <$> parseJSON x0 <*> parseJSON x1 <*> parseJSON x2 <*> parseJSON x3
+        r <- o .: "contents"
+        case r of
+          [x0, x1, x2, x3] -> H <$> parseJSON x0 <*> parseJSON x1 <*> parseJSON x2 <*> parseJSON x3
+          _ -> fail "FromJON Typemismatch: H"
 
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON BigRecord where
@@ -135,7 +150,7 @@ instance FromJSON BigRecord where
     letP <- o .: "let"
     moduleP <- o .: "module"
     bigRecord <- o .: "big_record"
-    return $ BigRecord {
+    pure $ BigRecord {
       bool = bool,
       int = int,
       maybeInt = maybeInt,
@@ -150,7 +165,7 @@ instance FromJSON BigRecord where
       moduleP = moduleP,
       bigRecord = bigRecord
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON User where
@@ -167,12 +182,12 @@ instance FromJSON User where
     name <- o .: "name"
     email <- o .: "email"
     active <- o .: "active"
-    return $ User {
+    pure $ User {
       name = name,
       email = email,
       active = active
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON UserRequest where
@@ -187,11 +202,11 @@ instance FromJSON UserRequest where
   parseJSON (Object o) = do
     name <- o .: "name"
     email <- o .: "email"
-    return $ UserRequest {
+    pure $ UserRequest {
       name = name,
       email = email
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON UserResponse where
@@ -214,7 +229,7 @@ instance FromJSON UserResponse where
     active <- o .: "active"
     createdAt <- o .: "created_at"
     modifiedAt <- o .: "modified_at"
-    return $ UserResponse {
+    pure $ UserResponse {
       id = id,
       name = name,
       email = email,
@@ -222,7 +237,7 @@ instance FromJSON UserResponse where
       createdAt = createdAt,
       modifiedAt = modifiedAt
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON UserResponses where
@@ -235,10 +250,10 @@ instance ToJSON UserResponses where
 instance FromJSON UserResponses where
   parseJSON (Object o) = do
     userResponses <- o .: "user_responses"
-    return $ UserResponses {
+    pure $ UserResponses {
       userResponses = userResponses
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON FunkyRecord where
@@ -251,10 +266,10 @@ instance ToJSON FunkyRecord where
 instance FromJSON FunkyRecord where
   parseJSON (Object o) = do
     boom1 <- o .: "boom1"
-    return $ Boom1 {
+    pure $ Boom1 {
       boom1 = boom1
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON FUnkyRecordP where
@@ -267,9 +282,9 @@ instance ToJSON FUnkyRecordP where
 instance FromJSON FUnkyRecordP where
   parseJSON (Object o) = do
     field <- o .: "field"
-    return $ FUnkyRecordP {
+    pure $ FUnkyRecordP {
       field = field
     }
-  parseJSON x = fail $ "Could not parse object: " ++ show x
+  parseJSON x = fail $ "Could not parse object: " <> show x
 
 -- footer

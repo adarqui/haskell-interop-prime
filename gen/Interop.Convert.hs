@@ -11,6 +11,7 @@ module Interop.Convert where
 
 import Data.Aeson
 import Data.Text   (Text)
+import Data.Monoid ((<>))
 
 userRequestToUserResponse :: Int64 -> String -> String -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse userResponseId userResponseName userResponseEmail userResponseActive userResponseCreatedAt userResponseModifiedAt UserRequest{..} =

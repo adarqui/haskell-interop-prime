@@ -21,25 +21,25 @@ getUsers' :: ApiEff (Either ApiError UserResponses)
 getUsers'  = handleError <$> getAt ([] :: [(Text, Text)]) ["users"]
 
 getUsers_ByUsersIds :: forall qp. QueryParam qp => [qp] -> [Int64] -> ApiEff (Either ApiError UserResponses)
-getUsers_ByUsersIds params _ByUsersIds = handleError <$> getAt (map qp params ++ map qp [ByUsersIds _ByUsersIds]) ["users"]
+getUsers_ByUsersIds params _ByUsersIds = handleError <$> getAt (map qp params <> map qp [ByUsersIds _ByUsersIds]) ["users"]
 
 getUsers_ByUsersIds' :: [Int64] -> ApiEff (Either ApiError UserResponses)
 getUsers_ByUsersIds' _ByUsersIds = handleError <$> getAt [ByUsersIds _ByUsersIds] ["users"]
 
 getUsers_ByUsersNames :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either ApiError UserResponses)
-getUsers_ByUsersNames params _ByUsersNames = handleError <$> getAt (map qp params ++ map qp [ByUsersNames _ByUsersNames]) ["users"]
+getUsers_ByUsersNames params _ByUsersNames = handleError <$> getAt (map qp params <> map qp [ByUsersNames _ByUsersNames]) ["users"]
 
 getUsers_ByUsersNames' :: [String] -> ApiEff (Either ApiError UserResponses)
 getUsers_ByUsersNames' _ByUsersNames = handleError <$> getAt [ByUsersNames _ByUsersNames] ["users"]
 
 getUsers_ByUsersEmails :: forall qp. QueryParam qp => [qp] -> [String] -> ApiEff (Either ApiError UserResponses)
-getUsers_ByUsersEmails params _ByUsersEmails = handleError <$> getAt (map qp params ++ map qp [ByUsersEmails _ByUsersEmails]) ["users"]
+getUsers_ByUsersEmails params _ByUsersEmails = handleError <$> getAt (map qp params <> map qp [ByUsersEmails _ByUsersEmails]) ["users"]
 
 getUsers_ByUsersEmails' :: [String] -> ApiEff (Either ApiError UserResponses)
 getUsers_ByUsersEmails' _ByUsersEmails = handleError <$> getAt [ByUsersEmails _ByUsersEmails] ["users"]
 
 getUser_ByUserActive :: forall qp. QueryParam qp => [qp] -> Int64 -> Bool -> ApiEff (Either ApiError UserResponse)
-getUser_ByUserActive params user_id _ByUserActive = handleError <$> getAt (map qp params ++ map qp [ByUserActive _ByUserActive]) ["user", T.pack $ show user_id]
+getUser_ByUserActive params user_id _ByUserActive = handleError <$> getAt (map qp params <> map qp [ByUserActive _ByUserActive]) ["user", T.pack $ show user_id]
 
 getUser_ByUserActive' :: Int64 -> Bool -> ApiEff (Either ApiError UserResponse)
 getUser_ByUserActive' user_id _ByUserActive = handleError <$> getAt [ByUserActive _ByUserActive] ["user", T.pack $ show user_id]

@@ -11,6 +11,7 @@ module Interop.Convert.Clean where
 
 import Data.Aeson
 import Data.Text   (Text)
+import Data.Monoid ((<>))
 
 userRequestToUserResponse :: Int64 -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse id active createdAt modifiedAt UserRequest{..} =
