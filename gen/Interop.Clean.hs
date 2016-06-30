@@ -36,27 +36,27 @@ instance ToJSON SumType where
     ]
   toJSON (B x0) = object $
     [ "tag" .= "B"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (C x0) = object $
     [ "tag" .= "C"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (D x0) = object $
     [ "tag" .= "D"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (E x0) = object $
     [ "tag" .= "E"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (F x0) = object $
     [ "tag" .= "F"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (G x0) = object $
     [ "tag" .= "G"
-    , "contents" .= toJSON x0
+    , "contents" .= [toJSON x0]
     ]
   toJSON (H x0 x1 x2 x3) = object $
     [ "tag" .= "H"
@@ -74,37 +74,37 @@ instance FromJSON SumType where
       "B" -> do
         r <- o .: "contents"
         case r of
-          x0 -> B <$> parseJSON x0
+          [x0] -> B <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: B"
 
       "C" -> do
         r <- o .: "contents"
         case r of
-          x0 -> C <$> parseJSON x0
+          [x0] -> C <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: C"
 
       "D" -> do
         r <- o .: "contents"
         case r of
-          x0 -> D <$> parseJSON x0
+          [x0] -> D <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: D"
 
       "E" -> do
         r <- o .: "contents"
         case r of
-          x0 -> E <$> parseJSON x0
+          [x0] -> E <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: E"
 
       "F" -> do
         r <- o .: "contents"
         case r of
-          x0 -> F <$> parseJSON x0
+          [x0] -> F <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: F"
 
       "G" -> do
         r <- o .: "contents"
         case r of
-          x0 -> G <$> parseJSON x0
+          [x0] -> G <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: G"
 
       "H" -> do
