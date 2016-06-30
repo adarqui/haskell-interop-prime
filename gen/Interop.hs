@@ -3,6 +3,7 @@
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE ExplicitForAll       #-}
 {-# LANGUAGE RankNTypes           #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
 
 module Interop where
 
@@ -15,14 +16,14 @@ import Data.Monoid ((<>))
 
 instance ToJSON Session where
   toJSON Session{..} = object $
-    [ "tag" .= "Session"
+    [ "tag" .= ("Session" :: Text)
     , "unSession" .= unSession
     ]
 
 
 instance FromJSON Session where
   parseJSON (Object o) = do
-    unSession <- o .: "unSession"
+    unSession <- o .: ("unSession" :: Text)
     pure $ Session {
       unSession = unSession
     }
@@ -31,94 +32,96 @@ instance FromJSON Session where
 
 instance ToJSON SumType where
   toJSON (A ) = object $
-    [ "tag" .= "A"
+    [ "tag" .= ("A" :: Text)
     , "contents" .= ([] :: [Text])
     ]
   toJSON (B x0) = object $
-    [ "tag" .= "B"
+    [ "tag" .= ("B" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (C x0) = object $
-    [ "tag" .= "C"
+    [ "tag" .= ("C" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (D x0) = object $
-    [ "tag" .= "D"
+    [ "tag" .= ("D" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (E x0) = object $
-    [ "tag" .= "E"
+    [ "tag" .= ("E" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (F x0) = object $
-    [ "tag" .= "F"
+    [ "tag" .= ("F" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (G x0) = object $
-    [ "tag" .= "G"
+    [ "tag" .= ("G" :: Text)
     , "contents" .= [toJSON x0]
     ]
   toJSON (H x0 x1 x2 x3) = object $
-    [ "tag" .= "H"
+    [ "tag" .= ("H" :: Text)
     , "contents" .= [toJSON x0, toJSON x1, toJSON x2, toJSON x3]
     ]
 
 
 instance FromJSON SumType where
   parseJSON (Object o) = do
-    tag <- o .: "tag"
+    tag <- o .: ("tag" :: Text)
     case tag of
-      "A" -> do
+      ("A" :: Text) -> do
         pure A
 
-      "B" -> do
+      ("B" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> B <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: B"
 
-      "C" -> do
+      ("C" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> C <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: C"
 
-      "D" -> do
+      ("D" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> D <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: D"
 
-      "E" -> do
+      ("E" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> E <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: E"
 
-      "F" -> do
+      ("F" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> F <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: F"
 
-      "G" -> do
+      ("G" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0] -> G <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: G"
 
-      "H" -> do
+      ("H" :: Text) -> do
         r <- o .: "contents"
         case r of
           [x0, x1, x2, x3] -> H <$> parseJSON x0 <*> parseJSON x1 <*> parseJSON x2 <*> parseJSON x3
           _ -> fail "FromJON Typemismatch: H"
+
+      _ -> fail "Could not parse SumType"
 
   parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance ToJSON BigRecord where
   toJSON BigRecord{..} = object $
-    [ "tag" .= "BigRecord"
+    [ "tag" .= ("BigRecord" :: Text)
     , "bigRecordBool" .= bigRecordBool
     , "bigRecordInt" .= bigRecordInt
     , "bigRecordMaybeInt" .= bigRecordMaybeInt
@@ -137,19 +140,19 @@ instance ToJSON BigRecord where
 
 instance FromJSON BigRecord where
   parseJSON (Object o) = do
-    bigRecordBool <- o .: "bigRecordBool"
-    bigRecordInt <- o .: "bigRecordInt"
-    bigRecordMaybeInt <- o .: "bigRecordMaybeInt"
-    bigRecordInteger <- o .: "bigRecordInteger"
-    bigRecordMaybeInteger <- o .: "bigRecordMaybeInteger"
-    bigRecordString <- o .: "bigRecordString"
-    bigRecordString2 <- o .: "bigRecordString2"
-    bigRecordSumType <- o .: "bigRecordSumType"
-    bigRecordData <- o .: "bigRecordData"
-    bigRecordClass <- o .: "bigRecordClass"
-    bigRecordLet <- o .: "bigRecordLet"
-    bigRecordModule <- o .: "bigRecordModule"
-    bigRecord <- o .: "bigRecord"
+    bigRecordBool <- o .: ("bigRecordBool" :: Text)
+    bigRecordInt <- o .: ("bigRecordInt" :: Text)
+    bigRecordMaybeInt <- o .: ("bigRecordMaybeInt" :: Text)
+    bigRecordInteger <- o .: ("bigRecordInteger" :: Text)
+    bigRecordMaybeInteger <- o .: ("bigRecordMaybeInteger" :: Text)
+    bigRecordString <- o .: ("bigRecordString" :: Text)
+    bigRecordString2 <- o .: ("bigRecordString2" :: Text)
+    bigRecordSumType <- o .: ("bigRecordSumType" :: Text)
+    bigRecordData <- o .: ("bigRecordData" :: Text)
+    bigRecordClass <- o .: ("bigRecordClass" :: Text)
+    bigRecordLet <- o .: ("bigRecordLet" :: Text)
+    bigRecordModule <- o .: ("bigRecordModule" :: Text)
+    bigRecord <- o .: ("bigRecord" :: Text)
     pure $ BigRecord {
       bigRecordBool = bigRecordBool,
       bigRecordInt = bigRecordInt,
@@ -170,7 +173,7 @@ instance FromJSON BigRecord where
 
 instance ToJSON User where
   toJSON User{..} = object $
-    [ "tag" .= "User"
+    [ "tag" .= ("User" :: Text)
     , "userName" .= userName
     , "userEmail" .= userEmail
     , "userActive" .= userActive
@@ -179,9 +182,9 @@ instance ToJSON User where
 
 instance FromJSON User where
   parseJSON (Object o) = do
-    userName <- o .: "userName"
-    userEmail <- o .: "userEmail"
-    userActive <- o .: "userActive"
+    userName <- o .: ("userName" :: Text)
+    userEmail <- o .: ("userEmail" :: Text)
+    userActive <- o .: ("userActive" :: Text)
     pure $ User {
       userName = userName,
       userEmail = userEmail,
@@ -192,7 +195,7 @@ instance FromJSON User where
 
 instance ToJSON UserRequest where
   toJSON UserRequest{..} = object $
-    [ "tag" .= "UserRequest"
+    [ "tag" .= ("UserRequest" :: Text)
     , "userRequestName" .= userRequestName
     , "userRequestEmail" .= userRequestEmail
     ]
@@ -200,8 +203,8 @@ instance ToJSON UserRequest where
 
 instance FromJSON UserRequest where
   parseJSON (Object o) = do
-    userRequestName <- o .: "userRequestName"
-    userRequestEmail <- o .: "userRequestEmail"
+    userRequestName <- o .: ("userRequestName" :: Text)
+    userRequestEmail <- o .: ("userRequestEmail" :: Text)
     pure $ UserRequest {
       userRequestName = userRequestName,
       userRequestEmail = userRequestEmail
@@ -211,7 +214,7 @@ instance FromJSON UserRequest where
 
 instance ToJSON UserResponse where
   toJSON UserResponse{..} = object $
-    [ "tag" .= "UserResponse"
+    [ "tag" .= ("UserResponse" :: Text)
     , "userResponseId" .= userResponseId
     , "userResponseName" .= userResponseName
     , "userResponseEmail" .= userResponseEmail
@@ -223,12 +226,12 @@ instance ToJSON UserResponse where
 
 instance FromJSON UserResponse where
   parseJSON (Object o) = do
-    userResponseId <- o .: "userResponseId"
-    userResponseName <- o .: "userResponseName"
-    userResponseEmail <- o .: "userResponseEmail"
-    userResponseActive <- o .: "userResponseActive"
-    userResponseCreatedAt <- o .: "userResponseCreatedAt"
-    userResponseModifiedAt <- o .: "userResponseModifiedAt"
+    userResponseId <- o .: ("userResponseId" :: Text)
+    userResponseName <- o .: ("userResponseName" :: Text)
+    userResponseEmail <- o .: ("userResponseEmail" :: Text)
+    userResponseActive <- o .: ("userResponseActive" :: Text)
+    userResponseCreatedAt <- o .: ("userResponseCreatedAt" :: Text)
+    userResponseModifiedAt <- o .: ("userResponseModifiedAt" :: Text)
     pure $ UserResponse {
       userResponseId = userResponseId,
       userResponseName = userResponseName,
@@ -242,14 +245,14 @@ instance FromJSON UserResponse where
 
 instance ToJSON UserResponses where
   toJSON UserResponses{..} = object $
-    [ "tag" .= "UserResponses"
+    [ "tag" .= ("UserResponses" :: Text)
     , "userResponses" .= userResponses
     ]
 
 
 instance FromJSON UserResponses where
   parseJSON (Object o) = do
-    userResponses <- o .: "userResponses"
+    userResponses <- o .: ("userResponses" :: Text)
     pure $ UserResponses {
       userResponses = userResponses
     }
@@ -258,14 +261,14 @@ instance FromJSON UserResponses where
 
 instance ToJSON FunkyRecord where
   toJSON Boom1{..} = object $
-    [ "tag" .= "FunkyRecord"
+    [ "tag" .= ("FunkyRecord" :: Text)
     , "boom1" .= boom1
     ]
 
 
 instance FromJSON FunkyRecord where
   parseJSON (Object o) = do
-    boom1 <- o .: "boom1"
+    boom1 <- o .: ("boom1" :: Text)
     pure $ Boom1 {
       boom1 = boom1
     }
@@ -274,14 +277,14 @@ instance FromJSON FunkyRecord where
 
 instance ToJSON FUnkyRecordP where
   toJSON FUnkyRecordP{..} = object $
-    [ "tag" .= "FUnkyRecordP"
+    [ "tag" .= ("FUnkyRecordP" :: Text)
     , "funkyrecordpField" .= funkyrecordpField
     ]
 
 
 instance FromJSON FUnkyRecordP where
   parseJSON (Object o) = do
-    funkyrecordpField <- o .: "funkyrecordpField"
+    funkyrecordpField <- o .: ("funkyrecordpField" :: Text)
     pure $ FUnkyRecordP {
       funkyrecordpField = funkyrecordpField
     }

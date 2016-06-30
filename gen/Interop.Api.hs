@@ -3,6 +3,7 @@
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE ExplicitForAll       #-}
 {-# LANGUAGE RankNTypes           #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
 
 module Interop.Api where
 
@@ -12,7 +13,6 @@ module Interop.Api where
 import Haskell.Api.Helpers
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Int
 
 getUsers :: forall qp. QueryParam qp => [qp] -> ApiEff (Either ApiError UserResponses)
 getUsers params = handleError <$> getAt params ["users"]

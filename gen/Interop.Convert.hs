@@ -3,6 +3,7 @@
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE ExplicitForAll       #-}
 {-# LANGUAGE RankNTypes           #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
 
 module Interop.Convert where
 
