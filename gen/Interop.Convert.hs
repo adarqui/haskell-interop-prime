@@ -10,7 +10,7 @@ module Interop.Convert where
 
 
 
-import Data.Aeson
+import Data.Aeson  (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
 import Data.Text   (Text)
 import Data.Monoid ((<>))
 
