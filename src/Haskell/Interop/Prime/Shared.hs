@@ -84,13 +84,17 @@ runMkG mkg s = do
   fields <- asks irFields
   return $
     case mkg of
-      MkGPurescriptImports    -> Just $ tplPurescriptImports s
-      MkGPurescriptApiImports -> Just $ tplApiImports opts s
-      MkGHaskellImports       -> Just $ tplHaskellImports s
-      MkGHaskellApiImports    -> Just $ tplApiImports opts s
-      MkGLensFields           -> Just $ tplLensFields opts fields s
-      MkGHeader header        -> Just $ tplHeader header s
-      MkGFooter footer        -> Just $ tplFooter footer s
+      MkGPurescriptImports          -> Just $ tplImports opts s
+      MkGPurescriptApiImports       -> Just $ tplApiImports opts s
+      MkGPurescriptApiStringImports -> Just $ tplApiStringImports opts s
+      MkGPurescriptConvertImports   -> Just $ tplConvertImports opts s
+      MkGHaskellImports             -> Just $ tplImports opts s
+      MkGHaskellApiImports          -> Just $ tplApiImports opts s
+      MkGHaskellApiStringImports    -> Just $ tplApiStringImports opts s
+      MkGHaskellConvertImports      -> Just $ tplImports opts s
+      MkGLensFields                 -> Just $ tplLensFields opts fields s
+      MkGHeader header              -> Just $ tplHeader header s
+      MkGFooter footer              -> Just $ tplFooter footer s
 
 
 

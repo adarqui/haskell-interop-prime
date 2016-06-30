@@ -39,6 +39,12 @@ module Haskell.Interop.Prime.Template (
   tplApiImports,
   tplPurescriptApiImports,
   tplHaskellApiImports,
+  tplApiStringImports,
+  tplPurescriptApiStringImports,
+  tplHaskellApiStringImports,
+  tplConvertImports,
+  tplPurescriptConvertImports,
+  tplHaskellConvertImports,
   tplHeader,
   tplFooter,
   tplJObject,
@@ -682,27 +688,24 @@ tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Control.Monad.Aff                ()"
   , "import Data.Argonaut.Core               (jsonEmptyObject)"
   , "import Data.Argonaut.Decode             (class DecodeJson, decodeJson)"
   , "import Data.Argonaut.Decode.Combinators ((.?))"
   , "import Data.Argonaut.Encode             (class EncodeJson, encodeJson)"
   , "import Data.Argonaut.Encode.Combinators ((~>), (:=))"
   , "import Data.Argonaut.Printer            (printJson)"
-  , "import Data.Date.Helpers                (Date(..))"
+  , "import Data.Date.Helpers                (Date)"
   , "import Data.Either                      (Either(..))"
   , "import Data.Foreign                     (ForeignError(..))"
   , "import Data.Foreign.NullOrUndefined     (unNullOrUndefined)"
   , "import Data.Foreign.Class               (class IsForeign, read, readProp)"
-  , "import Data.List                        (List ())"
   , "import Data.Maybe                       (Maybe(..))"
-  , "import Data.Set                         (Set ())"
   , "import Data.Tuple                       (Tuple(..))"
   , "import Network.HTTP.Affjax.Request      (class Requestable, toRequest)"
   , "import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))"
   , "import Optic.Core                       ((^.), (..))"
   , "import Optic.Types                      (Lens, Lens')"
-  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==))"
+  , "import Prelude                          (class Show, show, class Eq, pure, bind, ($), (<>), (<$>), (<*>), (==))"
   , ""
   , ""
   ]) <> s
@@ -734,10 +737,9 @@ tplPurescriptApiImports :: String -> String
 tplPurescriptApiImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Purescript.Api.Helpers"
-  , "import Prelude"
-  , "import Data.Either"
-  , "import Data.Tuple"
+  , "import Purescript.Api.Helpers (class QueryParam, ApiError, ApiEff, getAt, handleError, qp, deleteAt, putAt, postAt)"
+  , "import Prelude                (Unit, show, map, (<$>), (<>))"
+  , "import Data.Either            (Either)"
   , ""
   , ""
   ]) <> s
@@ -751,6 +753,73 @@ tplHaskellApiImports s = (intercalate "\n"
   , "import Haskell.Api.Helpers"
   , "import Data.Text (Text)"
   , "import qualified Data.Text as T"
+  , ""
+  , ""
+  ]) <> s
+
+
+
+tplApiStringImports :: InteropOptions -> String -> String
+tplApiStringImports InteropOptions{..} =
+  case lang of
+    LangPurescript -> tplPurescriptApiStringImports
+    LangHaskell    -> tplHaskellApiStringImports
+
+
+
+tplPurescriptApiStringImports :: String -> String
+tplPurescriptApiStringImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Purescript.Api.Helpers (class QueryParam, ApiError, ApiEff, getAt, handleError, qp)"
+  , "import Prelude                (map, (<$>), (<>))"
+  , "import Data.Either            (Either)"
+  , ""
+  , ""
+  ]) <> s
+
+
+
+tplHaskellApiStringImports :: String -> String
+tplHaskellApiStringImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Haskell.Api.Helpers"
+  , "import Data.Text (Text)"
+  , "import qualified Data.Text as T"
+  , ""
+  , ""
+  ]) <> s
+
+
+
+tplConvertImports :: InteropOptions -> String -> String
+tplConvertImports InteropOptions{..} =
+  case lang of
+    LangPurescript -> tplPurescriptConvertImports
+    LangHaskell    -> tplHaskellConvertImports
+
+
+
+tplPurescriptConvertImports :: String -> String
+tplPurescriptConvertImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Data.Date.Helpers                (Date)"
+  , "import Data.Maybe                       (Maybe)"
+  , ""
+  , ""
+  ]) <> s
+
+
+
+tplHaskellConvertImports :: String -> String
+tplHaskellConvertImports s = (intercalate "\n"
+  [ ""
+  , ""
+  , "import Data.Text   (Text)"
+  , "import Data.Maybe  (Maybe)"
+  , "import Data.Monoid ((<>))"
   , ""
   , ""
   ]) <> s

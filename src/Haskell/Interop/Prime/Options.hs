@@ -25,10 +25,14 @@ module Haskell.Interop.Prime.Options (
   defaultPurescriptMks,
   defaultPurescriptMkGs,
   defaultPurescriptApiMkGs,
+  defaultPurescriptApiStringMkGs,
+  defaultPurescriptConvertMkGs,
 
   defaultHaskellMks,
   defaultHaskellMkGs,
-  defaultHaskellApiMkGs
+  defaultHaskellApiMkGs,
+  defaultHaskellApiStringMkGs,
+  defaultHaskellConvertMkGs,
 ) where
 
 
@@ -240,6 +244,25 @@ defaultPurescriptApiMkGs header =
 
 
 
+defaultPurescriptApiStringMkGs :: String -> [MkG]
+defaultPurescriptApiStringMkGs header =
+  [ MkGPurescriptApiStringImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
+
+
+
+defaultPurescriptConvertMkGs :: String -> [MkG]
+defaultPurescriptConvertMkGs header =
+  [ MkGPurescriptConvertImports
+  , MkGHeader header
+  , MkGLensFields
+  , MkGFooter "-- footer"
+  ]
+
+
+
 defaultHaskellMks :: [Mk]
 defaultHaskellMks =
   [ MkToJSON
@@ -260,6 +283,24 @@ defaultHaskellMkGs header =
 defaultHaskellApiMkGs :: String -> [MkG]
 defaultHaskellApiMkGs header =
   [ MkGHaskellApiImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
+
+
+
+defaultHaskellApiStringMkGs :: String -> [MkG]
+defaultHaskellApiStringMkGs header =
+  [ MkGHaskellApiStringImports
+  , MkGHeader header
+  , MkGFooter "-- footer"
+  ]
+
+
+
+defaultHaskellConvertMkGs :: String -> [MkG]
+defaultHaskellConvertMkGs header =
+  [ MkGHaskellConvertImports
   , MkGHeader header
   , MkGFooter "-- footer"
   ]

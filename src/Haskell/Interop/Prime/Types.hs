@@ -62,8 +62,12 @@ data Mk
 data MkG
   = MkGPurescriptImports
   | MkGPurescriptApiImports
+  | MkGPurescriptApiStringImports
+  | MkGPurescriptConvertImports
   | MkGHaskellImports
   | MkGHaskellApiImports
+  | MkGHaskellApiStringImports
+  | MkGHaskellConvertImports
   | MkGLensFields
   | MkGHeader String
   | MkGFooter String
