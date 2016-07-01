@@ -135,7 +135,6 @@ tplConvertRecord opts@InteropOptions{..} one two =
   case lang of
     LangPurescript -> tplConvertRecord_Purescript opts one two
     LangHaskell    -> tplConvertRecord_Haskell opts one two
-    _              -> "tplConvertRecord not supported"
 
 
 
@@ -151,8 +150,6 @@ tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,co
   <> spaces spacingIndent <> "}\n"
   where
   fn_name          = firstToLower constr1 <> "To" <> constr2
-  fields_union     = union fields1 fields2
-  fields_intersect = intersect fields1 fields2
   fields_diff      = fields2 \\ fields1
   types_diff       = map snd fields_diff
   args_diff        = map fst fields_diff
@@ -167,7 +164,7 @@ tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,co
 -- | Converts 1 to 2
 --
 tplConvertRecord_Haskell :: InteropOptions -> (String, String, [(String, String)]) -> (String, string, [(String, String)]) -> String
-tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
+tplConvertRecord_Haskell InteropOptions{..} (base1,_,fields1) (base2,_,fields2) =
      printf "%s :: %s\n" fn_name (tplArrows arrows)
   <> printf "%s %s %s{..} =\n" fn_name (tplArguments args_diff) base1
   <> spaces spacingIndent <> printf "%s {\n" base2
@@ -176,8 +173,6 @@ tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,const
   <> spaces spacingIndent <> "}\n"
   where
   fn_name          = firstToLower base1 <> "To" <> base2
-  fields_union     = union fields1 fields2
-  fields_intersect = intersect fields1 fields2
   fields_diff      = fields2 \\ fields1
   types_diff       = map snd fields_diff
   args_diff        = map fst fields_diff

@@ -43,4 +43,5 @@ library
                      , template-haskell
                      , transformers
   hs-source-dirs:      src
+  ghc-options:         -Wall -Werror
   default-language:    Haskell98

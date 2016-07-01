@@ -121,7 +121,6 @@ defaultFieldNameTransformClean nb s =
   where
   lower_nb = map toLower nb
   lower_s  = map toLower s
-  ftl      = firstToLower nb
   stripped = drop (length lower_nb) s
   fixed    =
     case stripped of
@@ -136,7 +135,6 @@ defaultJsonNameTransformClean nb s =
   where
   lower_nb = map toLower nb
   lower_s  = map toLower s
-  ftl      = firstToLower nb
   stripped = drop (length lower_nb) s
   fixed    =
     case stripped of
@@ -147,10 +145,10 @@ defaultJsonNameTransformClean nb s =
   -- so trim the _p off of the end so that we don't have to send json tags with _p from the server side
   -- this could be done in Template.hs, but i'd rather just make it user customizable for now.
   -- thnx.
-  dropSuffix s =
-    if isSuffixOf "_p" s
-      then take (length s - 2) s
-      else s
+  dropSuffix s' =
+    if isSuffixOf "_p" s'
+      then take (length s' - 2) s'
+      else s'
 
 defaultJsonTagNameTransformClean :: StringTransformFn
 defaultJsonTagNameTransformClean _ s = s

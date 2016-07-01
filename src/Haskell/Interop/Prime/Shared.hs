@@ -17,10 +17,11 @@ module Haskell.Interop.Prime.Shared (
 
 
 
-import           Control.Monad
-import           Control.Monad.Trans.RWS
+import           Control.Monad                  (void)
+import           Control.Monad.Trans.RWS        (asks)
 import           Data.List                      (intercalate)
 import           Data.Maybe                     (catMaybes)
+import           Data.Monoid                    ((<>))
 import           Language.Haskell.TH
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
@@ -54,10 +55,10 @@ mkTypeIR_Purescript opts ty =
     case ty of
       ConT n   -> nameBase n
       VarT a   -> takeWhile (/= '_') $ nameBase a
-      AppT f x -> "(" ++ mkTypeIR_Purescript opts f ++ " " ++ mkTypeIR_Purescript opts x ++ ")"
+      AppT f x -> "(" <> mkTypeIR_Purescript opts f <> " " <> mkTypeIR_Purescript opts x <> ")"
       TupleT 0 -> "Unit "
       TupleT 2 -> "Tuple "
-      TupleT n -> "Tuple" ++ show n ++ " "
+      TupleT n -> "Tuple" <> show n <> " "
       ListT    -> "Array "
       x        -> show x
 
@@ -69,11 +70,11 @@ mkTypeIR_Haskell opts ty =
     case ty of
       ConT n       -> nameBase n
       VarT a       -> takeWhile (/= '_') $ nameBase a
-      AppT ListT x -> "[" ++ mkTypeIR_Haskell opts x ++ "]"
-      AppT f x     -> "(" ++ mkTypeIR_Haskell opts f ++ " " ++ mkTypeIR_Haskell opts x ++ ")"
+      AppT ListT x -> "[" <> mkTypeIR_Haskell opts x <> "]"
+      AppT f x     -> "(" <> mkTypeIR_Haskell opts f <> " " <> mkTypeIR_Haskell opts x <> ")"
       TupleT 0     -> "() "
       TupleT 2     -> "Tuple "
-      TupleT n     -> "Tuple" ++ show n ++ " "
+      TupleT n     -> "Tuple" <> show n <> " "
       x            -> show x
 
 

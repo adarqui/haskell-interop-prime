@@ -12,8 +12,8 @@ module Haskell.Interop.Prime.Convert (
 
 
 
-import           Control.Monad
-import           Control.Monad.Trans.RWS
+import           Control.Monad                  (forM, foldM)
+import           Control.Monad.Trans.RWS        (evalRWS)
 import           Data.List                      (intercalate)
 import           Data.Maybe                     (catMaybes)
 import           Language.Haskell.TH
@@ -30,10 +30,11 @@ default (String)
 
 
 instance Lift Type where
-  lift (ConT n) = [| ConT (mkName nstr) |] where nstr = show n
+  lift (ConT n)   = [| ConT (mkName nstr) |] where nstr = show n
   lift (AppT a b) = [| AppT a b |]
   lift (TupleT x) = [| TupleT x |]
-  lift (ListT) = [| ListT |]
+  lift (ListT)    = [| ListT |]
+  lift _          = error "unsupported"
 
 
 
