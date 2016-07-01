@@ -37,10 +37,10 @@ module Haskell.Interop.Prime.Options (
 
 
 
-import           Data.Char
-import           Data.List
-import qualified Data.Map                       as M
-import           Data.Transform.UnCamel
+import           Data.Char                   (toLower)
+import           Data.List                   (isPrefixOf, isSuffixOf)
+import qualified Data.Map                    as M
+import           Data.Transform.UnCamel      (unCamelSource)
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Types
 

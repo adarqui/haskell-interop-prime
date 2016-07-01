@@ -12,8 +12,8 @@ module Haskell.Interop.Prime.Misc (
 
 
 
-import           Data.Char
-import           Data.List
+import           Data.Char   (toLower)
+import           Data.List   (intercalate)
 import           Data.Monoid ((<>))
 
 
