@@ -35,8 +35,8 @@ nameAndType :: InteropOptions -> String -> Name -> Q (String, String)
 nameAndType opts param_name name = do
   TyConI dec <- reify name
   case dec of
-    (TySynD _ _ t)         -> return (param_name, mkTypeIR opts t)
-    _                      -> return (param_name, tplBuildType opts $ nameBase name)
+    (TySynD _ _ t)         -> pure (param_name, mkTypeIR opts t)
+    _                      -> pure (param_name, tplBuildType opts $ nameBase name)
 
 
 
@@ -82,7 +82,7 @@ runMkG :: MkG -> String -> ExportT (Maybe String)
 runMkG mkg s = do
   opts   <- asks irInterop
   fields <- asks irFields
-  return $
+  pure $
     case mkg of
       MkGPurescriptImports          -> Just $ tplImports opts s
       MkGPurescriptApiImports       -> Just $ tplApiImports opts s
@@ -109,7 +109,7 @@ runDebug :: InteropOptions -> IO a -> Q ()
 runDebug InteropOptions{..} f = do
   if debug
     then void $ runIO $ f
-    else return ()
+    else pure ()
 
 
 

@@ -45,13 +45,13 @@ mkConvert Options{..} nn = do
   ir_ps <- forM nn $ (\(t1, t2) -> do
       TyConI dec1 <- reify t1
       TyConI dec2 <- reify t2
-      return (buildInternalRep psInterop dec1, buildInternalRep psInterop dec2)
+      pure (buildInternalRep psInterop dec1, buildInternalRep psInterop dec2)
     )
 
   ir_hs <- forM nn $ (\(t1, t2) -> do
       TyConI dec1 <- reify t1
       TyConI dec2 <- reify t2
-      return $ (buildInternalRep hsInterop dec1, buildInternalRep hsInterop dec2)
+      pure $ (buildInternalRep hsInterop dec1, buildInternalRep hsInterop dec2)
     )
 
   let
@@ -61,7 +61,7 @@ mkConvert Options{..} nn = do
   runIO $ persistResults psInterop ps
   runIO $ persistResults hsInterop hs
 
-  return []
+  pure []
 
 
 
@@ -82,7 +82,7 @@ mkConvert' opts@InteropOptions{..} mkgs xs = do
                   Just $ tplConvertRecord opts (base1,constr1,fields1) (base2,constr2,fields2)
                 _                               -> Nothing
 
-      return [r]
+      pure [r]
 
     ) xs
 
@@ -91,8 +91,8 @@ mkConvert' opts@InteropOptions{..} mkgs xs = do
     (\acc mkg -> do
       r <- runMkG mkg acc
       case r of
-        Nothing -> return acc
-        Just r' -> return r'
+        Nothing -> pure acc
+        Just r' -> pure r'
     )
     (intercalate (newlines spacingNL) $ catMaybes $ concat converts)
     mkgs

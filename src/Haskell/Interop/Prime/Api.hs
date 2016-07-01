@@ -53,21 +53,21 @@ buildParam opts@InteropOptions{..} api_param_th =
   case api_param_th of
     Par_TH params         -> do
       params' <- mapM (\(p,t) -> nameAndType opts p t) params
-      return $ Par params'
+      pure $ Par params'
     ParBy_TH param name   -> do
       (p, t) <- nameAndType opts param name
-      return $ ParBy p t
+      pure $ ParBy p t
     ParBoth_TH args (p,t) ->
       ParBoth
       <$> mapM (\(p',t') -> nameAndType opts p' t') args
       <*> nameAndType opts p t
-    ParNone_TH            -> return ParNone
+    ParNone_TH            -> pure ParNone
 
 
 
 buildInternalApiRep :: InteropOptions -> ApiEntry_TH -> Q ApiEntry
 buildInternalApiRep opts@InteropOptions{..} (ApiEntry_TH route params methods) =
-  ApiEntry <$> (return route) <*> (buildParams opts params) <*> (buildMethods opts methods)
+  ApiEntry <$> (pure route) <*> (buildParams opts params) <*> (buildMethods opts methods)
 
 
 
@@ -77,7 +77,7 @@ mkApi Options{..} api@Api_TH{..} = do
   mkApi' psInterop psMkGs api
   mkApi' hsInterop hsMkGs api
 
-  return []
+  pure []
 
 
 
@@ -94,7 +94,7 @@ mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
   }
 
   result <- forM apiEntries $ (\api_entry -> do
-      return $ tplApiEntry opts api_entry
+      pure $ tplApiEntry opts api_entry
     )
 
   let
@@ -106,8 +106,8 @@ mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
           foldM (\acc mkg -> do
               r <- runMkG mkg acc
               case r of
-                Nothing -> return acc
-                Just r' -> return r'
+                Nothing -> pure acc
+                Just r' -> pure r'
             )
             intermediate_module
             mkgs
@@ -119,4 +119,4 @@ mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
 
   runIO $ persistResults opts api_module
 
-  return ()
+  pure ()
