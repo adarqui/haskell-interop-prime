@@ -13,7 +13,8 @@ module Haskell.Interop.Prime.Test.Types (
   NestedList,
   FunkyRecord (..),
   FUnkyRecordP (..),
-  Param (..)
+  Param (..),
+  ApplicationError (..)
 ) where
 
 
@@ -146,3 +147,12 @@ instance QueryParam Param where
 --
 class QueryParam a where
   qp :: a -> (String, String)
+
+
+
+-- Used by haskell-api-helpers to return JSON errors: FromJSON a, FromJSON b, Default b => Either (ApiError b) a
+--
+data ApplicationError
+  = Error_Unknown
+  | Error_Validation
+  | Error_PerimssionDenied

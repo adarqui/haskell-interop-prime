@@ -71,18 +71,18 @@ buildInternalApiRep opts@InteropOptions{..} (ApiEntry_TH route params methods) =
 
 
 
-mkApi :: Options -> Api_TH -> Q [Dec]
-mkApi Options{..} api@Api_TH{..} = do
+mkApi :: Options -> Name -> Api_TH -> Q [Dec]
+mkApi Options{..} napi_err api@Api_TH{..} = do
 
-  mkApi' psInterop psMkGs api
-  mkApi' hsInterop hsMkGs api
+  mkApi' psInterop psMkGs (nameBase napi_err) api
+  mkApi' hsInterop hsMkGs (nameBase napi_err) api
 
   pure []
 
 
 
-mkApi' :: InteropOptions -> [MkG] -> Api_TH -> Q ()
-mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
+mkApi' :: InteropOptions -> [MkG] -> String -> Api_TH -> Q ()
+mkApi' opts@InteropOptions{..} mkgs api_err Api_TH{..} = do
 
   ir <- forM apiEntries_TH $ (\api_entry_th -> do
      buildInternalApiRep opts api_entry_th
@@ -94,7 +94,7 @@ mkApi' opts@InteropOptions{..} mkgs Api_TH{..} = do
   }
 
   result <- forM apiEntries $ (\api_entry -> do
-      pure $ tplApiEntry opts api_entry
+      pure $ tplApiEntry opts api_err api_entry
     )
 
   let

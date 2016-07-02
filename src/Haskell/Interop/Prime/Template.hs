@@ -861,29 +861,29 @@ tplTestHeader module_name =
 
 
 
-tplApiEntry :: InteropOptions -> ApiEntry -> String
-tplApiEntry opts@InteropOptions{..} api_entry =
+tplApiEntry :: InteropOptions -> String -> ApiEntry -> String
+tplApiEntry opts@InteropOptions{..} api_err api_entry =
   case lang of
-    LangPurescript -> tplApiEntry' opts api_entry
-    LangHaskell    -> tplApiEntry' opts api_entry
+    LangPurescript -> tplApiEntry' opts api_err api_entry
+    LangHaskell    -> tplApiEntry' opts api_err api_entry
 
 
 
-tplApiEntry' :: InteropOptions -> ApiEntry -> String
-tplApiEntry' opts@InteropOptions{..} (ApiEntry route params methods) =
+tplApiEntry' :: InteropOptions -> String -> ApiEntry -> String
+tplApiEntry' opts@InteropOptions{..} api_err (ApiEntry route params methods) =
   intercalateMap
     "\n"
     (\(param, method) ->
-      tplApiEntry'' opts False route param method
+      tplApiEntry'' opts False route param method api_err
       <> "\n" <>
-      tplApiEntry'' opts True route param method
+      tplApiEntry'' opts True route param method api_err
     )
     [ (param, method) | param <- params, method <- methods ]
 
 
 
-tplApiEntry'' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String
-tplApiEntry'' opts@InteropOptions{..} simplified route param method =
+tplApiEntry'' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String -> String
+tplApiEntry'' opts@InteropOptions{..} simplified route param method api_err =
      printf "%s :: %s%s\n"
        fn_name'
        prolog
@@ -901,7 +901,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method =
     (tplApiParam_TypeSig opts param) <>
     [tplApiParam_ByType opts param] <>
     [tplApiMethod_RequestType opts method] <>
-    [printf "ApiEff (Either ApiError " <> tplApiMethod_ResultType opts method <> ")"]
+    [printf "ApiEff (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"]
   typesig' =
     if simplified
       then typesig

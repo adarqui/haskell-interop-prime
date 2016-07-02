@@ -90,4 +90,5 @@ mkApi
     (defaultPurescriptApiMkGs "module Interop.Api where")
     ((defaultOptionsCleanHaskell "/tmp/Interop.Api.hs" ) { debug = True })
     (defaultHaskellApiMkGs $ tplTestHeader "Interop.Api"))
+  ''ApplicationError
   apiSpec_TH
