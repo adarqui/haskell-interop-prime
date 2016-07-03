@@ -650,5 +650,5 @@ instance Show OneConstructor where
 
 instance Eq OneConstructor where
   (==) (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
-  (==) _ _ = False
+
 -- footer

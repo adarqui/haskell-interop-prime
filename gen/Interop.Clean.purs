@@ -1619,7 +1619,7 @@ instance oneConstructorShow :: Show OneConstructor where
 
 instance oneConstructorEq :: Eq OneConstructor where
   eq (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
-  eq _ _ = false
+
 
 active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
 active_ f o = o { active = _ } <$> f o.active

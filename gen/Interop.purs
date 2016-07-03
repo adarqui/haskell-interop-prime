@@ -1619,7 +1619,7 @@ instance oneConstructorShow :: Show OneConstructor where
 
 instance oneConstructorEq :: Eq OneConstructor where
   eq (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
-  eq _ _ = false
+
 
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
