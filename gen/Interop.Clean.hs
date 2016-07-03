@@ -360,4 +360,175 @@ instance Show FUnkyRecordP where
 
 instance Eq FUnkyRecordP where
   (==) a b = field a == field b
+
+instance ToJSON Param where
+  toJSON (Limit x0) = object $
+    [ "tag" .= ("Limit" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (Offset x0) = object $
+    [ "tag" .= ("Offset" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (ByUsersIds x0) = object $
+    [ "tag" .= ("ByUsersIds" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (ByUsersNames x0) = object $
+    [ "tag" .= ("ByUsersNames" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (ByUsersEmails x0) = object $
+    [ "tag" .= ("ByUsersEmails" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (ByUserActive x0) = object $
+    [ "tag" .= ("ByUserActive" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+
+
+instance FromJSON Param where
+  parseJSON (Object o) = do
+    tag <- o .: ("tag" :: Text)
+    case tag of
+      ("Limit" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> Limit <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: Limit"
+
+      ("Offset" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> Offset <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: Offset"
+
+      ("ByUsersIds" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUsersIds <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUsersIds"
+
+      ("ByUsersNames" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUsersNames <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUsersNames"
+
+      ("ByUsersEmails" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUsersEmails <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUsersEmails"
+
+      ("ByUserActive" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUserActive <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUserActive"
+
+      _ -> fail "Could not parse Param"
+
+  parseJSON x = fail $ "Could not parse object: " <> show x
+
+
+instance Show Param where
+  show (Limit x0) = "Limit: " <> show x0
+  show (Offset x0) = "Offset: " <> show x0
+  show (ByUsersIds x0) = "ByUsersIds: " <> show x0
+  show (ByUsersNames x0) = "ByUsersNames: " <> show x0
+  show (ByUsersEmails x0) = "ByUsersEmails: " <> show x0
+  show (ByUserActive x0) = "ByUserActive: " <> show x0
+
+
+instance Eq Param where
+  (==) (Limit x0a) (Limit x0b) = x0a == x0b
+  (==) (Offset x0a) (Offset x0b) = x0a == x0b
+  (==) (ByUsersIds x0a) (ByUsersIds x0b) = x0a == x0b
+  (==) (ByUsersNames x0a) (ByUsersNames x0b) = x0a == x0b
+  (==) (ByUsersEmails x0a) (ByUsersEmails x0b) = x0a == x0b
+  (==) (ByUserActive x0a) (ByUserActive x0b) = x0a == x0b
+  (==) _ _ = False
+
+instance ToJSON ParamTag where
+  toJSON (ParamTag_Limit ) = object $
+    [ "tag" .= ("ParamTag_Limit" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (ParamTag_Offset ) = object $
+    [ "tag" .= ("ParamTag_Offset" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (ParamTag_ByUsersIds ) = object $
+    [ "tag" .= ("ParamTag_ByUsersIds" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (ParamTag_ByUsersNames ) = object $
+    [ "tag" .= ("ParamTag_ByUsersNames" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (ParamTag_ByUsersEmails ) = object $
+    [ "tag" .= ("ParamTag_ByUsersEmails" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (ParamTag_ByUserActive ) = object $
+    [ "tag" .= ("ParamTag_ByUserActive" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+
+
+instance FromJSON ParamTag where
+  parseJSON (Object o) = do
+    tag <- o .: ("tag" :: Text)
+    case tag of
+      ("ParamTag_Limit" :: Text) -> do
+        pure ParamTag_Limit
+
+      ("ParamTag_Offset" :: Text) -> do
+        pure ParamTag_Offset
+
+      ("ParamTag_ByUsersIds" :: Text) -> do
+        pure ParamTag_ByUsersIds
+
+      ("ParamTag_ByUsersNames" :: Text) -> do
+        pure ParamTag_ByUsersNames
+
+      ("ParamTag_ByUsersEmails" :: Text) -> do
+        pure ParamTag_ByUsersEmails
+
+      ("ParamTag_ByUserActive" :: Text) -> do
+        pure ParamTag_ByUserActive
+
+      _ -> fail "Could not parse ParamTag"
+
+  parseJSON x = fail $ "Could not parse object: " <> show x
+
+
+instance Show ParamTag where
+  show ParamTag_Limit = "ParamTag_Limit"
+  show ParamTag_Offset = "ParamTag_Offset"
+  show ParamTag_ByUsersIds = "ParamTag_ByUsersIds"
+  show ParamTag_ByUsersNames = "ParamTag_ByUsersNames"
+  show ParamTag_ByUsersEmails = "ParamTag_ByUsersEmails"
+  show ParamTag_ByUserActive = "ParamTag_ByUserActive"
+
+
+instance Read ParamTag where
+  readsPrec _ "ParamTag_Limit" = [(ParamTag_Limit, "")]
+  readsPrec _ "ParamTag_Offset" = [(ParamTag_Offset, "")]
+  readsPrec _ "ParamTag_ByUsersIds" = [(ParamTag_ByUsersIds, "")]
+  readsPrec _ "ParamTag_ByUsersNames" = [(ParamTag_ByUsersNames, "")]
+  readsPrec _ "ParamTag_ByUsersEmails" = [(ParamTag_ByUsersEmails, "")]
+  readsPrec _ "ParamTag_ByUserActive" = [(ParamTag_ByUserActive, "")]
+
+
+instance Eq ParamTag where
+  (==) ParamTag_Limit ParamTag_Limit = True
+  (==) ParamTag_Offset ParamTag_Offset = True
+  (==) ParamTag_ByUsersIds ParamTag_ByUsersIds = True
+  (==) ParamTag_ByUsersNames ParamTag_ByUsersNames = True
+  (==) ParamTag_ByUsersEmails ParamTag_ByUsersEmails = True
+  (==) ParamTag_ByUserActive ParamTag_ByUserActive = True
+  (==) _ _ = False
 -- footer

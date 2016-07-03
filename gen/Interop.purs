@@ -1014,6 +1014,371 @@ instance fUnkyRecordPShow :: Show FUnkyRecordP where
 instance fUnkyRecordPEq :: Eq FUnkyRecordP where
   eq (FUnkyRecordP a) (FUnkyRecordP b) = a.funkyrecordpField == b.funkyrecordpField
 
+data Param
+  = Limit Int
+  | Offset Int
+  | ByUsersIds (Array Int)
+  | ByUsersNames (Array String)
+  | ByUsersEmails (Array String)
+  | ByUserActive Boolean
+
+
+
+instance paramEncodeJson :: EncodeJson Param where
+  encodeJson (Limit x0) =
+       "tag" := "Limit"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (Offset x0) =
+       "tag" := "Offset"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUsersIds x0) =
+       "tag" := "ByUsersIds"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUsersNames x0) =
+       "tag" := "ByUsersNames"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUsersEmails x0) =
+       "tag" := "ByUsersEmails"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUserActive x0) =
+       "tag" := "ByUserActive"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+
+
+instance paramDecodeJson :: DecodeJson Param where
+  decodeJson json = do
+    obj <- decodeJson json
+    tag <- obj .? "tag"
+    case tag of
+      "Limit" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> Limit <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for Limit"
+
+
+      "Offset" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> Offset <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for Offset"
+
+
+      "ByUsersIds" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUsersIds <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUsersIds"
+
+
+      "ByUsersNames" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUsersNames <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUsersNames"
+
+
+      "ByUsersEmails" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUsersEmails <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUsersEmails"
+
+
+      "ByUserActive" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUserActive <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUserActive"
+
+
+      _ -> Left $ "DecodeJson TypeMismatch for Param"
+
+
+
+instance paramRequestable :: Requestable Param where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance paramRespondable :: Respondable Param where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json = do
+    tag <- readProp "tag" json
+    case tag of
+      "Limit" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> Limit <$> read x0
+          _ -> Left $ TypeMismatch "Limit" "Respondable"
+
+
+      "Offset" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> Offset <$> read x0
+          _ -> Left $ TypeMismatch "Offset" "Respondable"
+
+
+      "ByUsersIds" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersIds <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersIds" "Respondable"
+
+
+      "ByUsersNames" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersNames <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersNames" "Respondable"
+
+
+      "ByUsersEmails" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersEmails <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersEmails" "Respondable"
+
+
+      "ByUserActive" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserActive <$> read x0
+          _ -> Left $ TypeMismatch "ByUserActive" "Respondable"
+
+
+      _ -> Left $ TypeMismatch "Param" "Respondable"
+
+
+
+instance paramIsForeign :: IsForeign Param where
+  read json = do
+    tag <- readProp "tag" json
+    case tag of
+      "Limit" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> Limit <$> read x0
+          _ -> Left $ TypeMismatch "Limit" "IsForeign"
+
+
+      "Offset" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> Offset <$> read x0
+          _ -> Left $ TypeMismatch "Offset" "IsForeign"
+
+
+      "ByUsersIds" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersIds <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersIds" "IsForeign"
+
+
+      "ByUsersNames" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersNames <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersNames" "IsForeign"
+
+
+      "ByUsersEmails" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUsersEmails <$> read x0
+          _ -> Left $ TypeMismatch "ByUsersEmails" "IsForeign"
+
+
+      "ByUserActive" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserActive <$> read x0
+          _ -> Left $ TypeMismatch "ByUserActive" "IsForeign"
+
+
+      _ -> Left $ TypeMismatch "Param" "IsForeign"
+
+
+
+instance paramShow :: Show Param where
+  show (Limit x0) = "Limit: " <> show x0
+  show (Offset x0) = "Offset: " <> show x0
+  show (ByUsersIds x0) = "ByUsersIds: " <> show x0
+  show (ByUsersNames x0) = "ByUsersNames: " <> show x0
+  show (ByUsersEmails x0) = "ByUsersEmails: " <> show x0
+  show (ByUserActive x0) = "ByUserActive: " <> show x0
+
+
+instance paramEq :: Eq Param where
+  eq (Limit x0a) (Limit x0b) = x0a == x0b
+  eq (Offset x0a) (Offset x0b) = x0a == x0b
+  eq (ByUsersIds x0a) (ByUsersIds x0b) = x0a == x0b
+  eq (ByUsersNames x0a) (ByUsersNames x0b) = x0a == x0b
+  eq (ByUsersEmails x0a) (ByUsersEmails x0b) = x0a == x0b
+  eq (ByUserActive x0a) (ByUserActive x0b) = x0a == x0b
+  eq _ _ = false
+
+data ParamTag
+  = ParamTag_Limit 
+  | ParamTag_Offset 
+  | ParamTag_ByUsersIds 
+  | ParamTag_ByUsersNames 
+  | ParamTag_ByUsersEmails 
+  | ParamTag_ByUserActive 
+
+
+
+instance paramTagEncodeJson :: EncodeJson ParamTag where
+  encodeJson (ParamTag_Limit ) =
+       "tag" := "ParamTag_Limit"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (ParamTag_Offset ) =
+       "tag" := "ParamTag_Offset"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (ParamTag_ByUsersIds ) =
+       "tag" := "ParamTag_ByUsersIds"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (ParamTag_ByUsersNames ) =
+       "tag" := "ParamTag_ByUsersNames"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (ParamTag_ByUsersEmails ) =
+       "tag" := "ParamTag_ByUsersEmails"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (ParamTag_ByUserActive ) =
+       "tag" := "ParamTag_ByUserActive"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+
+
+instance paramTagDecodeJson :: DecodeJson ParamTag where
+  decodeJson json = do
+    obj <- decodeJson json
+    tag <- obj .? "tag"
+    case tag of
+      "ParamTag_Limit" -> do
+        pure ParamTag_Limit
+
+      "ParamTag_Offset" -> do
+        pure ParamTag_Offset
+
+      "ParamTag_ByUsersIds" -> do
+        pure ParamTag_ByUsersIds
+
+      "ParamTag_ByUsersNames" -> do
+        pure ParamTag_ByUsersNames
+
+      "ParamTag_ByUsersEmails" -> do
+        pure ParamTag_ByUsersEmails
+
+      "ParamTag_ByUserActive" -> do
+        pure ParamTag_ByUserActive
+
+      _ -> Left $ "DecodeJson TypeMismatch for ParamTag"
+
+
+
+instance paramTagRequestable :: Requestable ParamTag where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance paramTagRespondable :: Respondable ParamTag where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json = do
+    tag <- readProp "tag" json
+    case tag of
+      "ParamTag_Limit" -> do
+        pure ParamTag_Limit
+
+      "ParamTag_Offset" -> do
+        pure ParamTag_Offset
+
+      "ParamTag_ByUsersIds" -> do
+        pure ParamTag_ByUsersIds
+
+      "ParamTag_ByUsersNames" -> do
+        pure ParamTag_ByUsersNames
+
+      "ParamTag_ByUsersEmails" -> do
+        pure ParamTag_ByUsersEmails
+
+      "ParamTag_ByUserActive" -> do
+        pure ParamTag_ByUserActive
+
+      _ -> Left $ TypeMismatch "ParamTag" "Respondable"
+
+
+
+instance paramTagIsForeign :: IsForeign ParamTag where
+  read json = do
+    tag <- readProp "tag" json
+    case tag of
+      "ParamTag_Limit" -> do
+        pure ParamTag_Limit
+
+      "ParamTag_Offset" -> do
+        pure ParamTag_Offset
+
+      "ParamTag_ByUsersIds" -> do
+        pure ParamTag_ByUsersIds
+
+      "ParamTag_ByUsersNames" -> do
+        pure ParamTag_ByUsersNames
+
+      "ParamTag_ByUsersEmails" -> do
+        pure ParamTag_ByUsersEmails
+
+      "ParamTag_ByUserActive" -> do
+        pure ParamTag_ByUserActive
+
+      _ -> Left $ TypeMismatch "ParamTag" "IsForeign"
+
+
+
+instance paramTagShow :: Show ParamTag where
+  show ParamTag_Limit = "ParamTag_Limit"
+  show ParamTag_Offset = "ParamTag_Offset"
+  show ParamTag_ByUsersIds = "ParamTag_ByUsersIds"
+  show ParamTag_ByUsersNames = "ParamTag_ByUsersNames"
+  show ParamTag_ByUsersEmails = "ParamTag_ByUsersEmails"
+  show ParamTag_ByUserActive = "ParamTag_ByUserActive"
+
+
+readParamTag :: String -> Maybe ParamTag
+readParamTag "ParamTag_Limit" = Just ParamTag_Limit
+readParamTag "ParamTag_Offset" = Just ParamTag_Offset
+readParamTag "ParamTag_ByUsersIds" = Just ParamTag_ByUsersIds
+readParamTag "ParamTag_ByUsersNames" = Just ParamTag_ByUsersNames
+readParamTag "ParamTag_ByUsersEmails" = Just ParamTag_ByUsersEmails
+readParamTag "ParamTag_ByUserActive" = Just ParamTag_ByUserActive
+readParamTag _ = Nothing
+
+instance paramTagEq :: Eq ParamTag where
+  eq ParamTag_Limit ParamTag_Limit = true
+  eq ParamTag_Offset ParamTag_Offset = true
+  eq ParamTag_ByUsersIds ParamTag_ByUsersIds = true
+  eq ParamTag_ByUsersNames ParamTag_ByUsersNames = true
+  eq ParamTag_ByUsersEmails ParamTag_ByUsersEmails = true
+  eq ParamTag_ByUserActive ParamTag_ByUserActive = true
+  eq _ _ = false
+
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
