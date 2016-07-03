@@ -683,7 +683,7 @@ tplRead_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> S
 tplRead_SumType_Haskell opts@InteropOptions{..} base fields =
      printf "instance Read %s where\n" base
   <> concatMap (\(f,vars) -> tplRead_SumType_Field_Haskell opts base f vars) fields
-  <> spaces si1 <> "read _ = []\n"
+  <> spaces si1 <> "readsPrec _ = []\n"
   where
   si1 = spacingIndent
 
