@@ -1447,6 +1447,180 @@ instance paramTagEq :: Eq ParamTag where
   eq ParamTag_ByUserActive ParamTag_ByUserActive = true
   eq _ _ = false
 
+data ApplicationError
+  = Error_Unknown 
+  | Error_Validation 
+  | Error_PerimssionDenied 
+
+
+
+instance applicationErrorEncodeJson :: EncodeJson ApplicationError where
+  encodeJson (Error_Unknown ) =
+       "tag" := "Error_Unknown"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (Error_Validation ) =
+       "tag" := "Error_Validation"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+  encodeJson (Error_PerimssionDenied ) =
+       "tag" := "Error_PerimssionDenied"
+    ~> "contents" := ([] :: Array String)
+    ~> jsonEmptyObject
+
+
+instance applicationErrorDecodeJson :: DecodeJson ApplicationError where
+  decodeJson json = do
+    obj <- decodeJson json
+    tag <- obj .? "tag"
+    case tag of
+      "Error_Unknown" -> do
+        pure Error_Unknown
+
+      "Error_Validation" -> do
+        pure Error_Validation
+
+      "Error_PerimssionDenied" -> do
+        pure Error_PerimssionDenied
+
+      _ -> Left $ "DecodeJson TypeMismatch for ApplicationError"
+
+
+
+instance applicationErrorRequestable :: Requestable ApplicationError where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance applicationErrorRespondable :: Respondable ApplicationError where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json = do
+    tag <- readProp "tag" json
+    case tag of
+      "Error_Unknown" -> do
+        pure Error_Unknown
+
+      "Error_Validation" -> do
+        pure Error_Validation
+
+      "Error_PerimssionDenied" -> do
+        pure Error_PerimssionDenied
+
+      _ -> Left $ TypeMismatch "ApplicationError" "Respondable"
+
+
+
+instance applicationErrorIsForeign :: IsForeign ApplicationError where
+  read json = do
+    tag <- readProp "tag" json
+    case tag of
+      "Error_Unknown" -> do
+        pure Error_Unknown
+
+      "Error_Validation" -> do
+        pure Error_Validation
+
+      "Error_PerimssionDenied" -> do
+        pure Error_PerimssionDenied
+
+      _ -> Left $ TypeMismatch "ApplicationError" "IsForeign"
+
+
+
+instance applicationErrorShow :: Show ApplicationError where
+  show Error_Unknown = "error_unknown"
+  show Error_Validation = "error_validation"
+  show Error_PerimssionDenied = "error_perimssion_denied"
+
+
+readApplicationError :: String -> Maybe ApplicationError
+readApplicationError "error_unknown" = Just Error_Unknown
+readApplicationError "error_validation" = Just Error_Validation
+readApplicationError "error_perimssion_denied" = Just Error_PerimssionDenied
+readApplicationError _ = Nothing
+
+instance applicationErrorEq :: Eq ApplicationError where
+  eq Error_Unknown Error_Unknown = true
+  eq Error_Validation Error_Validation = true
+  eq Error_PerimssionDenied Error_PerimssionDenied = true
+  eq _ _ = false
+
+data OneConstructor
+  = OneConstructor_Test String
+
+
+
+instance oneConstructorEncodeJson :: EncodeJson OneConstructor where
+  encodeJson (OneConstructor_Test x0) =
+       "tag" := "OneConstructor_Test"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+
+
+instance oneConstructorDecodeJson :: DecodeJson OneConstructor where
+  decodeJson json = do
+    obj <- decodeJson json
+    tag <- obj .? "tag"
+    case tag of
+      "OneConstructor_Test" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> OneConstructor_Test <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for OneConstructor_Test"
+
+
+      _ -> Left $ "DecodeJson TypeMismatch for OneConstructor"
+
+
+
+instance oneConstructorRequestable :: Requestable OneConstructor where
+  toRequest s =
+    let str = printJson (encodeJson s) :: String
+    in toRequest str
+
+
+instance oneConstructorRespondable :: Respondable OneConstructor where
+  responseType =
+    Tuple Nothing JSONResponse
+  fromResponse json = do
+    tag <- readProp "tag" json
+    case tag of
+      "OneConstructor_Test" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> OneConstructor_Test <$> read x0
+          _ -> Left $ TypeMismatch "OneConstructor_Test" "Respondable"
+
+
+      _ -> Left $ TypeMismatch "OneConstructor" "Respondable"
+
+
+
+instance oneConstructorIsForeign :: IsForeign OneConstructor where
+  read json = do
+    tag <- readProp "tag" json
+    case tag of
+      "OneConstructor_Test" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> OneConstructor_Test <$> read x0
+          _ -> Left $ TypeMismatch "OneConstructor_Test" "IsForeign"
+
+
+      _ -> Left $ TypeMismatch "OneConstructor" "IsForeign"
+
+
+
+instance oneConstructorShow :: Show OneConstructor where
+  show (OneConstructor_Test x0) = "OneConstructor_Test: " <> show x0
+
+
+instance oneConstructorEq :: Eq OneConstructor where
+  eq (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
+  eq _ _ = false
+
 active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
 active_ f o = o { active = _ } <$> f o.active
 

@@ -569,4 +569,86 @@ instance Eq ParamTag where
   (==) ParamTag_ByUsersEmails ParamTag_ByUsersEmails = True
   (==) ParamTag_ByUserActive ParamTag_ByUserActive = True
   (==) _ _ = False
+
+instance ToJSON ApplicationError where
+  toJSON (Error_Unknown ) = object $
+    [ "tag" .= ("Error_Unknown" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (Error_Validation ) = object $
+    [ "tag" .= ("Error_Validation" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+  toJSON (Error_PerimssionDenied ) = object $
+    [ "tag" .= ("Error_PerimssionDenied" :: Text)
+    , "contents" .= ([] :: [Text])
+    ]
+
+
+instance FromJSON ApplicationError where
+  parseJSON (Object o) = do
+    tag <- o .: ("tag" :: Text)
+    case tag of
+      ("Error_Unknown" :: Text) -> do
+        pure Error_Unknown
+
+      ("Error_Validation" :: Text) -> do
+        pure Error_Validation
+
+      ("Error_PerimssionDenied" :: Text) -> do
+        pure Error_PerimssionDenied
+
+      _ -> fail "Could not parse ApplicationError"
+
+  parseJSON x = fail $ "Could not parse object: " <> show x
+
+
+instance Show ApplicationError where
+  show Error_Unknown = "error_unknown"
+  show Error_Validation = "error_validation"
+  show Error_PerimssionDenied = "error_perimssion_denied"
+
+
+instance Read ApplicationError where
+  readsPrec _ "error_unknown" = [(Error_Unknown, "")]
+  readsPrec _ "error_validation" = [(Error_Validation, "")]
+  readsPrec _ "error_perimssion_denied" = [(Error_PerimssionDenied, "")]
+  readsPrec _ _ = []
+
+
+instance Eq ApplicationError where
+  (==) Error_Unknown Error_Unknown = True
+  (==) Error_Validation Error_Validation = True
+  (==) Error_PerimssionDenied Error_PerimssionDenied = True
+  (==) _ _ = False
+
+instance ToJSON OneConstructor where
+  toJSON (OneConstructor_Test x0) = object $
+    [ "tag" .= ("OneConstructor_Test" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+
+
+instance FromJSON OneConstructor where
+  parseJSON (Object o) = do
+    tag <- o .: ("tag" :: Text)
+    case tag of
+      ("OneConstructor_Test" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> OneConstructor_Test <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: OneConstructor_Test"
+
+      _ -> fail "Could not parse OneConstructor"
+
+  parseJSON x = fail $ "Could not parse object: " <> show x
+
+
+instance Show OneConstructor where
+  show (OneConstructor_Test x0) = "one_constructor_test: " <> show x0
+
+
+instance Eq OneConstructor where
+  (==) (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
+  (==) _ _ = False
 -- footer
