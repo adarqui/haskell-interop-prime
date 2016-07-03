@@ -746,7 +746,11 @@ tplEq_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> 
 tplEq_SumType_Purescript opts@InteropOptions{..} base fields =
      printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
   <> concatMap (\(f,vars) -> tplEq_SumType_Field_Purescript opts f vars) fields
-  <> spaces si1 <> "eq _ _ = false"
+  <> if length fields > 1
+        -- If there's only one constructor in the sum type, we will get warnings for overlap if we provide a catchall
+        -- so we check this here
+        then spaces si1 <> "eq _ _ = false"
+        else ""
   where
   si1 = spacingIndent
 
@@ -780,7 +784,11 @@ tplEq_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> Str
 tplEq_SumType_Haskell opts@InteropOptions{..} base fields =
      printf "instance Eq %s where\n" base
   <> concatMap (\(f,vars) -> tplEq_SumType_Field_Haskell opts f vars) fields
-  <> spaces si1 <> "(==) _ _ = False"
+  <> if length fields > 1
+        -- If there's only one constructor in the sum type, we will get warnings for overlap if we provide a catchall
+        -- so we check this here
+        then spaces si1 <> "(==) _ _ = False"
+        else ""
   where
   si1 = spacingIndent
 
