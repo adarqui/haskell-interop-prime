@@ -558,7 +558,7 @@ instance Read ParamTag where
   readsPrec _ "ParamTag_ByUsersNames" = [(ParamTag_ByUsersNames, "")]
   readsPrec _ "ParamTag_ByUsersEmails" = [(ParamTag_ByUsersEmails, "")]
   readsPrec _ "ParamTag_ByUserActive" = [(ParamTag_ByUserActive, "")]
-  readsPrec _ = []
+  readsPrec _ _ = []
 
 
 instance Eq ParamTag where
