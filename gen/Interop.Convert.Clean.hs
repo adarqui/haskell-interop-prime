@@ -10,10 +10,11 @@ module Interop.Convert.Clean where
 
 
 
-import           Data.Aeson  (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
-import           Data.Text   (Text)
-import qualified Data.Text as T
-import           Data.Monoid ((<>))
+import           Data.Aeson          (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
+import           Data.Text           (Text)
+import qualified Data.Text           as T
+import           Data.Monoid         ((<>))
+import           Haskell.Api.Helpers (QueryParam, qp)
 
 userRequestToUserResponse :: Int64 -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse id active createdAt modifiedAt UserRequest{..} =

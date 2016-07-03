@@ -10,10 +10,11 @@ module Interop where
 
 
 
-import           Data.Aeson  (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
-import           Data.Text   (Text)
-import qualified Data.Text as T
-import           Data.Monoid ((<>))
+import           Data.Aeson          (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
+import           Data.Text           (Text)
+import qualified Data.Text           as T
+import           Data.Monoid         ((<>))
+import           Haskell.Api.Helpers (QueryParam, qp)
 
 instance ToJSON Session where
   toJSON Session{..} = object $
