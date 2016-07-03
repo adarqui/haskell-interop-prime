@@ -34,6 +34,7 @@ module Haskell.Interop.Prime.Template (
   tplRead_SumType,
   tplEq_Record,
   tplEq_SumType,
+  tplQueryParam_SumType,
   tplImports,
   tplPurescriptImports,
   tplHaskellImports,
@@ -795,6 +796,54 @@ tplEq_SumType_Field_Haskell InteropOptions{..} field vars =
   vars'  = vars_x $ length vars
   vars'a = map (<>"a") vars'
   vars'b = map (<>"b") vars'
+
+
+
+tplQueryParam_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplQueryParam_SumType opts@InteropOptions{..} base fields =
+  case lang of
+    LangPurescript -> tplQueryParam_SumType_Purescript opts base fields
+    LangHaskell    -> tplQueryParam_SumType_Haskell opts base fields
+
+
+
+tplQueryParam_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
+tplQueryParam_SumType_Purescript opts@InteropOptions{..} base fields =
+     printf "instance %sQueryParam :: QueryParam %s where\n" (firstToLower base) base
+  <> concatMap (\(f,vars) -> tplQueryParam_SumType_Field_Purescript opts f vars) fields
+
+
+
+tplQueryParam_SumType_Field_Purescript :: InteropOptions -> String -> [String] -> String
+tplQueryParam_SumType_Field_Purescript InteropOptions{..} field (var:[]) =
+  spaces si1 <> printf "qp (%s x0) = Tuple \"%s\" %s\n" field field stringified
+  where
+  si1 = spacingIndent
+  stringified =
+    if isString var
+      then "x0"
+      else "(show x0)"
+tplQueryParam_SumType_Field_Purescript _ _ _ = error "tplQueryParam_SumType_Field_Purescript"
+
+
+
+tplQueryParam_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
+tplQueryParam_SumType_Haskell opts@InteropOptions{..} base fields =
+     printf "instance QueryParam %s where\n" base
+  <> concatMap (\(f,vars) -> tplQueryParam_SumType_Field_Haskell opts f vars) fields
+
+
+
+tplQueryParam_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
+tplQueryParam_SumType_Field_Haskell InteropOptions{..} field (var:[]) =
+  spaces si1 <> printf "qp (%s x0) = (\"%s\", %s)\n" field field stringified
+  where
+  si1 = spacingIndent
+  stringified =
+    if isString var
+      then if var == "Text" then "x0" else "(T.pack x0)"
+      else "(T.pack $ show x0)"
+tplQueryParam_SumType_Field_Haskell _ _ _ = error "tplQueryParam_SumType_Field_Haskell"
 
 
 

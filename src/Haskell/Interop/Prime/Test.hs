@@ -30,7 +30,7 @@ mkExports
   , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
   , (''FUnkyRecordP,  defaultPurescriptMks, defaultHaskellMks)
-  , (''Param,         defaultPurescriptMks, defaultHaskellMks)
+  , (''Param,         psMksQueryParam,      hsMksQueryParam)
   , (''ParamTag,      defaultPurescriptMks, defaultHaskellMks)
   ]
 
@@ -71,7 +71,7 @@ mkExports
   , (''NestedList,    defaultPurescriptMks, defaultHaskellMks)
   , (''FunkyRecord,   defaultPurescriptMks, defaultHaskellMks)
   , (''FUnkyRecordP,  defaultPurescriptMks, defaultHaskellMks)
-  , (''Param,         defaultPurescriptMks, defaultHaskellMks)
+  , (''Param,         psMksQueryParam,      hsMksQueryParam)
   , (''ParamTag,      defaultPurescriptMks, defaultHaskellMks)
   ]
 

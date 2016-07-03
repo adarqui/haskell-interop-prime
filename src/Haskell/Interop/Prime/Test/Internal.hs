@@ -2,12 +2,15 @@
 
 module Haskell.Interop.Prime.Test.Internal (
   apiSpec_TH,
-  apiEntries_TH
+  apiEntries_TH,
+  psMksQueryParam,
+  hsMksQueryParam
 ) where
 
 
 
 import           Data.Int
+import           Data.Monoid                      ((<>))
 import           Haskell.Interop.Prime
 import           Haskell.Interop.Prime.Test.Types
 
@@ -15,6 +18,16 @@ import           Haskell.Interop.Prime.Test.Types
 
 type Int64_L = [Int64]
 type String_L = [String]
+
+
+
+psMksQueryParam :: [Mk]
+psMksQueryParam = defaultPurescriptMks <> [MkQueryParam]
+
+
+
+hsMksQueryParam :: [Mk]
+hsMksQueryParam = defaultHaskellMks <> [MkQueryParam]
 
 
 

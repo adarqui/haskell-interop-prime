@@ -125,12 +125,14 @@ data FUnkyRecordP = FUnkyRecordP {
 
 
 data Param
-  = Limit         Int
-  | Offset        Int
-  | ByUsersIds    [Int64]
-  | ByUsersNames  [String]
-  | ByUsersEmails [String]
-  | ByUserActive  Bool
+  = Limit          Int
+  | Offset         Int
+  | ByUsersIds     [Int64]
+  | ByUserNameText Text
+  | ByUserNameStr  String
+  | ByUsersNames   [String]
+  | ByUsersEmails  [String]
+  | ByUserActive   Bool
 
 
 
@@ -141,16 +143,6 @@ data ParamTag
   | ParamTag_ByUsersNames
   | ParamTag_ByUsersEmails
   | ParamTag_ByUserActive
-
-
-
-instance QueryParam Param where
-  qp (Limit limit)                = ("limit", show limit)
-  qp (Offset offset)              = ("offset", show offset)
-  qp (ByUsersIds users_ids)       = ("users_ids", show users_ids)
-  qp (ByUsersNames users_names)   = ("users_names", show users_names)
-  qp (ByUsersEmails users_emails) = ("users_emails", show users_emails)
-  qp (ByUserActive bool)          = ("user_active", show bool)
 
 
 

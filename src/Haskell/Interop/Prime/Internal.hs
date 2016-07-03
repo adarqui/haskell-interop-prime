@@ -225,6 +225,20 @@ buildEq = do
 
 
 
+buildQueryParam :: ExportT (Maybe String)
+buildQueryParam = do
+  (opts, ir) <- opts_ir
+  pure $
+    case ir of
+      DataNormalIR base fields        ->
+        -- **WARNING** We only support sum types according to: Data Blah = Param1 Type1 | Param2 Type2 ...
+        if (sum (map (length . snd) fields) == (length fields))
+          then Just $ tplQueryParam_SumType opts base fields
+          else Nothing
+      _                               -> Nothing
+
+
+
 runMk :: Mk -> ExportT (Maybe String)
 runMk mk = do
   case mk of
@@ -243,6 +257,7 @@ runMk mk = do
     MkShow              -> buildShow
     MkRead              -> buildRead
     MkEq                -> buildEq
+    MkQueryParam        -> buildQueryParam
 
 
 
