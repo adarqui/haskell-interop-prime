@@ -10,9 +10,10 @@ module Interop.Convert where
 
 
 
-import Data.Aeson  (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
-import Data.Text   (Text)
-import Data.Monoid ((<>))
+import           Data.Aeson  (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
+import           Data.Text   (Text)
+import qualified Data.Text as T
+import           Data.Monoid ((<>))
 
 userRequestToUserResponse :: Int64 -> String -> String -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse userResponseId userResponseName userResponseEmail userResponseActive userResponseCreatedAt userResponseModifiedAt UserRequest{..} =
