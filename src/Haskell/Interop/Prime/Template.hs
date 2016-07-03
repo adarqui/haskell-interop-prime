@@ -618,15 +618,15 @@ tplShow_SumType opts@InteropOptions{..} base fields =
 tplShow_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
 tplShow_SumType_Purescript opts@InteropOptions{..} base fields =
      printf "instance %sShow :: Show %s where\n" (firstToLower base) base
-  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Purescript opts f vars) fields
+  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Purescript opts base f vars) fields
 
 
 
-tplShow_SumType_Field_Purescript :: InteropOptions -> String -> [String] -> String
-tplShow_SumType_Field_Purescript InteropOptions{..} field vars =
+tplShow_SumType_Field_Purescript :: InteropOptions -> String -> String -> [String] -> String
+tplShow_SumType_Field_Purescript InteropOptions{..} base field vars =
  (if null vars
     then
-      spaces si1 <> printf "show %s = \"%s\"" field field
+      spaces si1 <> printf "show %s = \"%s\"" field (jsonNameTransform base field)
     else
       spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') field <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
   <> "\n"
@@ -639,17 +639,17 @@ tplShow_SumType_Field_Purescript InteropOptions{..} field vars =
 tplShow_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
 tplShow_SumType_Haskell opts@InteropOptions{..} base fields =
      printf "instance Show %s where\n" base
-  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Haskell opts f vars) fields
+  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Haskell opts base f vars) fields
 
 
 
-tplShow_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
-tplShow_SumType_Field_Haskell InteropOptions{..} field vars =
+tplShow_SumType_Field_Haskell :: InteropOptions -> String -> String -> [String] -> String
+tplShow_SumType_Field_Haskell InteropOptions{..} base field vars =
  (if null vars
     then
-      spaces si1 <> printf "show %s = \"%s\"" field field
+      spaces si1 <> printf "show %s = \"%s\"" field (jsonNameTransform base field)
     else
-      spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') field <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
+      spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') (jsonNameTransform "" field) <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
   <> "\n"
   where
   si1 = spacingIndent
@@ -675,21 +675,24 @@ tplRead_SumType_Purescript opts@InteropOptions{..} base fields =
 
 tplRead_SumType_Field_Purescript :: InteropOptions -> String -> String -> [String] -> String
 tplRead_SumType_Field_Purescript InteropOptions{..} base field vars =
-  printf "read%s \"%s\" = Just %s\n" base field field
+  printf "read%s \"%s\" = Just %s\n" base (jsonNameTransform base field) field
 
 
 
 tplRead_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
 tplRead_SumType_Haskell opts@InteropOptions{..} base fields =
      printf "instance Read %s where\n" base
-  <> concatMap (\(f,vars) -> tplRead_SumType_Field_Haskell opts f vars) fields
+  <> concatMap (\(f,vars) -> tplRead_SumType_Field_Haskell opts base f vars) fields
+  <> spaces si1 <> "read _ = []\n"
+  where
+  si1 = spacingIndent
 
 
 
-tplRead_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
-tplRead_SumType_Field_Haskell InteropOptions{..} field vars =
+tplRead_SumType_Field_Haskell :: InteropOptions -> String -> String -> [String] -> String
+tplRead_SumType_Field_Haskell InteropOptions{..} base field vars =
   -- **WARNING** We only support empty constructors for now
-  spaces si1 <> printf "readsPrec _ \"%s\" = [(%s, \"\")]\n" field field
+  spaces si1 <> printf "readsPrec _ \"%s\" = [(%s, \"\")]\n" (jsonNameTransform base field) field
   where
   si1 = spacingIndent
 
@@ -816,7 +819,7 @@ tplQueryParam_SumType_Purescript opts@InteropOptions{..} base fields =
 
 tplQueryParam_SumType_Field_Purescript :: InteropOptions -> String -> [String] -> String
 tplQueryParam_SumType_Field_Purescript InteropOptions{..} field (var:[]) =
-  spaces si1 <> printf "qp (%s x0) = Tuple \"%s\" %s\n" field field stringified
+  spaces si1 <> printf "qp (%s x0) = Tuple \"%s\" %s\n" field (jsonNameTransform "" field) stringified
   where
   si1 = spacingIndent
   stringified =
@@ -836,7 +839,7 @@ tplQueryParam_SumType_Haskell opts@InteropOptions{..} base fields =
 
 tplQueryParam_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
 tplQueryParam_SumType_Field_Haskell InteropOptions{..} field (var:[]) =
-  spaces si1 <> printf "qp (%s x0) = (\"%s\", %s)\n" field field stringified
+  spaces si1 <> printf "qp (%s x0) = (\"%s\", %s)\n" field (jsonNameTransform "" field) stringified
   where
   si1 = spacingIndent
   stringified =

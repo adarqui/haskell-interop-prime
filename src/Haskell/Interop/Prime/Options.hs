@@ -130,8 +130,8 @@ defaultFieldNameTransformClean nb s =
 defaultJsonNameTransformClean :: StringTransformFn
 defaultJsonNameTransformClean nb s =
   if isPrefixOf lower_nb lower_s
-    then dropSuffix $ map toLower $ unCamelSource '_' fixed
-    else dropSuffix $ map toLower $ unCamelSource '_' s
+    then dropWhile (=='_') $ dropSuffix $ map toLower $ unCamelSource '_' fixed
+    else dropWhile (=='_') $ dropSuffix $ map toLower $ unCamelSource '_' s
   where
   lower_nb = map toLower nb
   lower_s  = map toLower s
