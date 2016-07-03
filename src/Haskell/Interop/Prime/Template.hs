@@ -601,7 +601,7 @@ tplShow_Record_Haskell :: InteropOptions -> String -> String -> [(String, String
 tplShow_Record_Haskell InteropOptions{..} base constr fields =
      printf "instance Show %s where\n" base
   <> spaces si2 <> "show rec = "
-  <> intercalateMap " <> \", \" <> " (\(f,_) -> printf "show \"%s: \" <> show (%s rec)" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  <> intercalateMap " <> \", \" <> " (\(f,_) -> printf "\"%s: \" <> show (%s rec)" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si2 = spacingIndent*2
 

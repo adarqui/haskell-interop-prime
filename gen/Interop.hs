@@ -33,7 +33,7 @@ instance FromJSON Session where
 
 
 instance Show Session where
-    show rec = show "unSession: " <> show (unSession rec)
+    show rec = "unSession: " <> show (unSession rec)
 
 instance Eq Session where
   (==) a b = unSession a == unSession b
@@ -202,7 +202,7 @@ instance FromJSON BigRecord where
 
 
 instance Show BigRecord where
-    show rec = show "bigRecordBool: " <> show (bigRecordBool rec) <> ", " <> show "bigRecordInt: " <> show (bigRecordInt rec) <> ", " <> show "bigRecordMaybeInt: " <> show (bigRecordMaybeInt rec) <> ", " <> show "bigRecordInteger: " <> show (bigRecordInteger rec) <> ", " <> show "bigRecordMaybeInteger: " <> show (bigRecordMaybeInteger rec) <> ", " <> show "bigRecordString: " <> show (bigRecordString rec) <> ", " <> show "bigRecordString2: " <> show (bigRecordString2 rec) <> ", " <> show "bigRecordSumType: " <> show (bigRecordSumType rec) <> ", " <> show "bigRecordData: " <> show (bigRecordData rec) <> ", " <> show "bigRecordClass: " <> show (bigRecordClass rec) <> ", " <> show "bigRecordLet: " <> show (bigRecordLet rec) <> ", " <> show "bigRecordModule: " <> show (bigRecordModule rec) <> ", " <> show "bigRecord: " <> show (bigRecord rec)
+    show rec = "bigRecordBool: " <> show (bigRecordBool rec) <> ", " <> "bigRecordInt: " <> show (bigRecordInt rec) <> ", " <> "bigRecordMaybeInt: " <> show (bigRecordMaybeInt rec) <> ", " <> "bigRecordInteger: " <> show (bigRecordInteger rec) <> ", " <> "bigRecordMaybeInteger: " <> show (bigRecordMaybeInteger rec) <> ", " <> "bigRecordString: " <> show (bigRecordString rec) <> ", " <> "bigRecordString2: " <> show (bigRecordString2 rec) <> ", " <> "bigRecordSumType: " <> show (bigRecordSumType rec) <> ", " <> "bigRecordData: " <> show (bigRecordData rec) <> ", " <> "bigRecordClass: " <> show (bigRecordClass rec) <> ", " <> "bigRecordLet: " <> show (bigRecordLet rec) <> ", " <> "bigRecordModule: " <> show (bigRecordModule rec) <> ", " <> "bigRecord: " <> show (bigRecord rec)
 
 instance Eq BigRecord where
   (==) a b = bigRecordBool a == bigRecordBool b && bigRecordInt a == bigRecordInt b && bigRecordMaybeInt a == bigRecordMaybeInt b && bigRecordInteger a == bigRecordInteger b && bigRecordMaybeInteger a == bigRecordMaybeInteger b && bigRecordString a == bigRecordString b && bigRecordString2 a == bigRecordString2 b && bigRecordSumType a == bigRecordSumType b && bigRecordData a == bigRecordData b && bigRecordClass a == bigRecordClass b && bigRecordLet a == bigRecordLet b && bigRecordModule a == bigRecordModule b && bigRecord a == bigRecord b
@@ -230,7 +230,7 @@ instance FromJSON User where
 
 
 instance Show User where
-    show rec = show "userName: " <> show (userName rec) <> ", " <> show "userEmail: " <> show (userEmail rec) <> ", " <> show "userActive: " <> show (userActive rec)
+    show rec = "userName: " <> show (userName rec) <> ", " <> "userEmail: " <> show (userEmail rec) <> ", " <> "userActive: " <> show (userActive rec)
 
 instance Eq User where
   (==) a b = userName a == userName b && userEmail a == userEmail b && userActive a == userActive b
@@ -255,7 +255,7 @@ instance FromJSON UserRequest where
 
 
 instance Show UserRequest where
-    show rec = show "userRequestName: " <> show (userRequestName rec) <> ", " <> show "userRequestEmail: " <> show (userRequestEmail rec)
+    show rec = "userRequestName: " <> show (userRequestName rec) <> ", " <> "userRequestEmail: " <> show (userRequestEmail rec)
 
 instance Eq UserRequest where
   (==) a b = userRequestName a == userRequestName b && userRequestEmail a == userRequestEmail b
@@ -292,7 +292,7 @@ instance FromJSON UserResponse where
 
 
 instance Show UserResponse where
-    show rec = show "userResponseId: " <> show (userResponseId rec) <> ", " <> show "userResponseName: " <> show (userResponseName rec) <> ", " <> show "userResponseEmail: " <> show (userResponseEmail rec) <> ", " <> show "userResponseActive: " <> show (userResponseActive rec) <> ", " <> show "userResponseCreatedAt: " <> show (userResponseCreatedAt rec) <> ", " <> show "userResponseModifiedAt: " <> show (userResponseModifiedAt rec)
+    show rec = "userResponseId: " <> show (userResponseId rec) <> ", " <> "userResponseName: " <> show (userResponseName rec) <> ", " <> "userResponseEmail: " <> show (userResponseEmail rec) <> ", " <> "userResponseActive: " <> show (userResponseActive rec) <> ", " <> "userResponseCreatedAt: " <> show (userResponseCreatedAt rec) <> ", " <> "userResponseModifiedAt: " <> show (userResponseModifiedAt rec)
 
 instance Eq UserResponse where
   (==) a b = userResponseId a == userResponseId b && userResponseName a == userResponseName b && userResponseEmail a == userResponseEmail b && userResponseActive a == userResponseActive b && userResponseCreatedAt a == userResponseCreatedAt b && userResponseModifiedAt a == userResponseModifiedAt b
@@ -314,7 +314,7 @@ instance FromJSON UserResponses where
 
 
 instance Show UserResponses where
-    show rec = show "userResponses: " <> show (userResponses rec)
+    show rec = "userResponses: " <> show (userResponses rec)
 
 instance Eq UserResponses where
   (==) a b = userResponses a == userResponses b
@@ -336,7 +336,7 @@ instance FromJSON FunkyRecord where
 
 
 instance Show FunkyRecord where
-    show rec = show "boom1: " <> show (boom1 rec)
+    show rec = "boom1: " <> show (boom1 rec)
 
 instance Eq FunkyRecord where
   (==) a b = boom1 a == boom1 b
@@ -358,7 +358,7 @@ instance FromJSON FUnkyRecordP where
 
 
 instance Show FUnkyRecordP where
-    show rec = show "funkyrecordpField: " <> show (funkyrecordpField rec)
+    show rec = "funkyrecordpField: " <> show (funkyrecordpField rec)
 
 instance Eq FUnkyRecordP where
   (==) a b = funkyrecordpField a == funkyrecordpField b

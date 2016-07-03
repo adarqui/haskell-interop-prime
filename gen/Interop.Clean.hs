@@ -33,7 +33,7 @@ instance FromJSON Session where
 
 
 instance Show Session where
-    show rec = show "unSession: " <> show (unSession rec)
+    show rec = "unSession: " <> show (unSession rec)
 
 instance Eq Session where
   (==) a b = unSession a == unSession b
@@ -202,7 +202,7 @@ instance FromJSON BigRecord where
 
 
 instance Show BigRecord where
-    show rec = show "bool: " <> show (bool rec) <> ", " <> show "int: " <> show (int rec) <> ", " <> show "maybeInt: " <> show (maybeInt rec) <> ", " <> show "integer: " <> show (integer rec) <> ", " <> show "maybeInteger: " <> show (maybeInteger rec) <> ", " <> show "string: " <> show (string rec) <> ", " <> show "string2: " <> show (string2 rec) <> ", " <> show "sumType: " <> show (sumType rec) <> ", " <> show "dataP: " <> show (dataP rec) <> ", " <> show "classP: " <> show (classP rec) <> ", " <> show "letP: " <> show (letP rec) <> ", " <> show "moduleP: " <> show (moduleP rec) <> ", " <> show "bigRecord: " <> show (bigRecord rec)
+    show rec = "bool: " <> show (bool rec) <> ", " <> "int: " <> show (int rec) <> ", " <> "maybeInt: " <> show (maybeInt rec) <> ", " <> "integer: " <> show (integer rec) <> ", " <> "maybeInteger: " <> show (maybeInteger rec) <> ", " <> "string: " <> show (string rec) <> ", " <> "string2: " <> show (string2 rec) <> ", " <> "sumType: " <> show (sumType rec) <> ", " <> "dataP: " <> show (dataP rec) <> ", " <> "classP: " <> show (classP rec) <> ", " <> "letP: " <> show (letP rec) <> ", " <> "moduleP: " <> show (moduleP rec) <> ", " <> "bigRecord: " <> show (bigRecord rec)
 
 instance Eq BigRecord where
   (==) a b = bool a == bool b && int a == int b && maybeInt a == maybeInt b && integer a == integer b && maybeInteger a == maybeInteger b && string a == string b && string2 a == string2 b && sumType a == sumType b && dataP a == dataP b && classP a == classP b && letP a == letP b && moduleP a == moduleP b && bigRecord a == bigRecord b
@@ -230,7 +230,7 @@ instance FromJSON User where
 
 
 instance Show User where
-    show rec = show "name: " <> show (name rec) <> ", " <> show "email: " <> show (email rec) <> ", " <> show "active: " <> show (active rec)
+    show rec = "name: " <> show (name rec) <> ", " <> "email: " <> show (email rec) <> ", " <> "active: " <> show (active rec)
 
 instance Eq User where
   (==) a b = name a == name b && email a == email b && active a == active b
@@ -255,7 +255,7 @@ instance FromJSON UserRequest where
 
 
 instance Show UserRequest where
-    show rec = show "name: " <> show (name rec) <> ", " <> show "email: " <> show (email rec)
+    show rec = "name: " <> show (name rec) <> ", " <> "email: " <> show (email rec)
 
 instance Eq UserRequest where
   (==) a b = name a == name b && email a == email b
@@ -292,7 +292,7 @@ instance FromJSON UserResponse where
 
 
 instance Show UserResponse where
-    show rec = show "id: " <> show (id rec) <> ", " <> show "name: " <> show (name rec) <> ", " <> show "email: " <> show (email rec) <> ", " <> show "active: " <> show (active rec) <> ", " <> show "createdAt: " <> show (createdAt rec) <> ", " <> show "modifiedAt: " <> show (modifiedAt rec)
+    show rec = "id: " <> show (id rec) <> ", " <> "name: " <> show (name rec) <> ", " <> "email: " <> show (email rec) <> ", " <> "active: " <> show (active rec) <> ", " <> "createdAt: " <> show (createdAt rec) <> ", " <> "modifiedAt: " <> show (modifiedAt rec)
 
 instance Eq UserResponse where
   (==) a b = id a == id b && name a == name b && email a == email b && active a == active b && createdAt a == createdAt b && modifiedAt a == modifiedAt b
@@ -314,7 +314,7 @@ instance FromJSON UserResponses where
 
 
 instance Show UserResponses where
-    show rec = show "userResponses: " <> show (userResponses rec)
+    show rec = "userResponses: " <> show (userResponses rec)
 
 instance Eq UserResponses where
   (==) a b = userResponses a == userResponses b
@@ -336,7 +336,7 @@ instance FromJSON FunkyRecord where
 
 
 instance Show FunkyRecord where
-    show rec = show "boom1: " <> show (boom1 rec)
+    show rec = "boom1: " <> show (boom1 rec)
 
 instance Eq FunkyRecord where
   (==) a b = boom1 a == boom1 b
@@ -358,7 +358,7 @@ instance FromJSON FUnkyRecordP where
 
 
 instance Show FUnkyRecordP where
-    show rec = show "field: " <> show (field rec)
+    show rec = "field: " <> show (field rec)
 
 instance Eq FUnkyRecordP where
   (==) a b = field a == field b
