@@ -14,7 +14,7 @@ module Haskell.Interop.Prime.Internal (
 
 import           Control.Monad                   (forM, foldM)
 import           Control.Monad.Trans.RWS         (evalRWS, asks, gets, put)
-import           Data.List                       (intercalate)
+import           Data.List                       (intercalate, nub)
 import           Data.Maybe                      (catMaybes)
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
@@ -267,14 +267,14 @@ runMk mk = do
 mkExports :: Options -> [(Name, [Mk], [Mk])] -> Q [Dec]
 mkExports Options{..} nmm = do
 
-  ir_ps <- forM nmm $ (\(t, psMks, _) -> do
+  ir_ps <- forM (nub nmm) $ (\(t, psMks, _) -> do
       TyConI dec <- reify t
-      pure (buildInternalRep psInterop dec, psMks)
+      pure (buildInternalRep psInterop dec, nub $ psMks)
     )
 
-  ir_hs <- forM nmm $ (\(t, _, hsMks) -> do
+  ir_hs <- forM (nub nmm) $ (\(t, _, hsMks) -> do
       TyConI dec <- reify t
-      pure $ (buildInternalRep hsInterop dec, hsMks)
+      pure $ (buildInternalRep hsInterop dec, nub $ hsMks)
     )
 
   let

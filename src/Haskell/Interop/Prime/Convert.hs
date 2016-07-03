@@ -14,7 +14,7 @@ module Haskell.Interop.Prime.Convert (
 
 import           Control.Monad                  (forM, foldM)
 import           Control.Monad.Trans.RWS        (evalRWS)
-import           Data.List                      (intercalate)
+import           Data.List                      (intercalate, nub)
 import           Data.Maybe                     (catMaybes)
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
@@ -43,7 +43,7 @@ instance Lift Type where
 mkConvert :: Options -> [(Name, Name)] -> Q [Dec]
 mkConvert Options{..} nn = do
 
-  ir_ps <- forM nn $ (\(t1, t2) -> do
+  ir_ps <- forM (nub nn) $ (\(t1, t2) -> do
       TyConI dec1 <- reify t1
       TyConI dec2 <- reify t2
       pure (buildInternalRep psInterop dec1, buildInternalRep psInterop dec2)
