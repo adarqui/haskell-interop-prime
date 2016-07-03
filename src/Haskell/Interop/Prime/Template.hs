@@ -896,7 +896,7 @@ tplPurescriptImports s = (intercalate "\n"
   , "import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))"
   , "import Optic.Core                       ((^.), (..))"
   , "import Optic.Types                      (Lens, Lens')"
-  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==))"
+  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==), (&&))"
   , ""
   , ""
   ]) <> s
