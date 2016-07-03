@@ -669,12 +669,16 @@ tplRead_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -
 tplRead_SumType_Purescript opts@InteropOptions{..} base fields =
      printf "read%s :: String -> Maybe %s\n" base base
   <> concatMap (\(f,vars) -> tplRead_SumType_Field_Purescript opts base f vars) fields
-  <> printf "read%s _ = Nothing" base
+  <> if length fields > 1
+        -- If there's only one constructor in the sum type, we will get warnings for overlap if we provide a catchall
+        -- so we check this here
+        then printf "read%s _ = Nothing" base
+        else ""
 
 
 
 tplRead_SumType_Field_Purescript :: InteropOptions -> String -> String -> [String] -> String
-tplRead_SumType_Field_Purescript InteropOptions{..} base field vars =
+tplRead_SumType_Field_Purescript InteropOptions{..} base field _ =
   printf "read%s \"%s\" = Just %s\n" base (jsonNameTransform base field) field
 
 
@@ -683,14 +687,18 @@ tplRead_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> S
 tplRead_SumType_Haskell opts@InteropOptions{..} base fields =
      printf "instance Read %s where\n" base
   <> concatMap (\(f,vars) -> tplRead_SumType_Field_Haskell opts base f vars) fields
-  <> spaces si1 <> "readsPrec _ _ = []\n"
+  <> if length fields > 1
+        -- If there's only one constructor in the sum type, we will get warnings for overlap if we provide a catchall
+        -- so we check this here
+        then spaces si1 <> "readsPrec _ _ = []\n"
+        else ""
   where
   si1 = spacingIndent
 
 
 
 tplRead_SumType_Field_Haskell :: InteropOptions -> String -> String -> [String] -> String
-tplRead_SumType_Field_Haskell InteropOptions{..} base field vars =
+tplRead_SumType_Field_Haskell InteropOptions{..} base field _ =
   -- **WARNING** We only support empty constructors for now
   spaces si1 <> printf "readsPrec _ \"%s\" = [(%s, \"\")]\n" (jsonNameTransform base field) field
   where

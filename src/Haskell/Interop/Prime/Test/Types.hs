@@ -15,7 +15,8 @@ module Haskell.Interop.Prime.Test.Types (
   FUnkyRecordP (..),
   Param (..),
   ParamTag (..),
-  ApplicationError (..)
+  ApplicationError (..),
+  OneConstructor (..)
 ) where
 
 
@@ -159,3 +160,8 @@ data ApplicationError
   = Error_Unknown
   | Error_Validation
   | Error_PerimssionDenied
+
+
+
+data OneConstructor
+  = OneConstructor_Test String
