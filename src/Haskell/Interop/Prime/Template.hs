@@ -578,37 +578,74 @@ tplIsForeign_SumType_Field InteropOptions{..} field vars =
 
 
 tplShow_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplShow_Record InteropOptions{..} base constr fields =
-     instance_decl
+tplShow_Record opts@InteropOptions{..} base constr fields =
+  case lang of
+    LangPurescript -> tplShow_Record_Purescript opts base constr fields
+    LangHaskell    -> tplShow_Record_Haskell opts base constr fields
+
+
+
+tplShow_Record_Purescript :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplShow_Record_Purescript InteropOptions{..} base constr fields =
+     printf "instance %sShow :: Show %s where\n" (firstToLower base) base
+  <> spaces si2 <> printf "show (%s o) = " constr
   <> intercalateMap " <> \", \" <> " (\(f,_) -> printf "show \"%s: \" <> show o.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si2 = spacingIndent*2
-  instance_decl =
-    case lang of
-      LangPurescript ->
-           printf "instance %sShow :: Show %s where\n" (firstToLower base) base
-        <> spaces si2 <> printf "show (%s o) = " constr
-      LangHaskell    -> haskellNotSupported
+
+
+
+tplShow_Record_Haskell :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplShow_Record_Haskell InteropOptions{..} base constr fields =
+     printf "instance Show %s where\n" base
+  <> spaces si2 <> "show rec = "
+  <> intercalateMap " <> \", \" <> " (\(f,_) -> printf "show \"%s: \" <> show (%s rec)" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  where
+  si2 = spacingIndent*2
 
 
 
 tplShow_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplShow_SumType opts@InteropOptions{..} base fields =
-     instance_decl
-  <> concatMap (\(f,vars) -> tplShow_SumType_Field opts f vars) fields
-  where
-  instance_decl =
-    case lang of
-      LangPurescript -> printf "instance %sShow :: Show %s where\n" (firstToLower base) base
-      LangHaskell    -> haskellNotSupported
+  case lang of
+    LangPurescript -> tplShow_SumType_Purescript opts base fields
+    LangHaskell    -> tplShow_SumType_Haskell opts base fields
 
 
 
-tplShow_SumType_Field :: InteropOptions -> String -> [String] -> String
-tplShow_SumType_Field InteropOptions{..} field vars =
+tplShow_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
+tplShow_SumType_Purescript opts@InteropOptions{..} base fields =
+     printf "instance %sShow :: Show %s where\n" (firstToLower base) base
+  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Purescript opts f vars) fields
+
+
+
+tplShow_SumType_Field_Purescript :: InteropOptions -> String -> [String] -> String
+tplShow_SumType_Field_Purescript InteropOptions{..} field vars =
  (if null vars
     then
-      spaces si1 <> printf "show (%s) = \"%s\"" field field
+      spaces si1 <> printf "show %s = \"%s\"" field field
+    else
+      spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') field <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
+  <> "\n"
+  where
+  si1 = spacingIndent
+  vars' = vars_x $ length vars
+
+
+
+tplShow_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
+tplShow_SumType_Haskell opts@InteropOptions{..} base fields =
+     printf "instance Show %s where\n" base
+  <> concatMap (\(f,vars) -> tplShow_SumType_Field_Haskell opts f vars) fields
+
+
+
+tplShow_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
+tplShow_SumType_Field_Haskell InteropOptions{..} field vars =
+ (if null vars
+    then
+      spaces si1 <> printf "show %s = \"%s\"" field field
     else
       spaces si1 <> printf "show (%s %s) = \"%s: \" <> " field (intercalate " " vars') field <> (intercalateMap " <> \" \" <> " (printf "show %s") vars'))
   <> "\n"
@@ -619,45 +656,96 @@ tplShow_SumType_Field InteropOptions{..} field vars =
 
 
 tplEq_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplEq_Record InteropOptions{..} base constr fields =
-     instance_decl
+tplEq_Record opts@InteropOptions{..} base constr fields =
+  case lang of
+    LangPurescript -> tplEq_Record_Purescript opts base constr fields
+    LangHaskell    -> tplEq_Record_Haskell opts base constr fields
+
+
+
+tplEq_Record_Purescript :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplEq_Record_Purescript InteropOptions{..} base constr fields =
+     printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
+  <> spaces si1 <> printf "eq (%s a) (%s b) = " constr constr
   <> intercalateMap " && " (\(f,_) -> printf "a.%s == b.%s" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
   where
   si1 = spacingIndent
-  instance_decl =
-    case lang of
-      LangPurescript ->
-           printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
-        <> spaces si1 <> printf "eq (%s a) (%s b) = " constr constr
-      LangHaskell    -> haskellNotSupported
+
+
+
+tplEq_Record_Haskell :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplEq_Record_Haskell InteropOptions{..} base constr fields =
+     printf "instance Eq %s where\n" base
+  <> spaces si1 <> "(==) a b = "
+  <> intercalateMap " && " (\(f,_) -> printf "%s a == %s b" (fieldNameTransform constr f) (fieldNameTransform constr f)) fields
+  where
+  si1 = spacingIndent
 
 
 
 tplEq_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplEq_SumType opts@InteropOptions{..} base fields =
-     instance_decl
-  <> concatMap (\(f,vars) -> tplEq_SumType_Field opts f vars) fields
+  case lang of
+    LangPurescript -> tplEq_SumType_Purescript opts base fields
+    LangHaskell    -> tplEq_SumType_Haskell opts base fields
+
+
+
+tplEq_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
+tplEq_SumType_Purescript opts@InteropOptions{..} base fields =
+     printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
+  <> concatMap (\(f,vars) -> tplEq_SumType_Field_Purescript opts f vars) fields
   <> spaces si1 <> "eq _ _ = false"
   where
   si1 = spacingIndent
-  instance_decl =
-    case lang of
-      LangPurescript -> printf "instance %sEq :: Eq %s where\n" (firstToLower base) base
-      LangHaskell    -> haskellNotSupported
 
 
 
-tplEq_SumType_Field :: InteropOptions -> String -> [String] -> String
-tplEq_SumType_Field InteropOptions{..} field vars =
+tplEq_SumType_Field_Purescript :: InteropOptions -> String -> [String] -> String
+tplEq_SumType_Field_Purescript InteropOptions{..} field vars =
  (if null vars
     then
       spaces si1
       <>
-      printf "eq (%s) (%s) = true" field field
+      printf "eq %s %s = true" field field
     else
       spaces si1
       <>
       printf "eq (%s %s) (%s %s) = %s"
+        field (intercalate " " vars'a)
+        field (intercalate " " vars'b)
+        (intercalateMap (" && " :: String) (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))
+  )
+  <> "\n"
+  where
+  si1 = spacingIndent
+  vars'  = vars_x $ length vars
+  vars'a = map (<>"a") vars'
+  vars'b = map (<>"b") vars'
+
+
+
+tplEq_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
+tplEq_SumType_Haskell opts@InteropOptions{..} base fields =
+     printf "instance Eq %s where\n" base
+  <> concatMap (\(f,vars) -> tplEq_SumType_Field_Haskell opts f vars) fields
+  <> spaces si1 <> "(==) _ _ = False"
+  where
+  si1 = spacingIndent
+
+
+
+tplEq_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
+tplEq_SumType_Field_Haskell InteropOptions{..} field vars =
+ (if null vars
+    then
+      spaces si1
+      <>
+      printf "(==) %s %s = True" field field
+    else
+      spaces si1
+      <>
+      printf "(==) (%s %s) (%s %s) = %s"
         field (intercalate " " vars'a)
         field (intercalate " " vars'b)
         (intercalateMap (" && " :: String) (\(a,b) -> printf "%s == %s" a b) (zip vars'a vars'b))

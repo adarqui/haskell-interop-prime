@@ -265,6 +265,8 @@ defaultHaskellMks :: [Mk]
 defaultHaskellMks =
   [ MkToJSON
   , MkFromJSON
+  , MkShow
+  , MkEq
   ]
 
 
