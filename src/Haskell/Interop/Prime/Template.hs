@@ -31,6 +31,7 @@ module Haskell.Interop.Prime.Template (
   tplIsForeign_SumType,
   tplShow_Record,
   tplShow_SumType,
+  tplRead_SumType,
   tplEq_Record,
   tplEq_SumType,
   tplImports,
@@ -652,6 +653,44 @@ tplShow_SumType_Field_Haskell InteropOptions{..} field vars =
   where
   si1 = spacingIndent
   vars' = vars_x $ length vars
+
+
+
+tplRead_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplRead_SumType opts@InteropOptions{..} base fields =
+  case lang of
+    LangPurescript -> tplRead_SumType_Purescript opts base fields
+    LangHaskell    -> tplRead_SumType_Haskell opts base fields
+
+
+
+tplRead_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
+tplRead_SumType_Purescript opts@InteropOptions{..} base fields =
+     printf "read%s :: String -> Maybe %s\n" base base
+  <> concatMap (\(f,vars) -> tplRead_SumType_Field_Purescript opts base f vars) fields
+  <> printf "read%s _ = Nothing" base
+
+
+
+tplRead_SumType_Field_Purescript :: InteropOptions -> String -> String -> [String] -> String
+tplRead_SumType_Field_Purescript InteropOptions{..} base field vars =
+  printf "read%s \"%s\" = Just %s\n" base field field
+
+
+
+tplRead_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
+tplRead_SumType_Haskell opts@InteropOptions{..} base fields =
+     printf "instance Read %s where\n" base
+  <> concatMap (\(f,vars) -> tplRead_SumType_Field_Haskell opts f vars) fields
+
+
+
+tplRead_SumType_Field_Haskell :: InteropOptions -> String -> [String] -> String
+tplRead_SumType_Field_Haskell InteropOptions{..} field vars =
+  -- **WARNING** We only support empty constructors for now
+  spaces si1 <> printf "readsPrec _ \"%s\" = [(%s, \"\")]\n" field field
+  where
+  si1 = spacingIndent
 
 
 

@@ -218,6 +218,7 @@ defaultPurescriptMks =
   , MkRespondable
   , MkIsForeign
   , MkShow
+  , MkRead
   , MkEq
   ]
 
@@ -266,6 +267,7 @@ defaultHaskellMks =
   [ MkToJSON
   , MkFromJSON
   , MkShow
+  , MkRead
   , MkEq
   ]
 

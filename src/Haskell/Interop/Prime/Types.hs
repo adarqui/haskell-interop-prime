@@ -54,6 +54,7 @@ data Mk
   | MkRespondable
   | MkIsForeign
   | MkShow
+  | MkRead
   | MkEq
   deriving (Show, Eq, Ord)
 

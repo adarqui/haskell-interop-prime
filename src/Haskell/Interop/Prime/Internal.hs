@@ -199,6 +199,20 @@ buildShow = do
 
 
 
+buildRead :: ExportT (Maybe String)
+buildRead = do
+  (opts, ir) <- opts_ir
+  pure $
+    case ir of
+      DataNormalIR base fields        ->
+        -- **WARNING** We only support empty constructors for now
+        if (sum (map (length . snd) fields) == 0)
+          then Just $ tplRead_SumType opts base fields
+          else Nothing
+      _                               -> Nothing
+
+
+
 buildEq :: ExportT (Maybe String)
 buildEq = do
   (opts, ir) <- opts_ir
@@ -227,6 +241,7 @@ runMk mk = do
     MkRespondable       -> buildRespondable
     MkIsForeign         -> buildIsForeign
     MkShow              -> buildShow
+    MkRead              -> buildRead
     MkEq                -> buildEq
 
 

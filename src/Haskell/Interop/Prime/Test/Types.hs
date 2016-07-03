@@ -14,6 +14,7 @@ module Haskell.Interop.Prime.Test.Types (
   FunkyRecord (..),
   FUnkyRecordP (..),
   Param (..),
+  ParamTag (..),
   ApplicationError (..)
 ) where
 
@@ -130,6 +131,16 @@ data Param
   | ByUsersNames  [String]
   | ByUsersEmails [String]
   | ByUserActive  Bool
+
+
+
+data ParamTag
+  = ParamTag_Limit
+  | ParamTag_Offset
+  | ParamTag_ByUsersIds
+  | ParamTag_ByUsersNames
+  | ParamTag_ByUsersEmails
+  | ParamTag_ByUserActive
 
 
 
