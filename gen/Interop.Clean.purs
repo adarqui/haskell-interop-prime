@@ -325,7 +325,7 @@ instance sumTypeIsForeign :: IsForeign SumType where
 
 
 instance sumTypeShow :: Show SumType where
-  show A = "A"
+  show A = "a"
   show (B x0) = "B: " <> show x0
   show (C x0) = "C: " <> show x0
   show (D x0) = "D: " <> show x0
@@ -1285,14 +1285,14 @@ instance paramEq :: Eq Param where
   eq _ _ = false
 
 instance paramQueryParam :: QueryParam Param where
-  qp (Limit x0) = Tuple "Limit" (show x0)
-  qp (Offset x0) = Tuple "Offset" (show x0)
-  qp (ByUsersIds x0) = Tuple "ByUsersIds" (show x0)
-  qp (ByUserNameText x0) = Tuple "ByUserNameText" x0
-  qp (ByUserNameStr x0) = Tuple "ByUserNameStr" x0
-  qp (ByUsersNames x0) = Tuple "ByUsersNames" (show x0)
-  qp (ByUsersEmails x0) = Tuple "ByUsersEmails" (show x0)
-  qp (ByUserActive x0) = Tuple "ByUserActive" (show x0)
+  qp (Limit x0) = Tuple "limit" (show x0)
+  qp (Offset x0) = Tuple "offset" (show x0)
+  qp (ByUsersIds x0) = Tuple "by_users_ids" (show x0)
+  qp (ByUserNameText x0) = Tuple "by_user_name_text" x0
+  qp (ByUserNameStr x0) = Tuple "by_user_name_str" x0
+  qp (ByUsersNames x0) = Tuple "by_users_names" (show x0)
+  qp (ByUsersEmails x0) = Tuple "by_users_emails" (show x0)
+  qp (ByUserActive x0) = Tuple "by_user_active" (show x0)
 
 
 data ParamTag
@@ -1420,21 +1420,21 @@ instance paramTagIsForeign :: IsForeign ParamTag where
 
 
 instance paramTagShow :: Show ParamTag where
-  show ParamTag_Limit = "ParamTag_Limit"
-  show ParamTag_Offset = "ParamTag_Offset"
-  show ParamTag_ByUsersIds = "ParamTag_ByUsersIds"
-  show ParamTag_ByUsersNames = "ParamTag_ByUsersNames"
-  show ParamTag_ByUsersEmails = "ParamTag_ByUsersEmails"
-  show ParamTag_ByUserActive = "ParamTag_ByUserActive"
+  show ParamTag_Limit = "limit"
+  show ParamTag_Offset = "offset"
+  show ParamTag_ByUsersIds = "by_users_ids"
+  show ParamTag_ByUsersNames = "by_users_names"
+  show ParamTag_ByUsersEmails = "by_users_emails"
+  show ParamTag_ByUserActive = "by_user_active"
 
 
 readParamTag :: String -> Maybe ParamTag
-readParamTag "ParamTag_Limit" = Just ParamTag_Limit
-readParamTag "ParamTag_Offset" = Just ParamTag_Offset
-readParamTag "ParamTag_ByUsersIds" = Just ParamTag_ByUsersIds
-readParamTag "ParamTag_ByUsersNames" = Just ParamTag_ByUsersNames
-readParamTag "ParamTag_ByUsersEmails" = Just ParamTag_ByUsersEmails
-readParamTag "ParamTag_ByUserActive" = Just ParamTag_ByUserActive
+readParamTag "limit" = Just ParamTag_Limit
+readParamTag "offset" = Just ParamTag_Offset
+readParamTag "by_users_ids" = Just ParamTag_ByUsersIds
+readParamTag "by_users_names" = Just ParamTag_ByUsersNames
+readParamTag "by_users_emails" = Just ParamTag_ByUsersEmails
+readParamTag "by_user_active" = Just ParamTag_ByUserActive
 readParamTag _ = Nothing
 
 instance paramTagEq :: Eq ParamTag where

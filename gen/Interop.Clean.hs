@@ -126,14 +126,14 @@ instance FromJSON SumType where
 
 
 instance Show SumType where
-  show A = "A"
-  show (B x0) = "B: " <> show x0
-  show (C x0) = "C: " <> show x0
-  show (D x0) = "D: " <> show x0
-  show (E x0) = "E: " <> show x0
-  show (F x0) = "F: " <> show x0
-  show (G x0) = "G: " <> show x0
-  show (H x0 x1 x2 x3) = "H: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
+  show A = "a"
+  show (B x0) = "b: " <> show x0
+  show (C x0) = "c: " <> show x0
+  show (D x0) = "d: " <> show x0
+  show (E x0) = "e: " <> show x0
+  show (F x0) = "f: " <> show x0
+  show (G x0) = "g: " <> show x0
+  show (H x0 x1 x2 x3) = "h: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
 
 
 instance Eq SumType where
@@ -454,14 +454,14 @@ instance FromJSON Param where
 
 
 instance Show Param where
-  show (Limit x0) = "Limit: " <> show x0
-  show (Offset x0) = "Offset: " <> show x0
-  show (ByUsersIds x0) = "ByUsersIds: " <> show x0
-  show (ByUserNameText x0) = "ByUserNameText: " <> show x0
-  show (ByUserNameStr x0) = "ByUserNameStr: " <> show x0
-  show (ByUsersNames x0) = "ByUsersNames: " <> show x0
-  show (ByUsersEmails x0) = "ByUsersEmails: " <> show x0
-  show (ByUserActive x0) = "ByUserActive: " <> show x0
+  show (Limit x0) = "limit: " <> show x0
+  show (Offset x0) = "offset: " <> show x0
+  show (ByUsersIds x0) = "by_users_ids: " <> show x0
+  show (ByUserNameText x0) = "by_user_name_text: " <> show x0
+  show (ByUserNameStr x0) = "by_user_name_str: " <> show x0
+  show (ByUsersNames x0) = "by_users_names: " <> show x0
+  show (ByUsersEmails x0) = "by_users_emails: " <> show x0
+  show (ByUserActive x0) = "by_user_active: " <> show x0
 
 
 instance Eq Param where
@@ -476,14 +476,14 @@ instance Eq Param where
   (==) _ _ = False
 
 instance QueryParam Param where
-  qp (Limit x0) = ("Limit", (T.pack $ show x0))
-  qp (Offset x0) = ("Offset", (T.pack $ show x0))
-  qp (ByUsersIds x0) = ("ByUsersIds", (T.pack $ show x0))
-  qp (ByUserNameText x0) = ("ByUserNameText", x0)
-  qp (ByUserNameStr x0) = ("ByUserNameStr", (T.pack x0))
-  qp (ByUsersNames x0) = ("ByUsersNames", (T.pack $ show x0))
-  qp (ByUsersEmails x0) = ("ByUsersEmails", (T.pack $ show x0))
-  qp (ByUserActive x0) = ("ByUserActive", (T.pack $ show x0))
+  qp (Limit x0) = ("limit", (T.pack $ show x0))
+  qp (Offset x0) = ("offset", (T.pack $ show x0))
+  qp (ByUsersIds x0) = ("by_users_ids", (T.pack $ show x0))
+  qp (ByUserNameText x0) = ("by_user_name_text", x0)
+  qp (ByUserNameStr x0) = ("by_user_name_str", (T.pack x0))
+  qp (ByUsersNames x0) = ("by_users_names", (T.pack $ show x0))
+  qp (ByUsersEmails x0) = ("by_users_emails", (T.pack $ show x0))
+  qp (ByUserActive x0) = ("by_user_active", (T.pack $ show x0))
 
 
 instance ToJSON ParamTag where
@@ -541,21 +541,22 @@ instance FromJSON ParamTag where
 
 
 instance Show ParamTag where
-  show ParamTag_Limit = "ParamTag_Limit"
-  show ParamTag_Offset = "ParamTag_Offset"
-  show ParamTag_ByUsersIds = "ParamTag_ByUsersIds"
-  show ParamTag_ByUsersNames = "ParamTag_ByUsersNames"
-  show ParamTag_ByUsersEmails = "ParamTag_ByUsersEmails"
-  show ParamTag_ByUserActive = "ParamTag_ByUserActive"
+  show ParamTag_Limit = "limit"
+  show ParamTag_Offset = "offset"
+  show ParamTag_ByUsersIds = "by_users_ids"
+  show ParamTag_ByUsersNames = "by_users_names"
+  show ParamTag_ByUsersEmails = "by_users_emails"
+  show ParamTag_ByUserActive = "by_user_active"
 
 
 instance Read ParamTag where
-  readsPrec _ "ParamTag_Limit" = [(ParamTag_Limit, "")]
-  readsPrec _ "ParamTag_Offset" = [(ParamTag_Offset, "")]
-  readsPrec _ "ParamTag_ByUsersIds" = [(ParamTag_ByUsersIds, "")]
-  readsPrec _ "ParamTag_ByUsersNames" = [(ParamTag_ByUsersNames, "")]
-  readsPrec _ "ParamTag_ByUsersEmails" = [(ParamTag_ByUsersEmails, "")]
-  readsPrec _ "ParamTag_ByUserActive" = [(ParamTag_ByUserActive, "")]
+  readsPrec _ "limit" = [(ParamTag_Limit, "")]
+  readsPrec _ "offset" = [(ParamTag_Offset, "")]
+  readsPrec _ "by_users_ids" = [(ParamTag_ByUsersIds, "")]
+  readsPrec _ "by_users_names" = [(ParamTag_ByUsersNames, "")]
+  readsPrec _ "by_users_emails" = [(ParamTag_ByUsersEmails, "")]
+  readsPrec _ "by_user_active" = [(ParamTag_ByUserActive, "")]
+  read _ = []
 
 
 instance Eq ParamTag where
