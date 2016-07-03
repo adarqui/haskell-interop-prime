@@ -325,7 +325,7 @@ instance sumTypeIsForeign :: IsForeign SumType where
 
 
 instance sumTypeShow :: Show SumType where
-  show (A) = "A"
+  show A = "A"
   show (B x0) = "B: " <> show x0
   show (C x0) = "C: " <> show x0
   show (D x0) = "D: " <> show x0
@@ -336,7 +336,7 @@ instance sumTypeShow :: Show SumType where
 
 
 instance sumTypeEq :: Eq SumType where
-  eq (A) (A) = true
+  eq A A = true
   eq (B x0a) (B x0b) = x0a == x0b
   eq (C x0a) (C x0b) = x0a == x0b
   eq (D x0a) (D x0b) = x0a == x0b
