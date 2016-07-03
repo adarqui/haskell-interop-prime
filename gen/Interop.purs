@@ -1018,6 +1018,8 @@ data Param
   = Limit Int
   | Offset Int
   | ByUsersIds (Array Int)
+  | ByUserNameText String
+  | ByUserNameStr String
   | ByUsersNames (Array String)
   | ByUsersEmails (Array String)
   | ByUserActive Boolean
@@ -1035,6 +1037,14 @@ instance paramEncodeJson :: EncodeJson Param where
     ~> jsonEmptyObject
   encodeJson (ByUsersIds x0) =
        "tag" := "ByUsersIds"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUserNameText x0) =
+       "tag" := "ByUserNameText"
+    ~> "contents" := [encodeJson x0]
+    ~> jsonEmptyObject
+  encodeJson (ByUserNameStr x0) =
+       "tag" := "ByUserNameStr"
     ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
   encodeJson (ByUsersNames x0) =
@@ -1075,6 +1085,20 @@ instance paramDecodeJson :: DecodeJson Param where
         case r of
           [x0] -> ByUsersIds <$> decodeJson x0
           _ -> Left $ "DecodeJson TypeMismatch for ByUsersIds"
+
+
+      "ByUserNameText" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUserNameText <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUserNameText"
+
+
+      "ByUserNameStr" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> ByUserNameStr <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for ByUserNameStr"
 
 
       "ByUsersNames" -> do
@@ -1135,6 +1159,20 @@ instance paramRespondable :: Respondable Param where
           _ -> Left $ TypeMismatch "ByUsersIds" "Respondable"
 
 
+      "ByUserNameText" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserNameText <$> read x0
+          _ -> Left $ TypeMismatch "ByUserNameText" "Respondable"
+
+
+      "ByUserNameStr" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserNameStr <$> read x0
+          _ -> Left $ TypeMismatch "ByUserNameStr" "Respondable"
+
+
       "ByUsersNames" -> do
         r <- readProp "contents" json
         case r of
@@ -1185,6 +1223,20 @@ instance paramIsForeign :: IsForeign Param where
           _ -> Left $ TypeMismatch "ByUsersIds" "IsForeign"
 
 
+      "ByUserNameText" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserNameText <$> read x0
+          _ -> Left $ TypeMismatch "ByUserNameText" "IsForeign"
+
+
+      "ByUserNameStr" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> ByUserNameStr <$> read x0
+          _ -> Left $ TypeMismatch "ByUserNameStr" "IsForeign"
+
+
       "ByUsersNames" -> do
         r <- readProp "contents" json
         case r of
@@ -1214,6 +1266,8 @@ instance paramShow :: Show Param where
   show (Limit x0) = "Limit: " <> show x0
   show (Offset x0) = "Offset: " <> show x0
   show (ByUsersIds x0) = "ByUsersIds: " <> show x0
+  show (ByUserNameText x0) = "ByUserNameText: " <> show x0
+  show (ByUserNameStr x0) = "ByUserNameStr: " <> show x0
   show (ByUsersNames x0) = "ByUsersNames: " <> show x0
   show (ByUsersEmails x0) = "ByUsersEmails: " <> show x0
   show (ByUserActive x0) = "ByUserActive: " <> show x0
@@ -1223,10 +1277,23 @@ instance paramEq :: Eq Param where
   eq (Limit x0a) (Limit x0b) = x0a == x0b
   eq (Offset x0a) (Offset x0b) = x0a == x0b
   eq (ByUsersIds x0a) (ByUsersIds x0b) = x0a == x0b
+  eq (ByUserNameText x0a) (ByUserNameText x0b) = x0a == x0b
+  eq (ByUserNameStr x0a) (ByUserNameStr x0b) = x0a == x0b
   eq (ByUsersNames x0a) (ByUsersNames x0b) = x0a == x0b
   eq (ByUsersEmails x0a) (ByUsersEmails x0b) = x0a == x0b
   eq (ByUserActive x0a) (ByUserActive x0b) = x0a == x0b
   eq _ _ = false
+
+instance paramQueryParam :: QueryParam Param where
+  qp (Limit x0) = Tuple "Limit" (show x0)
+  qp (Offset x0) = Tuple "Offset" (show x0)
+  qp (ByUsersIds x0) = Tuple "ByUsersIds" (show x0)
+  qp (ByUserNameText x0) = Tuple "ByUserNameText" x0
+  qp (ByUserNameStr x0) = Tuple "ByUserNameStr" x0
+  qp (ByUsersNames x0) = Tuple "ByUsersNames" (show x0)
+  qp (ByUsersEmails x0) = Tuple "ByUsersEmails" (show x0)
+  qp (ByUserActive x0) = Tuple "ByUserActive" (show x0)
+
 
 data ParamTag
   = ParamTag_Limit 

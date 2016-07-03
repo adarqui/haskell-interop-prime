@@ -374,6 +374,14 @@ instance ToJSON Param where
     [ "tag" .= ("ByUsersIds" :: Text)
     , "contents" .= [toJSON x0]
     ]
+  toJSON (ByUserNameText x0) = object $
+    [ "tag" .= ("ByUserNameText" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
+  toJSON (ByUserNameStr x0) = object $
+    [ "tag" .= ("ByUserNameStr" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
   toJSON (ByUsersNames x0) = object $
     [ "tag" .= ("ByUsersNames" :: Text)
     , "contents" .= [toJSON x0]
@@ -410,6 +418,18 @@ instance FromJSON Param where
           [x0] -> ByUsersIds <$> parseJSON x0
           _ -> fail "FromJON Typemismatch: ByUsersIds"
 
+      ("ByUserNameText" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUserNameText <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUserNameText"
+
+      ("ByUserNameStr" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> ByUserNameStr <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: ByUserNameStr"
+
       ("ByUsersNames" :: Text) -> do
         r <- o .: "contents"
         case r of
@@ -437,6 +457,8 @@ instance Show Param where
   show (Limit x0) = "Limit: " <> show x0
   show (Offset x0) = "Offset: " <> show x0
   show (ByUsersIds x0) = "ByUsersIds: " <> show x0
+  show (ByUserNameText x0) = "ByUserNameText: " <> show x0
+  show (ByUserNameStr x0) = "ByUserNameStr: " <> show x0
   show (ByUsersNames x0) = "ByUsersNames: " <> show x0
   show (ByUsersEmails x0) = "ByUsersEmails: " <> show x0
   show (ByUserActive x0) = "ByUserActive: " <> show x0
@@ -446,10 +468,23 @@ instance Eq Param where
   (==) (Limit x0a) (Limit x0b) = x0a == x0b
   (==) (Offset x0a) (Offset x0b) = x0a == x0b
   (==) (ByUsersIds x0a) (ByUsersIds x0b) = x0a == x0b
+  (==) (ByUserNameText x0a) (ByUserNameText x0b) = x0a == x0b
+  (==) (ByUserNameStr x0a) (ByUserNameStr x0b) = x0a == x0b
   (==) (ByUsersNames x0a) (ByUsersNames x0b) = x0a == x0b
   (==) (ByUsersEmails x0a) (ByUsersEmails x0b) = x0a == x0b
   (==) (ByUserActive x0a) (ByUserActive x0b) = x0a == x0b
   (==) _ _ = False
+
+instance QueryParam Param where
+  qp (Limit x0) = ("Limit", (T.pack $ show x0))
+  qp (Offset x0) = ("Offset", (T.pack $ show x0))
+  qp (ByUsersIds x0) = ("ByUsersIds", (T.pack $ show x0))
+  qp (ByUserNameText x0) = ("ByUserNameText", x0)
+  qp (ByUserNameStr x0) = ("ByUserNameStr", (T.pack x0))
+  qp (ByUsersNames x0) = ("ByUsersNames", (T.pack $ show x0))
+  qp (ByUsersEmails x0) = ("ByUsersEmails", (T.pack $ show x0))
+  qp (ByUserActive x0) = ("ByUserActive", (T.pack $ show x0))
+
 
 instance ToJSON ParamTag where
   toJSON (ParamTag_Limit ) = object $
