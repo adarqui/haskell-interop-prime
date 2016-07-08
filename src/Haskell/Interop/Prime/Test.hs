@@ -34,6 +34,7 @@ mkExports
   , (''ParamTag,         defaultPurescriptMks, defaultHaskellMks)
   , (''ApplicationError, defaultPurescriptMks, defaultHaskellMks)
   , (''OneConstructor,   defaultPurescriptMks, defaultHaskellMks)
+  , (''ParamTag,         [MkDefault "ParamTag_Limit"], [MkDefault "ParamTag_Limit"])
   ]
 
 
@@ -77,6 +78,7 @@ mkExports
   , (''ParamTag,         defaultPurescriptMks, defaultHaskellMks)
   , (''ApplicationError, defaultPurescriptMks, defaultHaskellMks)
   , (''OneConstructor,   defaultPurescriptMks, defaultHaskellMks)
+  , (''ParamTag,         [MkDefault "ParamTag_Limit"], [MkDefault "ParamTag_Limit"])
   ]
 
 

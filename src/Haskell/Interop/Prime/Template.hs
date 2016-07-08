@@ -35,6 +35,7 @@ module Haskell.Interop.Prime.Template (
   tplEq_Record,
   tplEq_SumType,
   tplQueryParam_SumType,
+  tplDefault,
   tplImports,
   tplPurescriptImports,
   tplHaskellImports,
@@ -863,6 +864,28 @@ tplQueryParam_SumType_Field_Haskell InteropOptions{..} field (var:[]) =
       then if var == "Text" then "x0" else "(T.pack x0)"
       else "(T.pack $ show x0)"
 tplQueryParam_SumType_Field_Haskell _ _ _ = error "tplQueryParam_SumType_Field_Haskell"
+
+
+
+tplDefault :: InteropOptions -> String -> String -> String
+tplDefault opts@InteropOptions{..} base default_value =
+  case lang of
+    LangPurescript -> tplDefault_Purescript opts base default_value
+    LangHaskell    -> tplDefault_Haskell opts base default_value
+
+
+
+tplDefault_Purescript :: InteropOptions -> String -> String -> String
+tplDefault_Purescript InteropOptions{..} base default_value =
+     printf "instance %sDefault :: Default %s where\n" (firstToLower base) base
+  <> printf "def = %s" default_value
+
+
+
+tplDefault_Haskell :: InteropOptions -> String -> String -> String
+tplDefault_Haskell InteropOptions{..} base default_value =
+     printf "instance Default %s where\n" base
+  <> printf "def = %s" default_value
 
 
 

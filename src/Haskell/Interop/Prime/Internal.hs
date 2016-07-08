@@ -239,6 +239,18 @@ buildQueryParam = do
 
 
 
+buildDefault :: String -> ExportT (Maybe String)
+buildDefault default_value = do
+  (opts, ir) <- opts_ir
+  pure $
+    case ir of
+      NewtypeRecIR base _ _ -> Just $ tplDefault opts base default_value
+      DataRecIR base _ _    -> Just $ tplDefault opts base default_value
+      DataNormalIR base _   -> Just $ tplDefault opts base default_value
+      _                     -> Nothing
+
+
+
 runMk :: Mk -> ExportT (Maybe String)
 runMk mk = do
   case mk of
@@ -258,6 +270,7 @@ runMk mk = do
     MkRead              -> buildRead
     MkEq                -> buildEq
     MkQueryParam        -> buildQueryParam
+    MkDefault value     -> buildDefault value
 
 
 

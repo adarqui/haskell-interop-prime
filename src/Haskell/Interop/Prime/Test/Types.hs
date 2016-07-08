@@ -38,6 +38,7 @@ data SumType
   | F SumType
   | G [SumType]
   | H Bool Int String (Maybe Bool)
+  | I (Int, String)
 
 
 
@@ -54,6 +55,8 @@ data BigRecord = BigRecord {
   bigRecordClass        :: String,
   bigRecordLet          :: String,
   bigRecordModule       :: String,
+  bigRecordTuple        :: (Int, String),
+  bigRecordTuple3       :: (Int, String, Bool),
   bigRecord             :: Bool
 }
 

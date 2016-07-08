@@ -56,6 +56,7 @@ data Mk
   | MkShow
   | MkRead
   | MkEq
+  | MkDefault String
   -- haskell-api-helpers & purescript-api-helpers
   | MkQueryParam
   deriving (Show, Eq, Ord)
