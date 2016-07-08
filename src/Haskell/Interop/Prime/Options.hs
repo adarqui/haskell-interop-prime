@@ -56,7 +56,7 @@ defaultOptionsPurescript :: FilePath -> InteropOptions
 defaultOptionsPurescript = defaultOptions LangPurescript
 
 defaultOptionsHaskell :: FilePath -> InteropOptions
-defaultOptionsHaskell = defaultOptions LangHaskell
+defaultOptionsHaskell path = (defaultOptions LangHaskell path) { psDataToNewtype = False }
 
 defaultOptions :: Lang -> FilePath -> InteropOptions
 defaultOptions lang path = InteropOptions {

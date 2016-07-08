@@ -73,8 +73,8 @@ mkTypeIR_Haskell opts ty =
       AppT ListT x -> "[" <> mkTypeIR_Haskell opts x <> "]"
       AppT f x     -> "(" <> mkTypeIR_Haskell opts f <> " " <> mkTypeIR_Haskell opts x <> ")"
       TupleT 0     -> "() "
-      TupleT 2     -> "Tuple "
-      TupleT n     -> "Tuple" <> show n <> " "
+      TupleT 2     -> "(,) "
+      TupleT n     -> "(" <> replicate n ',' <> ")"
       x            -> show x
 
 
