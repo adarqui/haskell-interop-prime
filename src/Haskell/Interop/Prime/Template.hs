@@ -1012,6 +1012,8 @@ tplHaskellApiStringImports :: String -> String
 tplHaskellApiStringImports s = (intercalate "\n"
   [ ""
   , ""
+  , "import Data.Int            (Int64)"
+  , "import Data.Monoid         ((<>))"
   , "import Data.Text           (Text)"
   , "import Haskell.Api.Helpers (ApiEff, ApiError, QueryParam, qp, handleError, getAt, putAt, postAt, deleteAt)"
   , ""
