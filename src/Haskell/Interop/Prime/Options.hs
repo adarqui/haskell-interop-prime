@@ -264,7 +264,8 @@ defaultPurescriptConvertMkGs header =
 
 defaultHaskellMks :: [Mk]
 defaultHaskellMks =
-  [ MkToJSON
+  [ MkType
+  , MkToJSON
   , MkFromJSON
   , MkShow
   , MkRead
