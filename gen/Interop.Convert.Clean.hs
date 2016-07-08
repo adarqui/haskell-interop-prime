@@ -17,6 +17,7 @@ import qualified Data.Text           as T
 import           Data.Time           (UTCTime)
 import           Data.Monoid         ((<>))
 import           Haskell.Api.Helpers (QueryParam, qp)
+import           Data.Default
 
 userRequestToUserResponse :: Int64 -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse id active createdAt modifiedAt UserRequest{..} =

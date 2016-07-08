@@ -20,6 +20,7 @@ import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))
 import Optic.Core                       ((^.), (..))
 import Optic.Types                      (Lens, Lens')
 import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==), (&&))
+import Data.Default
 
 newtype Session = Session {
   unSession :: String

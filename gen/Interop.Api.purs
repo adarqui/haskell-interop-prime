@@ -4,6 +4,7 @@ module Interop.Api where
 import Data.Either            (Either)
 import Prelude                (Unit, show, map, (<$>), (<>))
 import Purescript.Api.Helpers (class QueryParam, ApiError, ApiEff, getAt, handleError, qp, deleteAt, putAt, postAt)
+import Data.Default
 
 getUsers :: forall qp. QueryParam qp => Array qp -> ApiEff (Either (ApiError ApplicationError) UserResponses)
 getUsers params = handleError <$> getAt params ["users"]

@@ -15,6 +15,7 @@ import Data.Monoid         ((<>))
 import Data.Text           (Text)
 import qualified Data.Text as T (pack)
 import Haskell.Api.Helpers (ApiEff, ApiError, QueryParam, qp, handleError, getAt, putAt, postAt, deleteAt)
+import Data.Default
 
 getUsers :: forall qp. QueryParam qp => [qp] -> ApiEff (Either (ApiError ApplicationError) UserResponses)
 getUsers params = handleError <$> getAt params ["users"]
