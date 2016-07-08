@@ -878,14 +878,18 @@ tplDefault opts@InteropOptions{..} base default_value =
 tplDefault_Purescript :: InteropOptions -> String -> String -> String
 tplDefault_Purescript InteropOptions{..} base default_value =
      printf "instance %sDefault :: Default %s where\n" (firstToLower base) base
-  <> printf "def = %s" default_value
+  <> spaces si1 <> printf "def = %s" default_value
+  where
+  si1 = spacingIndent
 
 
 
 tplDefault_Haskell :: InteropOptions -> String -> String -> String
 tplDefault_Haskell InteropOptions{..} base default_value =
      printf "instance Default %s where\n" base
-  <> printf "def = %s" default_value
+  <> spaces si1 <> printf "def = %s" default_value
+  where
+  si1 = spacingIndent
 
 
 
