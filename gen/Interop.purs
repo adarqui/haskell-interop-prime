@@ -98,6 +98,7 @@ data SumType
   | F SumType
   | G (Array SumType)
   | H Boolean Int String (Maybe Boolean)
+  | I ((Tuple Int) String)
 
 
 
@@ -133,6 +134,10 @@ instance sumTypeEncodeJson :: EncodeJson SumType where
   encodeJson (H x0 x1 x2 x3) =
        "tag" := "H"
     ~> "contents" := [encodeJson x0, encodeJson x1, encodeJson x2, encodeJson x3]
+    ~> jsonEmptyObject
+  encodeJson (I x0) =
+       "tag" := "I"
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
 
 
@@ -191,6 +196,13 @@ instance sumTypeDecodeJson :: DecodeJson SumType where
         case r of
           [x0, x1, x2, x3] -> H <$> decodeJson x0 <*> decodeJson x1 <*> decodeJson x2 <*> decodeJson x3
           _ -> Left $ "DecodeJson TypeMismatch for H"
+
+
+      "I" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> I <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for I"
 
 
       _ -> Left $ "DecodeJson TypeMismatch for SumType"
@@ -261,6 +273,13 @@ instance sumTypeRespondable :: Respondable SumType where
           _ -> Left $ TypeMismatch "H" "Respondable"
 
 
+      "I" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> I <$> read x0
+          _ -> Left $ TypeMismatch "I" "Respondable"
+
+
       _ -> Left $ TypeMismatch "SumType" "Respondable"
 
 
@@ -321,6 +340,13 @@ instance sumTypeIsForeign :: IsForeign SumType where
           _ -> Left $ TypeMismatch "H" "IsForeign"
 
 
+      "I" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> I <$> read x0
+          _ -> Left $ TypeMismatch "I" "IsForeign"
+
+
       _ -> Left $ TypeMismatch "SumType" "IsForeign"
 
 
@@ -334,6 +360,7 @@ instance sumTypeShow :: Show SumType where
   show (F x0) = "F: " <> show x0
   show (G x0) = "G: " <> show x0
   show (H x0 x1 x2 x3) = "H: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
+  show (I x0) = "I: " <> show x0
 
 
 instance sumTypeEq :: Eq SumType where
@@ -345,6 +372,7 @@ instance sumTypeEq :: Eq SumType where
   eq (F x0a) (F x0b) = x0a == x0b
   eq (G x0a) (G x0b) = x0a == x0b
   eq (H x0a x1a x2a x3a) (H x0b x1b x2b x3b) = x0a == x0b && x1a == x1b && x2a == x2b && x3a == x3b
+  eq (I x0a) (I x0b) = x0a == x0b
   eq _ _ = false
 
 newtype BigRecord = BigRecord {
@@ -360,6 +388,8 @@ newtype BigRecord = BigRecord {
   bigRecordClass :: String,
   bigRecordLet :: String,
   bigRecordModule :: String,
+  bigRecordTuple :: ((Tuple Int) String),
+  bigRecordTuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 
@@ -377,6 +407,8 @@ type BigRecordR = {
   bigRecordClass :: String,
   bigRecordLet :: String,
   bigRecordModule :: String,
+  bigRecordTuple :: ((Tuple Int) String),
+  bigRecordTuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 
@@ -394,14 +426,16 @@ _BigRecord :: Lens' BigRecord {
   bigRecordClass :: String,
   bigRecordLet :: String,
   bigRecordModule :: String,
+  bigRecordTuple :: ((Tuple Int) String),
+  bigRecordTuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
-mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordString2 bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecord =
-  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordString2, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecord}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> String -> SumType -> String -> String -> String -> String -> ((Tuple Int) String) -> (((Tuple3 Int) String) Boolean) -> Boolean -> BigRecord
+mkBigRecord bigRecordBool bigRecordInt bigRecordMaybeInt bigRecordInteger bigRecordMaybeInteger bigRecordString bigRecordString2 bigRecordSumType bigRecordData bigRecordClass bigRecordLet bigRecordModule bigRecordTuple bigRecordTuple3 bigRecord =
+  BigRecord{bigRecordBool, bigRecordInt, bigRecordMaybeInt, bigRecordInteger, bigRecordMaybeInteger, bigRecordString, bigRecordString2, bigRecordSumType, bigRecordData, bigRecordClass, bigRecordLet, bigRecordModule, bigRecordTuple, bigRecordTuple3, bigRecord}
 
 
 unwrapBigRecord :: BigRecord -> {
@@ -417,6 +451,8 @@ unwrapBigRecord :: BigRecord -> {
   bigRecordClass :: String,
   bigRecordLet :: String,
   bigRecordModule :: String,
+  bigRecordTuple :: ((Tuple Int) String),
+  bigRecordTuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 unwrapBigRecord (BigRecord r) = r
@@ -436,6 +472,8 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "bigRecordClass" := o.bigRecordClass
     ~> "bigRecordLet" := o.bigRecordLet
     ~> "bigRecordModule" := o.bigRecordModule
+    ~> "bigRecordTuple" := o.bigRecordTuple
+    ~> "bigRecordTuple3" := o.bigRecordTuple3
     ~> "bigRecord" := o.bigRecord
     ~> jsonEmptyObject
 
@@ -455,6 +493,8 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     bigRecordClass <- obj .? "bigRecordClass"
     bigRecordLet <- obj .? "bigRecordLet"
     bigRecordModule <- obj .? "bigRecordModule"
+    bigRecordTuple <- obj .? "bigRecordTuple"
+    bigRecordTuple3 <- obj .? "bigRecordTuple3"
     bigRecord <- obj .? "bigRecord"
     pure $ BigRecord {
       bigRecordBool,
@@ -469,6 +509,8 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       bigRecordClass,
       bigRecordLet,
       bigRecordModule,
+      bigRecordTuple,
+      bigRecordTuple3,
       bigRecord
     }
 
@@ -496,6 +538,8 @@ instance bigRecordRespondable :: Respondable BigRecord where
       <*> readProp "bigRecordClass" json
       <*> readProp "bigRecordLet" json
       <*> readProp "bigRecordModule" json
+      <*> readProp "bigRecordTuple" json
+      <*> readProp "bigRecordTuple3" json
       <*> readProp "bigRecord" json
 
 
@@ -514,14 +558,16 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
       <*> readProp "bigRecordClass" json
       <*> readProp "bigRecordLet" json
       <*> readProp "bigRecordModule" json
+      <*> readProp "bigRecordTuple" json
+      <*> readProp "bigRecordTuple3" json
       <*> readProp "bigRecord" json
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bigRecordBool: " <> show o.bigRecordBool <> ", " <> show "bigRecordInt: " <> show o.bigRecordInt <> ", " <> show "bigRecordMaybeInt: " <> show o.bigRecordMaybeInt <> ", " <> show "bigRecordInteger: " <> show o.bigRecordInteger <> ", " <> show "bigRecordMaybeInteger: " <> show o.bigRecordMaybeInteger <> ", " <> show "bigRecordString: " <> show o.bigRecordString <> ", " <> show "bigRecordString2: " <> show o.bigRecordString2 <> ", " <> show "bigRecordSumType: " <> show o.bigRecordSumType <> ", " <> show "bigRecordData: " <> show o.bigRecordData <> ", " <> show "bigRecordClass: " <> show o.bigRecordClass <> ", " <> show "bigRecordLet: " <> show o.bigRecordLet <> ", " <> show "bigRecordModule: " <> show o.bigRecordModule <> ", " <> show "bigRecord: " <> show o.bigRecord
+    show (BigRecord o) = show "bigRecordBool: " <> show o.bigRecordBool <> ", " <> show "bigRecordInt: " <> show o.bigRecordInt <> ", " <> show "bigRecordMaybeInt: " <> show o.bigRecordMaybeInt <> ", " <> show "bigRecordInteger: " <> show o.bigRecordInteger <> ", " <> show "bigRecordMaybeInteger: " <> show o.bigRecordMaybeInteger <> ", " <> show "bigRecordString: " <> show o.bigRecordString <> ", " <> show "bigRecordString2: " <> show o.bigRecordString2 <> ", " <> show "bigRecordSumType: " <> show o.bigRecordSumType <> ", " <> show "bigRecordData: " <> show o.bigRecordData <> ", " <> show "bigRecordClass: " <> show o.bigRecordClass <> ", " <> show "bigRecordLet: " <> show o.bigRecordLet <> ", " <> show "bigRecordModule: " <> show o.bigRecordModule <> ", " <> show "bigRecordTuple: " <> show o.bigRecordTuple <> ", " <> show "bigRecordTuple3: " <> show o.bigRecordTuple3 <> ", " <> show "bigRecord: " <> show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
-  eq (BigRecord a) (BigRecord b) = a.bigRecordBool == b.bigRecordBool && a.bigRecordInt == b.bigRecordInt && a.bigRecordMaybeInt == b.bigRecordMaybeInt && a.bigRecordInteger == b.bigRecordInteger && a.bigRecordMaybeInteger == b.bigRecordMaybeInteger && a.bigRecordString == b.bigRecordString && a.bigRecordString2 == b.bigRecordString2 && a.bigRecordSumType == b.bigRecordSumType && a.bigRecordData == b.bigRecordData && a.bigRecordClass == b.bigRecordClass && a.bigRecordLet == b.bigRecordLet && a.bigRecordModule == b.bigRecordModule && a.bigRecord == b.bigRecord
+  eq (BigRecord a) (BigRecord b) = a.bigRecordBool == b.bigRecordBool && a.bigRecordInt == b.bigRecordInt && a.bigRecordMaybeInt == b.bigRecordMaybeInt && a.bigRecordInteger == b.bigRecordInteger && a.bigRecordMaybeInteger == b.bigRecordMaybeInteger && a.bigRecordString == b.bigRecordString && a.bigRecordString2 == b.bigRecordString2 && a.bigRecordSumType == b.bigRecordSumType && a.bigRecordData == b.bigRecordData && a.bigRecordClass == b.bigRecordClass && a.bigRecordLet == b.bigRecordLet && a.bigRecordModule == b.bigRecordModule && a.bigRecordTuple == b.bigRecordTuple && a.bigRecordTuple3 == b.bigRecordTuple3 && a.bigRecord == b.bigRecord
 
 type FakeUTCTime  = Int
 
@@ -1621,6 +1667,9 @@ instance oneConstructorEq :: Eq OneConstructor where
   eq (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
 
 
+instance paramTagDefault :: Default ParamTag where
+def = ParamTag_Limit
+
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord
 
@@ -1671,6 +1720,14 @@ bigRecordString2_ f o = o { bigRecordString2 = _ } <$> f o.bigRecordString2
 
 bigRecordSumType_ :: forall b a r. Lens { bigRecordSumType :: a | r } { bigRecordSumType :: b | r } a b
 bigRecordSumType_ f o = o { bigRecordSumType = _ } <$> f o.bigRecordSumType
+
+
+bigRecordTuple_ :: forall b a r. Lens { bigRecordTuple :: a | r } { bigRecordTuple :: b | r } a b
+bigRecordTuple_ f o = o { bigRecordTuple = _ } <$> f o.bigRecordTuple
+
+
+bigRecordTuple3_ :: forall b a r. Lens { bigRecordTuple3 :: a | r } { bigRecordTuple3 :: b | r } a b
+bigRecordTuple3_ f o = o { bigRecordTuple3 = _ } <$> f o.bigRecordTuple3
 
 
 boom1_ :: forall b a r. Lens { boom1 :: a | r } { boom1 :: b | r } a b

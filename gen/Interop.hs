@@ -73,6 +73,10 @@ instance ToJSON SumType where
     [ "tag" .= ("H" :: Text)
     , "contents" .= [toJSON x0, toJSON x1, toJSON x2, toJSON x3]
     ]
+  toJSON (I x0) = object $
+    [ "tag" .= ("I" :: Text)
+    , "contents" .= [toJSON x0]
+    ]
 
 
 instance FromJSON SumType where
@@ -124,6 +128,12 @@ instance FromJSON SumType where
           [x0, x1, x2, x3] -> H <$> parseJSON x0 <*> parseJSON x1 <*> parseJSON x2 <*> parseJSON x3
           _ -> fail "FromJON Typemismatch: H"
 
+      ("I" :: Text) -> do
+        r <- o .: "contents"
+        case r of
+          [x0] -> I <$> parseJSON x0
+          _ -> fail "FromJON Typemismatch: I"
+
       _ -> fail "Could not parse SumType"
 
   parseJSON x = fail $ "Could not parse object: " <> show x
@@ -138,6 +148,7 @@ instance Show SumType where
   show (F x0) = "F: " <> show x0
   show (G x0) = "G: " <> show x0
   show (H x0 x1 x2 x3) = "H: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
+  show (I x0) = "I: " <> show x0
 
 
 instance Eq SumType where
@@ -149,6 +160,7 @@ instance Eq SumType where
   (==) (F x0a) (F x0b) = x0a == x0b
   (==) (G x0a) (G x0b) = x0a == x0b
   (==) (H x0a x1a x2a x3a) (H x0b x1b x2b x3b) = x0a == x0b && x1a == x1b && x2a == x2b && x3a == x3b
+  (==) (I x0a) (I x0b) = x0a == x0b
   (==) _ _ = False
 
 instance ToJSON BigRecord where
@@ -166,6 +178,8 @@ instance ToJSON BigRecord where
     , "bigRecordClass" .= bigRecordClass
     , "bigRecordLet" .= bigRecordLet
     , "bigRecordModule" .= bigRecordModule
+    , "bigRecordTuple" .= bigRecordTuple
+    , "bigRecordTuple3" .= bigRecordTuple3
     , "bigRecord" .= bigRecord
     ]
 
@@ -184,6 +198,8 @@ instance FromJSON BigRecord where
     bigRecordClass <- o .: ("bigRecordClass" :: Text)
     bigRecordLet <- o .: ("bigRecordLet" :: Text)
     bigRecordModule <- o .: ("bigRecordModule" :: Text)
+    bigRecordTuple <- o .: ("bigRecordTuple" :: Text)
+    bigRecordTuple3 <- o .: ("bigRecordTuple3" :: Text)
     bigRecord <- o .: ("bigRecord" :: Text)
     pure $ BigRecord {
       bigRecordBool = bigRecordBool,
@@ -198,16 +214,18 @@ instance FromJSON BigRecord where
       bigRecordClass = bigRecordClass,
       bigRecordLet = bigRecordLet,
       bigRecordModule = bigRecordModule,
+      bigRecordTuple = bigRecordTuple,
+      bigRecordTuple3 = bigRecordTuple3,
       bigRecord = bigRecord
     }
   parseJSON x = fail $ "Could not parse object: " <> show x
 
 
 instance Show BigRecord where
-    show rec = "bigRecordBool: " <> show (bigRecordBool rec) <> ", " <> "bigRecordInt: " <> show (bigRecordInt rec) <> ", " <> "bigRecordMaybeInt: " <> show (bigRecordMaybeInt rec) <> ", " <> "bigRecordInteger: " <> show (bigRecordInteger rec) <> ", " <> "bigRecordMaybeInteger: " <> show (bigRecordMaybeInteger rec) <> ", " <> "bigRecordString: " <> show (bigRecordString rec) <> ", " <> "bigRecordString2: " <> show (bigRecordString2 rec) <> ", " <> "bigRecordSumType: " <> show (bigRecordSumType rec) <> ", " <> "bigRecordData: " <> show (bigRecordData rec) <> ", " <> "bigRecordClass: " <> show (bigRecordClass rec) <> ", " <> "bigRecordLet: " <> show (bigRecordLet rec) <> ", " <> "bigRecordModule: " <> show (bigRecordModule rec) <> ", " <> "bigRecord: " <> show (bigRecord rec)
+    show rec = "bigRecordBool: " <> show (bigRecordBool rec) <> ", " <> "bigRecordInt: " <> show (bigRecordInt rec) <> ", " <> "bigRecordMaybeInt: " <> show (bigRecordMaybeInt rec) <> ", " <> "bigRecordInteger: " <> show (bigRecordInteger rec) <> ", " <> "bigRecordMaybeInteger: " <> show (bigRecordMaybeInteger rec) <> ", " <> "bigRecordString: " <> show (bigRecordString rec) <> ", " <> "bigRecordString2: " <> show (bigRecordString2 rec) <> ", " <> "bigRecordSumType: " <> show (bigRecordSumType rec) <> ", " <> "bigRecordData: " <> show (bigRecordData rec) <> ", " <> "bigRecordClass: " <> show (bigRecordClass rec) <> ", " <> "bigRecordLet: " <> show (bigRecordLet rec) <> ", " <> "bigRecordModule: " <> show (bigRecordModule rec) <> ", " <> "bigRecordTuple: " <> show (bigRecordTuple rec) <> ", " <> "bigRecordTuple3: " <> show (bigRecordTuple3 rec) <> ", " <> "bigRecord: " <> show (bigRecord rec)
 
 instance Eq BigRecord where
-  (==) a b = bigRecordBool a == bigRecordBool b && bigRecordInt a == bigRecordInt b && bigRecordMaybeInt a == bigRecordMaybeInt b && bigRecordInteger a == bigRecordInteger b && bigRecordMaybeInteger a == bigRecordMaybeInteger b && bigRecordString a == bigRecordString b && bigRecordString2 a == bigRecordString2 b && bigRecordSumType a == bigRecordSumType b && bigRecordData a == bigRecordData b && bigRecordClass a == bigRecordClass b && bigRecordLet a == bigRecordLet b && bigRecordModule a == bigRecordModule b && bigRecord a == bigRecord b
+  (==) a b = bigRecordBool a == bigRecordBool b && bigRecordInt a == bigRecordInt b && bigRecordMaybeInt a == bigRecordMaybeInt b && bigRecordInteger a == bigRecordInteger b && bigRecordMaybeInteger a == bigRecordMaybeInteger b && bigRecordString a == bigRecordString b && bigRecordString2 a == bigRecordString2 b && bigRecordSumType a == bigRecordSumType b && bigRecordData a == bigRecordData b && bigRecordClass a == bigRecordClass b && bigRecordLet a == bigRecordLet b && bigRecordModule a == bigRecordModule b && bigRecordTuple a == bigRecordTuple b && bigRecordTuple3 a == bigRecordTuple3 b && bigRecord a == bigRecord b
 
 instance ToJSON User where
   toJSON User{..} = object $
@@ -653,4 +671,7 @@ instance Show OneConstructor where
 instance Eq OneConstructor where
   (==) (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
 
+
+instance Default ParamTag where
+def = ParamTag_Limit
 -- footer

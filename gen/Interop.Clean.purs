@@ -98,6 +98,7 @@ data SumType
   | F SumType
   | G (Array SumType)
   | H Boolean Int String (Maybe Boolean)
+  | I ((Tuple Int) String)
 
 
 
@@ -133,6 +134,10 @@ instance sumTypeEncodeJson :: EncodeJson SumType where
   encodeJson (H x0 x1 x2 x3) =
        "tag" := "H"
     ~> "contents" := [encodeJson x0, encodeJson x1, encodeJson x2, encodeJson x3]
+    ~> jsonEmptyObject
+  encodeJson (I x0) =
+       "tag" := "I"
+    ~> "contents" := [encodeJson x0]
     ~> jsonEmptyObject
 
 
@@ -191,6 +196,13 @@ instance sumTypeDecodeJson :: DecodeJson SumType where
         case r of
           [x0, x1, x2, x3] -> H <$> decodeJson x0 <*> decodeJson x1 <*> decodeJson x2 <*> decodeJson x3
           _ -> Left $ "DecodeJson TypeMismatch for H"
+
+
+      "I" -> do
+        r <- obj .? "contents"
+        case r of
+          [x0] -> I <$> decodeJson x0
+          _ -> Left $ "DecodeJson TypeMismatch for I"
 
 
       _ -> Left $ "DecodeJson TypeMismatch for SumType"
@@ -261,6 +273,13 @@ instance sumTypeRespondable :: Respondable SumType where
           _ -> Left $ TypeMismatch "H" "Respondable"
 
 
+      "I" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> I <$> read x0
+          _ -> Left $ TypeMismatch "I" "Respondable"
+
+
       _ -> Left $ TypeMismatch "SumType" "Respondable"
 
 
@@ -321,6 +340,13 @@ instance sumTypeIsForeign :: IsForeign SumType where
           _ -> Left $ TypeMismatch "H" "IsForeign"
 
 
+      "I" -> do
+        r <- readProp "contents" json
+        case r of
+          [x0] -> I <$> read x0
+          _ -> Left $ TypeMismatch "I" "IsForeign"
+
+
       _ -> Left $ TypeMismatch "SumType" "IsForeign"
 
 
@@ -334,6 +360,7 @@ instance sumTypeShow :: Show SumType where
   show (F x0) = "F: " <> show x0
   show (G x0) = "G: " <> show x0
   show (H x0 x1 x2 x3) = "H: " <> show x0 <> " " <> show x1 <> " " <> show x2 <> " " <> show x3
+  show (I x0) = "I: " <> show x0
 
 
 instance sumTypeEq :: Eq SumType where
@@ -345,6 +372,7 @@ instance sumTypeEq :: Eq SumType where
   eq (F x0a) (F x0b) = x0a == x0b
   eq (G x0a) (G x0b) = x0a == x0b
   eq (H x0a x1a x2a x3a) (H x0b x1b x2b x3b) = x0a == x0b && x1a == x1b && x2a == x2b && x3a == x3b
+  eq (I x0a) (I x0b) = x0a == x0b
   eq _ _ = false
 
 newtype BigRecord = BigRecord {
@@ -360,6 +388,8 @@ newtype BigRecord = BigRecord {
   classP :: String,
   letP :: String,
   moduleP :: String,
+  tuple :: ((Tuple Int) String),
+  tuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 
@@ -377,6 +407,8 @@ type BigRecordR = {
   classP :: String,
   letP :: String,
   moduleP :: String,
+  tuple :: ((Tuple Int) String),
+  tuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 
@@ -394,14 +426,16 @@ _BigRecord :: Lens' BigRecord {
   classP :: String,
   letP :: String,
   moduleP :: String,
+  tuple :: ((Tuple Int) String),
+  tuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 _BigRecord f (BigRecord o) = BigRecord <$> f o
 
 
-mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> String -> SumType -> String -> String -> String -> String -> Boolean -> BigRecord
-mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType dataP classP letP moduleP bigRecord =
-  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, dataP, classP, letP, moduleP, bigRecord}
+mkBigRecord :: Boolean -> Int -> (Maybe Int) -> Int -> (Maybe Int) -> String -> String -> SumType -> String -> String -> String -> String -> ((Tuple Int) String) -> (((Tuple3 Int) String) Boolean) -> Boolean -> BigRecord
+mkBigRecord bool int maybeInt integer maybeInteger string string2 sumType dataP classP letP moduleP tuple tuple3 bigRecord =
+  BigRecord{bool, int, maybeInt, integer, maybeInteger, string, string2, sumType, dataP, classP, letP, moduleP, tuple, tuple3, bigRecord}
 
 
 unwrapBigRecord :: BigRecord -> {
@@ -417,6 +451,8 @@ unwrapBigRecord :: BigRecord -> {
   classP :: String,
   letP :: String,
   moduleP :: String,
+  tuple :: ((Tuple Int) String),
+  tuple3 :: (((Tuple3 Int) String) Boolean),
   bigRecord :: Boolean
 }
 unwrapBigRecord (BigRecord r) = r
@@ -436,6 +472,8 @@ instance bigRecordEncodeJson :: EncodeJson BigRecord where
     ~> "class" := o.classP
     ~> "let" := o.letP
     ~> "module" := o.moduleP
+    ~> "tuple" := o.tuple
+    ~> "tuple3" := o.tuple3
     ~> "big_record" := o.bigRecord
     ~> jsonEmptyObject
 
@@ -455,6 +493,8 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
     classP <- obj .? "class"
     letP <- obj .? "let"
     moduleP <- obj .? "module"
+    tuple <- obj .? "tuple"
+    tuple3 <- obj .? "tuple3"
     bigRecord <- obj .? "big_record"
     pure $ BigRecord {
       bool,
@@ -469,6 +509,8 @@ instance bigRecordDecodeJson :: DecodeJson BigRecord where
       classP,
       letP,
       moduleP,
+      tuple,
+      tuple3,
       bigRecord
     }
 
@@ -496,6 +538,8 @@ instance bigRecordRespondable :: Respondable BigRecord where
       <*> readProp "class" json
       <*> readProp "let" json
       <*> readProp "module" json
+      <*> readProp "tuple" json
+      <*> readProp "tuple3" json
       <*> readProp "big_record" json
 
 
@@ -514,14 +558,16 @@ instance bigRecordIsForeign :: IsForeign BigRecord where
       <*> readProp "class" json
       <*> readProp "let" json
       <*> readProp "module" json
+      <*> readProp "tuple" json
+      <*> readProp "tuple3" json
       <*> readProp "big_record" json
 
 
 instance bigRecordShow :: Show BigRecord where
-    show (BigRecord o) = show "bool: " <> show o.bool <> ", " <> show "int: " <> show o.int <> ", " <> show "maybeInt: " <> show o.maybeInt <> ", " <> show "integer: " <> show o.integer <> ", " <> show "maybeInteger: " <> show o.maybeInteger <> ", " <> show "string: " <> show o.string <> ", " <> show "string2: " <> show o.string2 <> ", " <> show "sumType: " <> show o.sumType <> ", " <> show "dataP: " <> show o.dataP <> ", " <> show "classP: " <> show o.classP <> ", " <> show "letP: " <> show o.letP <> ", " <> show "moduleP: " <> show o.moduleP <> ", " <> show "bigRecord: " <> show o.bigRecord
+    show (BigRecord o) = show "bool: " <> show o.bool <> ", " <> show "int: " <> show o.int <> ", " <> show "maybeInt: " <> show o.maybeInt <> ", " <> show "integer: " <> show o.integer <> ", " <> show "maybeInteger: " <> show o.maybeInteger <> ", " <> show "string: " <> show o.string <> ", " <> show "string2: " <> show o.string2 <> ", " <> show "sumType: " <> show o.sumType <> ", " <> show "dataP: " <> show o.dataP <> ", " <> show "classP: " <> show o.classP <> ", " <> show "letP: " <> show o.letP <> ", " <> show "moduleP: " <> show o.moduleP <> ", " <> show "tuple: " <> show o.tuple <> ", " <> show "tuple3: " <> show o.tuple3 <> ", " <> show "bigRecord: " <> show o.bigRecord
 
 instance bigRecordEq :: Eq BigRecord where
-  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.dataP == b.dataP && a.classP == b.classP && a.letP == b.letP && a.moduleP == b.moduleP && a.bigRecord == b.bigRecord
+  eq (BigRecord a) (BigRecord b) = a.bool == b.bool && a.int == b.int && a.maybeInt == b.maybeInt && a.integer == b.integer && a.maybeInteger == b.maybeInteger && a.string == b.string && a.string2 == b.string2 && a.sumType == b.sumType && a.dataP == b.dataP && a.classP == b.classP && a.letP == b.letP && a.moduleP == b.moduleP && a.tuple == b.tuple && a.tuple3 == b.tuple3 && a.bigRecord == b.bigRecord
 
 type FakeUTCTime  = Int
 
@@ -1621,6 +1667,9 @@ instance oneConstructorEq :: Eq OneConstructor where
   eq (OneConstructor_Test x0a) (OneConstructor_Test x0b) = x0a == x0b
 
 
+instance paramTagDefault :: Default ParamTag where
+def = ParamTag_Limit
+
 active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
 active_ f o = o { active = _ } <$> f o.active
 
@@ -1703,6 +1752,14 @@ string2_ f o = o { string2 = _ } <$> f o.string2
 
 sumType_ :: forall b a r. Lens { sumType :: a | r } { sumType :: b | r } a b
 sumType_ f o = o { sumType = _ } <$> f o.sumType
+
+
+tuple_ :: forall b a r. Lens { tuple :: a | r } { tuple :: b | r } a b
+tuple_ f o = o { tuple = _ } <$> f o.tuple
+
+
+tuple3_ :: forall b a r. Lens { tuple3 :: a | r } { tuple3 :: b | r } a b
+tuple3_ f o = o { tuple3 = _ } <$> f o.tuple3
 
 
 unSession_ :: forall b a r. Lens { unSession :: a | r } { unSession :: b | r } a b
