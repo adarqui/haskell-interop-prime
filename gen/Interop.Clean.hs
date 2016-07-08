@@ -18,6 +18,11 @@ import           Data.Time           (UTCTime)
 import           Data.Monoid         ((<>))
 import           Haskell.Api.Helpers (QueryParam, qp)
 
+newtype Session = Session {
+  unSession :: String
+}
+
+
 instance ToJSON Session where
   toJSON Session{..} = object $
     [ "tag" .= ("Session" :: Text)
@@ -39,6 +44,19 @@ instance Show Session where
 
 instance Eq Session where
   (==) a b = unSession a == unSession b
+
+data SumType
+  = A 
+  | B Int
+  | C Bool
+  | D String
+  | E [Int]
+  | F SumType
+  | G [SumType]
+  | H Bool Int String (Maybe Bool)
+  | I (((,) Int) String)
+
+
 
 instance ToJSON SumType where
   toJSON (A ) = object $
@@ -163,6 +181,25 @@ instance Eq SumType where
   (==) (I x0a) (I x0b) = x0a == x0b
   (==) _ _ = False
 
+newtype BigRecord = BigRecord {
+  bool :: Bool,
+  int :: Int,
+  maybeInt :: (Maybe Int),
+  integer :: Integer,
+  maybeInteger :: (Maybe Integer),
+  string :: String,
+  string2 :: [Char],
+  sumType :: SumType,
+  dataP :: String,
+  classP :: String,
+  letP :: String,
+  moduleP :: String,
+  tuple :: (((,) Int) String),
+  tuple3 :: ((((,,,) Int) String) Bool),
+  bigRecord :: Bool
+}
+
+
 instance ToJSON BigRecord where
   toJSON BigRecord{..} = object $
     [ "tag" .= ("BigRecord" :: Text)
@@ -227,6 +264,16 @@ instance Show BigRecord where
 instance Eq BigRecord where
   (==) a b = bool a == bool b && int a == int b && maybeInt a == maybeInt b && integer a == integer b && maybeInteger a == maybeInteger b && string a == string b && string2 a == string2 b && sumType a == sumType b && dataP a == dataP b && classP a == classP b && letP a == letP b && moduleP a == moduleP b && tuple a == tuple b && tuple3 a == tuple3 b && bigRecord a == bigRecord b
 
+type FakeUTCTime  = Integer
+
+
+newtype User = User {
+  name :: String,
+  email :: String,
+  active :: Bool
+}
+
+
 instance ToJSON User where
   toJSON User{..} = object $
     [ "tag" .= ("User" :: Text)
@@ -255,6 +302,12 @@ instance Show User where
 instance Eq User where
   (==) a b = name a == name b && email a == email b && active a == active b
 
+newtype UserRequest = UserRequest {
+  name :: String,
+  email :: String
+}
+
+
 instance ToJSON UserRequest where
   toJSON UserRequest{..} = object $
     [ "tag" .= ("UserRequest" :: Text)
@@ -279,6 +332,16 @@ instance Show UserRequest where
 
 instance Eq UserRequest where
   (==) a b = name a == name b && email a == email b
+
+newtype UserResponse = UserResponse {
+  id :: Int64,
+  name :: String,
+  email :: String,
+  active :: Bool,
+  createdAt :: (Maybe FakeUTCTime),
+  modifiedAt :: (Maybe FakeUTCTime)
+}
+
 
 instance ToJSON UserResponse where
   toJSON UserResponse{..} = object $
@@ -317,6 +380,11 @@ instance Show UserResponse where
 instance Eq UserResponse where
   (==) a b = id a == id b && name a == name b && email a == email b && active a == active b && createdAt a == createdAt b && modifiedAt a == modifiedAt b
 
+newtype UserResponses = UserResponses {
+  userResponses :: [UserResponse]
+}
+
+
 instance ToJSON UserResponses where
   toJSON UserResponses{..} = object $
     [ "tag" .= ("UserResponses" :: Text)
@@ -338,6 +406,20 @@ instance Show UserResponses where
 
 instance Eq UserResponses where
   (==) a b = userResponses a == userResponses b
+
+type Text  = String
+
+
+type TextMaybe  = (Maybe Text)
+
+
+type NestedList a = [[a]]
+
+
+newtype FunkyRecord = Boom1 {
+  boom1 :: Bool
+}
+
 
 instance ToJSON FunkyRecord where
   toJSON Boom1{..} = object $
@@ -361,6 +443,11 @@ instance Show FunkyRecord where
 instance Eq FunkyRecord where
   (==) a b = boom1 a == boom1 b
 
+newtype FUnkyRecordP = FUnkyRecordP {
+  field :: Bool
+}
+
+
 instance ToJSON FUnkyRecordP where
   toJSON FUnkyRecordP{..} = object $
     [ "tag" .= ("FUnkyRecordP" :: Text)
@@ -382,6 +469,18 @@ instance Show FUnkyRecordP where
 
 instance Eq FUnkyRecordP where
   (==) a b = field a == field b
+
+data Param
+  = Limit Int
+  | Offset Int
+  | ByUsersIds [Int64]
+  | ByUserNameText Text
+  | ByUserNameStr String
+  | ByUsersNames [String]
+  | ByUsersEmails [String]
+  | ByUserActive Bool
+
+
 
 instance ToJSON Param where
   toJSON (Limit x0) = object $
@@ -508,6 +607,16 @@ instance QueryParam Param where
   qp (ByUserActive x0) = ("by_user_active", (T.pack $ show x0))
 
 
+data ParamTag
+  = ParamTag_Limit 
+  | ParamTag_Offset 
+  | ParamTag_ByUsersIds 
+  | ParamTag_ByUsersNames 
+  | ParamTag_ByUsersEmails 
+  | ParamTag_ByUserActive 
+
+
+
 instance ToJSON ParamTag where
   toJSON (ParamTag_Limit ) = object $
     [ "tag" .= ("ParamTag_Limit" :: Text)
@@ -590,6 +699,13 @@ instance Eq ParamTag where
   (==) ParamTag_ByUserActive ParamTag_ByUserActive = True
   (==) _ _ = False
 
+data ApplicationError
+  = Error_Unknown 
+  | Error_Validation 
+  | Error_PerimssionDenied 
+
+
+
 instance ToJSON ApplicationError where
   toJSON (Error_Unknown ) = object $
     [ "tag" .= ("Error_Unknown" :: Text)
@@ -641,6 +757,11 @@ instance Eq ApplicationError where
   (==) Error_Validation Error_Validation = True
   (==) Error_PerimssionDenied Error_PerimssionDenied = True
   (==) _ _ = False
+
+data OneConstructor
+  = OneConstructor_Test String
+
+
 
 instance ToJSON OneConstructor where
   toJSON (OneConstructor_Test x0) = object $
