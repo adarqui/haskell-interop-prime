@@ -1669,7 +1669,7 @@ instance oneConstructorEq :: Eq OneConstructor where
 
 
 instance paramTagDefault :: Default ParamTag where
-def = ParamTag_Limit
+  def = ParamTag_Limit
 
 bigRecord_ :: forall b a r. Lens { bigRecord :: a | r } { bigRecord :: b | r } a b
 bigRecord_ f o = o { bigRecord = _ } <$> f o.bigRecord

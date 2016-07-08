@@ -1669,7 +1669,7 @@ instance oneConstructorEq :: Eq OneConstructor where
 
 
 instance paramTagDefault :: Default ParamTag where
-def = ParamTag_Limit
+  def = ParamTag_Limit
 
 active_ :: forall b a r. Lens { active :: a | r } { active :: b | r } a b
 active_ f o = o { active = _ } <$> f o.active
