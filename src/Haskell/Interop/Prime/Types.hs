@@ -8,7 +8,8 @@ module Haskell.Interop.Prime.Types (
   ExportT,
   Lang (..),
   MkTypeOpts (..),
-  isMkTypeOpts_Deriving,
+  isMkTypeOpt_Deriving,
+  isMkTypeOpts_StrictFields,
   Deriving (..),
   mkTypeOpts_DerivingToString,
   derivingToString,
@@ -33,6 +34,7 @@ module Haskell.Interop.Prime.Types (
 
 
 import           Control.Monad.Trans.RWS (RWS)
+import           Data.List               (any)
 import qualified Data.Map                as M
 import           Language.Haskell.TH
 
@@ -50,9 +52,12 @@ data MkTypeOpts
   | MkTypeOpts_Deriving Deriving
   deriving (Show, Eq, Ord)
 
-isMkTypeOpts_Deriving :: MkTypeOpts -> Bool
-isMkTypeOpts_Deriving (MkTypeOpts_Deriving _) = True
-isMkTypeOpts_Deriving _                       = False
+isMkTypeOpt_Deriving :: MkTypeOpts -> Bool
+isMkTypeOpt_Deriving (MkTypeOpts_Deriving _) = True
+isMkTypeOpt_Deriving _                       = False
+
+isMkTypeOpts_StrictFields :: [MkTypeOpts] -> Bool
+isMkTypeOpts_StrictFields = any (==MkTypeOpts_StrictFields)
 
 
 

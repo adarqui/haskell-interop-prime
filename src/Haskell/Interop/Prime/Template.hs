@@ -69,9 +69,9 @@ module Haskell.Interop.Prime.Template (
 
 
 
-import Data.Maybe (catMaybes)
 import           Data.List
 import qualified Data.Map                    as M
+import           Data.Maybe                  (catMaybes)
 import           Data.Monoid
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Types
@@ -130,7 +130,10 @@ tplRecord type_ type_opts InteropOptions{..} base constr fields =
   <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
   <> "\n}" <> derive <> "\n"
   where
-  derive = buildDeriving spacingIndent type_opts
+  derive        = buildDeriving spacingIndent type_opts
+  isStrict      = isMkTypeOpts_StrictFields type_opts
+  strictField s | isStrict  = "!(" <> s <> ")"
+                | otherwise = s
 
 
 
