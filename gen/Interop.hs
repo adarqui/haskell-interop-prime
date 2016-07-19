@@ -31,7 +31,7 @@ newtype Session = Session {
 
 
 newtype Session = Session {
-  unSession :: String
+  unSession :: !(String)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -226,21 +226,21 @@ data BigRecord = BigRecord {
 
 
 data BigRecord = BigRecord {
-  bigRecordBool :: Bool,
-  bigRecordInt :: Int,
-  bigRecordMaybeInt :: (Maybe Int),
-  bigRecordInteger :: Integer,
-  bigRecordMaybeInteger :: (Maybe Integer),
-  bigRecordString :: String,
-  bigRecordString2 :: [Char],
-  bigRecordSumType :: SumType,
-  bigRecordData :: String,
-  bigRecordClass :: String,
-  bigRecordLet :: String,
-  bigRecordModule :: String,
-  bigRecordTuple :: (((,) Int) String),
-  bigRecordTuple3 :: ((((,,,) Int) String) Bool),
-  bigRecord :: Bool
+  bigRecordBool :: !(Bool),
+  bigRecordInt :: !(Int),
+  bigRecordMaybeInt :: !((Maybe Int)),
+  bigRecordInteger :: !(Integer),
+  bigRecordMaybeInteger :: !((Maybe Integer)),
+  bigRecordString :: !(String),
+  bigRecordString2 :: !([Char]),
+  bigRecordSumType :: !(SumType),
+  bigRecordData :: !(String),
+  bigRecordClass :: !(String),
+  bigRecordLet :: !(String),
+  bigRecordModule :: !(String),
+  bigRecordTuple :: !((((,) Int) String)),
+  bigRecordTuple3 :: !(((((,,,) Int) String) Bool)),
+  bigRecord :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -322,9 +322,9 @@ data User = User {
 
 
 data User = User {
-  userName :: String,
-  userEmail :: String,
-  userActive :: Bool
+  userName :: !(String),
+  userEmail :: !(String),
+  userActive :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -363,8 +363,8 @@ data UserRequest = UserRequest {
 
 
 data UserRequest = UserRequest {
-  userRequestName :: String,
-  userRequestEmail :: String
+  userRequestName :: !(String),
+  userRequestEmail :: !(String)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -404,12 +404,12 @@ data UserResponse = UserResponse {
 
 
 data UserResponse = UserResponse {
-  userResponseId :: Int64,
-  userResponseName :: String,
-  userResponseEmail :: String,
-  userResponseActive :: Bool,
-  userResponseCreatedAt :: (Maybe FakeUTCTime),
-  userResponseModifiedAt :: (Maybe FakeUTCTime)
+  userResponseId :: !(Int64),
+  userResponseName :: !(String),
+  userResponseEmail :: !(String),
+  userResponseActive :: !(Bool),
+  userResponseCreatedAt :: !((Maybe FakeUTCTime)),
+  userResponseModifiedAt :: !((Maybe FakeUTCTime))
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -456,7 +456,7 @@ data UserResponses = UserResponses {
 
 
 data UserResponses = UserResponses {
-  userResponses :: [UserResponse]
+  userResponses :: !([UserResponse])
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -506,7 +506,7 @@ data FunkyRecord = Boom1 {
 
 
 data FunkyRecord = Boom1 {
-  boom1 :: Bool
+  boom1 :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -538,7 +538,7 @@ data FUnkyRecordP = FUnkyRecordP {
 
 
 data FUnkyRecordP = FUnkyRecordP {
-  funkyrecordpField :: Bool
+  funkyrecordpField :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 

@@ -31,7 +31,7 @@ newtype Session = Session {
 
 
 newtype Session = Session {
-  unSession :: String
+  unSession :: !(String)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -226,21 +226,21 @@ newtype BigRecord = BigRecord {
 
 
 newtype BigRecord = BigRecord {
-  bool :: Bool,
-  int :: Int,
-  maybeInt :: (Maybe Int),
-  integer :: Integer,
-  maybeInteger :: (Maybe Integer),
-  string :: String,
-  string2 :: [Char],
-  sumType :: SumType,
-  dataP :: String,
-  classP :: String,
-  letP :: String,
-  moduleP :: String,
-  tuple :: (((,) Int) String),
-  tuple3 :: ((((,,,) Int) String) Bool),
-  bigRecord :: Bool
+  bool :: !(Bool),
+  int :: !(Int),
+  maybeInt :: !((Maybe Int)),
+  integer :: !(Integer),
+  maybeInteger :: !((Maybe Integer)),
+  string :: !(String),
+  string2 :: !([Char]),
+  sumType :: !(SumType),
+  dataP :: !(String),
+  classP :: !(String),
+  letP :: !(String),
+  moduleP :: !(String),
+  tuple :: !((((,) Int) String)),
+  tuple3 :: !(((((,,,) Int) String) Bool)),
+  bigRecord :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -322,9 +322,9 @@ newtype User = User {
 
 
 newtype User = User {
-  name :: String,
-  email :: String,
-  active :: Bool
+  name :: !(String),
+  email :: !(String),
+  active :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -363,8 +363,8 @@ newtype UserRequest = UserRequest {
 
 
 newtype UserRequest = UserRequest {
-  name :: String,
-  email :: String
+  name :: !(String),
+  email :: !(String)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -404,12 +404,12 @@ newtype UserResponse = UserResponse {
 
 
 newtype UserResponse = UserResponse {
-  id :: Int64,
-  name :: String,
-  email :: String,
-  active :: Bool,
-  createdAt :: (Maybe FakeUTCTime),
-  modifiedAt :: (Maybe FakeUTCTime)
+  id :: !(Int64),
+  name :: !(String),
+  email :: !(String),
+  active :: !(Bool),
+  createdAt :: !((Maybe FakeUTCTime)),
+  modifiedAt :: !((Maybe FakeUTCTime))
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -456,7 +456,7 @@ newtype UserResponses = UserResponses {
 
 
 newtype UserResponses = UserResponses {
-  userResponses :: [UserResponse]
+  userResponses :: !([UserResponse])
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -506,7 +506,7 @@ newtype FunkyRecord = Boom1 {
 
 
 newtype FunkyRecord = Boom1 {
-  boom1 :: Bool
+  boom1 :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -538,7 +538,7 @@ newtype FUnkyRecordP = FUnkyRecordP {
 
 
 newtype FUnkyRecordP = FUnkyRecordP {
-  field :: Bool
+  field :: !(Bool)
 }  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
