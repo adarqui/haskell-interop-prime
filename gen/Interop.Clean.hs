@@ -74,7 +74,7 @@ data SumType
   | G [SumType]
   | H Bool Int String (Maybe Bool)
   | I (((,) Int) String)
-
+  
 
 
 instance ToJSON SumType where
@@ -579,7 +579,7 @@ data Param
   | ByUsersNames [String]
   | ByUsersEmails [String]
   | ByUserActive Bool
-
+  
 
 
 instance ToJSON Param where
@@ -724,7 +724,7 @@ data ParamTag
   | ParamTag_ByUsersNames 
   | ParamTag_ByUsersEmails 
   | ParamTag_ByUserActive 
-
+  
 
 
 instance ToJSON ParamTag where
@@ -820,7 +820,7 @@ data ApplicationError
   = Error_Unknown 
   | Error_Validation 
   | Error_PerimssionDenied 
-
+  
 
 
 instance ToJSON ApplicationError where
@@ -882,7 +882,7 @@ data OneConstructor
 
 data OneConstructor
   = OneConstructor_Test String
-
+  
 
 
 instance ToJSON OneConstructor where
