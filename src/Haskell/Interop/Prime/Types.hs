@@ -7,6 +7,8 @@
 module Haskell.Interop.Prime.Types (
   ExportT,
   Lang (..),
+  MkTypeOpts (..),
+  Deriving (..),
   Mk (..),
   MkG (..),
   Options (..),
@@ -36,13 +38,34 @@ import           Language.Haskell.TH
 data Lang
   = LangPurescript
   | LangHaskell
-  deriving (Show, Eq, Ord, Enum)
+  deriving (Show, Eq, Ord)
+
+
+
+data MkTypeOpts
+  = MkTypeOpts_StrictFields
+  | MkTypeOpts_Deriving Deriving
+  deriving (Show, Eq, Ord)
+
+
+
+data Deriving
+  = Deriving_Generic
+  | Deriving_Typeable
+  | Deriving_NFData
+  | Deriving_Show
+  | Deriving_Read
+  | Deriving_Eq
+  | Deriving_Ord
+  | Deriving_Enum
+  deriving (Show, Eq, Ord)
 
 
 
 data Mk
   = MkType
   | MkTypeRows String
+  | MkTypeWith [MkTypeOpts]
   | MkToJSON
   | MkFromJSON
   | MkUnwrap
