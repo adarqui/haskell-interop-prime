@@ -127,7 +127,7 @@ tplDataRecord type_opts opts@InteropOptions{..} =
 tplRecord :: String -> [MkTypeOpts] -> InteropOptions -> String -> String -> [(String, String)] -> String
 tplRecord type_ type_opts InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
-  <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
+  <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) (strictField t)) fields
   <> "\n}" <> derive <> "\n"
   where
   derive        = buildDeriving spacingIndent type_opts
