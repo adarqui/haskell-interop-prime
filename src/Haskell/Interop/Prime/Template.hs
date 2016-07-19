@@ -128,7 +128,9 @@ tplRecord :: String -> [MkTypeOpts] -> InteropOptions -> String -> String -> [(S
 tplRecord type_ type_opts InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
   <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
-  <> "\n}\n"
+  <> "\n}" <> derive <> "\n"
+  where
+  derive = buildDeriving spacingIndent type_opts
 
 
 
@@ -215,7 +217,7 @@ buildDeriving :: Int -> [MkTypeOpts] -> String
 buildDeriving spacing_indent opts =
   case (intercalate "," $ catMaybes $ map mkTypeOpts_DerivingToString opts) of
     "" -> ""
-    s  -> spaces spacing_indent
+    s  -> spaces spacing_indent <> "deriving (" <> s <> ")"
 
 
 

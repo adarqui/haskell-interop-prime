@@ -261,7 +261,7 @@ runMk mk = do
   case mk of
     MkType              -> buildType
     MkTypeRows suffix   -> buildTypeRows suffix
-    MkTypeWith opts     -> buildTypeWith opts
+    MkTypeWith typeopts -> buildTypeWith typeopts
     MkLens              -> buildLens
     MkMk                -> buildMk
     MkUnwrap            -> buildUnwrap
