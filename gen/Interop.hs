@@ -26,7 +26,7 @@ newtype Session = Session {
 
 newtype Session = Session {
   unSession :: String
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON Session where
@@ -74,7 +74,7 @@ data SumType
   | G [SumType]
   | H Bool Int String (Maybe Bool)
   | I (((,) Int) String)
-  
+  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON SumType where
@@ -235,7 +235,7 @@ data BigRecord = BigRecord {
   bigRecordTuple :: (((,) Int) String),
   bigRecordTuple3 :: ((((,,,) Int) String) Bool),
   bigRecord :: Bool
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON BigRecord where
@@ -319,7 +319,7 @@ data User = User {
   userName :: String,
   userEmail :: String,
   userActive :: Bool
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON User where
@@ -359,7 +359,7 @@ data UserRequest = UserRequest {
 data UserRequest = UserRequest {
   userRequestName :: String,
   userRequestEmail :: String
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON UserRequest where
@@ -404,7 +404,7 @@ data UserResponse = UserResponse {
   userResponseActive :: Bool,
   userResponseCreatedAt :: (Maybe FakeUTCTime),
   userResponseModifiedAt :: (Maybe FakeUTCTime)
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON UserResponse where
@@ -451,7 +451,7 @@ data UserResponses = UserResponses {
 
 data UserResponses = UserResponses {
   userResponses :: [UserResponse]
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON UserResponses where
@@ -501,7 +501,7 @@ data FunkyRecord = Boom1 {
 
 data FunkyRecord = Boom1 {
   boom1 :: Bool
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON FunkyRecord where
@@ -533,7 +533,7 @@ data FUnkyRecordP = FUnkyRecordP {
 
 data FUnkyRecordP = FUnkyRecordP {
   funkyrecordpField :: Bool
-}
+}  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON FUnkyRecordP where
@@ -579,7 +579,7 @@ data Param
   | ByUsersNames [String]
   | ByUsersEmails [String]
   | ByUserActive Bool
-  
+  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON Param where
@@ -724,7 +724,7 @@ data ParamTag
   | ParamTag_ByUsersNames 
   | ParamTag_ByUsersEmails 
   | ParamTag_ByUserActive 
-  
+  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON ParamTag where
@@ -820,7 +820,7 @@ data ApplicationError
   = Error_Unknown 
   | Error_Validation 
   | Error_PerimssionDenied 
-  
+  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON ApplicationError where
@@ -882,7 +882,7 @@ data OneConstructor
 
 data OneConstructor
   = OneConstructor_Test String
-  
+  deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
 instance ToJSON OneConstructor where
