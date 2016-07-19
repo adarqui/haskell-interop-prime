@@ -208,11 +208,14 @@ tplDataNormal :: [MkTypeOpts] -> InteropOptions -> String -> [(String, [String])
 tplDataNormal type_opts InteropOptions{..} base fields =
      printf "data %s\n" base
   <> spaces spacingIndent <> "= "
-  <> intercalateMap (spaces spacingIndent <> "| ") (\(n,t) -> printf "%s %s\n" n (intercalate " " t)) fields
+  <> intercalateMap (spaces spacingIndent <> "| ") (\(n,t) -> printf "%s %s\n" n (intercalate " " $ map strictField t)) fields
   <> derive
   <> "\n"
   where
   derive = buildDeriving spacingIndent type_opts
+  isStrict      = isMkTypeOpts_StrictFields type_opts
+  strictField s | isStrict  = "!(" <> s <> ")"
+                | otherwise = s
 
 
 
