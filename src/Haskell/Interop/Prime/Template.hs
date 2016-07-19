@@ -207,12 +207,16 @@ tplDataNormal type_opts InteropOptions{..} base fields =
   <> derive
   <> "\n"
   where
-  derive = spaces spacingIndent <> buildDeriving type_opts
+  derive = buildDeriving spacingIndent type_opts
 
 
 
-buildDeriving :: [MkTypeOpts] -> String
-buildDeriving opts = intercalate "," $ catMaybes $ map mkTypeOpts_DerivingToString opts
+buildDeriving :: Int -> [MkTypeOpts] -> String
+buildDeriving spacing_indent opts =
+  case (intercalate "," $ catMaybes $ map mkTypeOpts_DerivingToString opts) of
+    "" -> ""
+    s  -> spaces spacing_indent
+
 
 
 
