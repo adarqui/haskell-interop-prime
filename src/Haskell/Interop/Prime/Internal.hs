@@ -47,13 +47,18 @@ opts_ir = do
 
 
 buildType :: ExportT (Maybe String)
-buildType = do
+buildType = buildTypeWith []
+
+
+
+buildTypeWith :: [MkTypeOpts] -> ExportT (Maybe String)
+buildTypeWith opts = do
   (opts, ir) <- opts_ir
   pure $
     case ir of
-      NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord opts base constr fields
-      DataRecIR base constr fields    -> Just $ tplDataRecord opts base constr fields
-      DataNormalIR base fields        -> Just $ tplDataNormal opts base fields
+      NewtypeRecIR base constr fields -> Just $ tplNewtypeRecord [] opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplDataRecord [] opts base constr fields
+      DataNormalIR base fields        -> Just $ tplDataNormal [] opts base fields
       TypeIR base vars type_          -> Just $ tplType opts base vars type_
       _                               -> Nothing
 
@@ -256,6 +261,7 @@ runMk mk = do
   case mk of
     MkType              -> buildType
     MkTypeRows suffix   -> buildTypeRows suffix
+    MkTypeWith opts     -> buildTypeWith opts
     MkLens              -> buildLens
     MkMk                -> buildMk
     MkUnwrap            -> buildUnwrap

@@ -69,6 +69,7 @@ module Haskell.Interop.Prime.Template (
 
 
 
+import Data.Maybe (catMaybes)
 import           Data.List
 import qualified Data.Map                    as M
 import           Data.Monoid
@@ -110,21 +111,21 @@ tplLensField field =
 
 
 
-tplNewtypeRecord :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplNewtypeRecord :: [MkTypeOpts] -> InteropOptions -> String -> String -> [(String, String)] -> String
 tplNewtypeRecord = tplRecord "newtype"
 
 
 
-tplDataRecord :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplDataRecord opts@InteropOptions{..} =
+tplDataRecord :: [MkTypeOpts] -> InteropOptions -> String -> String -> [(String, String)] -> String
+tplDataRecord type_opts opts@InteropOptions{..} =
   if psDataToNewtype
-    then tplRecord "newtype" opts
-    else tplRecord "data" opts
+    then tplRecord "newtype" type_opts opts
+    else tplRecord "data" type_opts opts
 
 
 
-tplRecord :: String -> InteropOptions -> String -> String -> [(String, String)] -> String
-tplRecord type_ InteropOptions{..} base constr fields =
+tplRecord :: String -> [MkTypeOpts] -> InteropOptions -> String -> String -> [(String, String)] -> String
+tplRecord type_ type_opts InteropOptions{..} base constr fields =
      printf "%s %s = %s {\n" type_ base constr
   <> intercalateMap ",\n" (\(n,t) -> spaces spacingIndent <> printf "%s :: %s" (fieldNameTransform base n) t) fields
   <> "\n}\n"
@@ -198,12 +199,20 @@ tplRows InteropOptions{..} suffix base fields =
 
 
 
-tplDataNormal :: InteropOptions -> String -> [(String, [String])] -> String
-tplDataNormal InteropOptions{..} base fields =
+tplDataNormal :: [MkTypeOpts] -> InteropOptions -> String -> [(String, [String])] -> String
+tplDataNormal type_opts InteropOptions{..} base fields =
      printf "data %s\n" base
   <> spaces spacingIndent <> "= "
   <> intercalateMap (spaces spacingIndent <> "| ") (\(n,t) -> printf "%s %s\n" n (intercalate " " t)) fields
+  <> derive
   <> "\n"
+  where
+  derive = spaces spacingIndent <> buildDeriving type_opts
+
+
+
+buildDeriving :: [MkTypeOpts] -> String
+buildDeriving opts = intercalate "," $ catMaybes $ map mkTypeOpts_DerivingToString opts
 
 
 

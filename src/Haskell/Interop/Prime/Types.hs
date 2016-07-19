@@ -8,7 +8,10 @@ module Haskell.Interop.Prime.Types (
   ExportT,
   Lang (..),
   MkTypeOpts (..),
+  isMkTypeOpts_Deriving,
   Deriving (..),
+  mkTypeOpts_DerivingToString,
+  derivingToString,
   Mk (..),
   MkG (..),
   Options (..),
@@ -47,6 +50,10 @@ data MkTypeOpts
   | MkTypeOpts_Deriving Deriving
   deriving (Show, Eq, Ord)
 
+isMkTypeOpts_Deriving :: MkTypeOpts -> Bool
+isMkTypeOpts_Deriving (MkTypeOpts_Deriving _) = True
+isMkTypeOpts_Deriving _                       = False
+
 
 
 data Deriving
@@ -59,6 +66,22 @@ data Deriving
   | Deriving_Ord
   | Deriving_Enum
   deriving (Show, Eq, Ord)
+
+derivingToString :: Deriving -> String
+derivingToString der =
+  case der of
+    Deriving_Generic  -> "Generic"
+    Deriving_Typeable -> "Typeable"
+    Deriving_NFData   -> "NFData"
+    Deriving_Show     -> "Show"
+    Deriving_Read     -> "Read"
+    Deriving_Eq       -> "Eq"
+    Deriving_Ord      -> "Ord"
+    Deriving_Enum     -> "Enum"
+
+mkTypeOpts_DerivingToString :: MkTypeOpts -> Maybe String
+mkTypeOpts_DerivingToString (MkTypeOpts_Deriving der) = Just $ derivingToString der
+mkTypeOpts_DerivingToString _                         = Nothing
 
 
 

@@ -17,6 +17,8 @@ I'm still figuring out what I need from this library. Eventually it will need a 
 i'd like to generate more instances for Haskell: Read, Eq, Ord, Enum, Show etc. I'd like to generate equivalent
 code between Haskell & Purescript so that, in my haskell source files, the only thing i'm deriving is Generic & Typeable.
 
+This code is a train wreck. LMAO. I'm starting to enjoy adding more spaghetti. Though, it is useful. So, tasty spaghetti.
+
 ## Examples
 
 Example:

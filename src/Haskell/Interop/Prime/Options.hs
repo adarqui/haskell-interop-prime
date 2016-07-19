@@ -265,6 +265,17 @@ defaultPurescriptConvertMkGs header =
 defaultHaskellMks :: [Mk]
 defaultHaskellMks =
   [ MkType
+  , MkTypeWith
+      [ MkTypeOpts_StrictFields
+      , MkTypeOpts_Deriving Deriving_Generic
+      , MkTypeOpts_Deriving Deriving_Typeable
+      , MkTypeOpts_Deriving Deriving_NFData
+      , MkTypeOpts_Deriving Deriving_Show
+      , MkTypeOpts_Deriving Deriving_Read
+      , MkTypeOpts_Deriving Deriving_Eq
+      , MkTypeOpts_Deriving Deriving_Ord
+      , MkTypeOpts_Deriving Deriving_Enum
+      ]
   , MkToJSON
   , MkFromJSON
   , MkShow
