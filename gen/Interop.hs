@@ -24,6 +24,11 @@ newtype Session = Session {
 }
 
 
+newtype Session = Session {
+  unSession :: String
+}
+
+
 instance ToJSON Session where
   toJSON Session{..} = object $
     [ "tag" .= ("Session" :: Text)
@@ -56,7 +61,20 @@ data SumType
   | G [SumType]
   | H Bool Int String (Maybe Bool)
   | I (((,) Int) String)
+  
 
+
+data SumType
+  = A 
+  | B Int
+  | C Bool
+  | D String
+  | E [Int]
+  | F SumType
+  | G [SumType]
+  | H Bool Int String (Maybe Bool)
+  | I (((,) Int) String)
+  
 
 
 instance ToJSON SumType where
@@ -201,6 +219,25 @@ data BigRecord = BigRecord {
 }
 
 
+data BigRecord = BigRecord {
+  bigRecordBool :: Bool,
+  bigRecordInt :: Int,
+  bigRecordMaybeInt :: (Maybe Int),
+  bigRecordInteger :: Integer,
+  bigRecordMaybeInteger :: (Maybe Integer),
+  bigRecordString :: String,
+  bigRecordString2 :: [Char],
+  bigRecordSumType :: SumType,
+  bigRecordData :: String,
+  bigRecordClass :: String,
+  bigRecordLet :: String,
+  bigRecordModule :: String,
+  bigRecordTuple :: (((,) Int) String),
+  bigRecordTuple3 :: ((((,,,) Int) String) Bool),
+  bigRecord :: Bool
+}
+
+
 instance ToJSON BigRecord where
   toJSON BigRecord{..} = object $
     [ "tag" .= ("BigRecord" :: Text)
@@ -268,6 +305,16 @@ instance Eq BigRecord where
 type FakeUTCTime  = Integer
 
 
+type FakeUTCTime  = Integer
+
+
+data User = User {
+  userName :: String,
+  userEmail :: String,
+  userActive :: Bool
+}
+
+
 data User = User {
   userName :: String,
   userEmail :: String,
@@ -309,6 +356,12 @@ data UserRequest = UserRequest {
 }
 
 
+data UserRequest = UserRequest {
+  userRequestName :: String,
+  userRequestEmail :: String
+}
+
+
 instance ToJSON UserRequest where
   toJSON UserRequest{..} = object $
     [ "tag" .= ("UserRequest" :: Text)
@@ -333,6 +386,16 @@ instance Show UserRequest where
 
 instance Eq UserRequest where
   (==) a b = userRequestName a == userRequestName b && userRequestEmail a == userRequestEmail b
+
+data UserResponse = UserResponse {
+  userResponseId :: Int64,
+  userResponseName :: String,
+  userResponseEmail :: String,
+  userResponseActive :: Bool,
+  userResponseCreatedAt :: (Maybe FakeUTCTime),
+  userResponseModifiedAt :: (Maybe FakeUTCTime)
+}
+
 
 data UserResponse = UserResponse {
   userResponseId :: Int64,
@@ -386,6 +449,11 @@ data UserResponses = UserResponses {
 }
 
 
+data UserResponses = UserResponses {
+  userResponses :: [UserResponse]
+}
+
+
 instance ToJSON UserResponses where
   toJSON UserResponses{..} = object $
     [ "tag" .= ("UserResponses" :: Text)
@@ -411,10 +479,24 @@ instance Eq UserResponses where
 type Text  = String
 
 
+type Text  = String
+
+
+type TextMaybe  = (Maybe Text)
+
+
 type TextMaybe  = (Maybe Text)
 
 
 type NestedList a = [[a]]
+
+
+type NestedList a = [[a]]
+
+
+data FunkyRecord = Boom1 {
+  boom1 :: Bool
+}
 
 
 data FunkyRecord = Boom1 {
@@ -443,6 +525,11 @@ instance Show FunkyRecord where
 
 instance Eq FunkyRecord where
   (==) a b = boom1 a == boom1 b
+
+data FUnkyRecordP = FUnkyRecordP {
+  funkyrecordpField :: Bool
+}
+
 
 data FUnkyRecordP = FUnkyRecordP {
   funkyrecordpField :: Bool
@@ -480,7 +567,19 @@ data Param
   | ByUsersNames [String]
   | ByUsersEmails [String]
   | ByUserActive Bool
+  
 
+
+data Param
+  = Limit Int
+  | Offset Int
+  | ByUsersIds [Int64]
+  | ByUserNameText Text
+  | ByUserNameStr String
+  | ByUsersNames [String]
+  | ByUsersEmails [String]
+  | ByUserActive Bool
+  
 
 
 instance ToJSON Param where
@@ -615,7 +714,17 @@ data ParamTag
   | ParamTag_ByUsersNames 
   | ParamTag_ByUsersEmails 
   | ParamTag_ByUserActive 
+  
 
+
+data ParamTag
+  = ParamTag_Limit 
+  | ParamTag_Offset 
+  | ParamTag_ByUsersIds 
+  | ParamTag_ByUsersNames 
+  | ParamTag_ByUsersEmails 
+  | ParamTag_ByUserActive 
+  
 
 
 instance ToJSON ParamTag where
@@ -704,7 +813,14 @@ data ApplicationError
   = Error_Unknown 
   | Error_Validation 
   | Error_PerimssionDenied 
+  
 
+
+data ApplicationError
+  = Error_Unknown 
+  | Error_Validation 
+  | Error_PerimssionDenied 
+  
 
 
 instance ToJSON ApplicationError where
@@ -761,7 +877,12 @@ instance Eq ApplicationError where
 
 data OneConstructor
   = OneConstructor_Test String
+  
 
+
+data OneConstructor
+  = OneConstructor_Test String
+  
 
 
 instance ToJSON OneConstructor where

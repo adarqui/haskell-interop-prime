@@ -100,7 +100,7 @@ data SumType
   | G (Array SumType)
   | H Boolean Int String (Maybe Boolean)
   | I ((Tuple Int) String)
-
+  
 
 
 instance sumTypeEncodeJson :: EncodeJson SumType where
@@ -1071,7 +1071,7 @@ data Param
   | ByUsersNames (Array String)
   | ByUsersEmails (Array String)
   | ByUserActive Boolean
-
+  
 
 
 instance paramEncodeJson :: EncodeJson Param where
@@ -1350,7 +1350,7 @@ data ParamTag
   | ParamTag_ByUsersNames 
   | ParamTag_ByUsersEmails 
   | ParamTag_ByUserActive 
-
+  
 
 
 instance paramTagEncodeJson :: EncodeJson ParamTag where
@@ -1498,7 +1498,7 @@ data ApplicationError
   = Error_Unknown 
   | Error_Validation 
   | Error_PerimssionDenied 
-
+  
 
 
 instance applicationErrorEncodeJson :: EncodeJson ApplicationError where
@@ -1596,7 +1596,7 @@ instance applicationErrorEq :: Eq ApplicationError where
 
 data OneConstructor
   = OneConstructor_Test String
-
+  
 
 
 instance oneConstructorEncodeJson :: EncodeJson OneConstructor where
