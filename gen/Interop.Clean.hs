@@ -72,14 +72,14 @@ data SumType
 
 data SumType
   = A 
-  | B Int
-  | C Bool
-  | D String
-  | E [Int]
-  | F SumType
-  | G [SumType]
-  | H Bool Int String (Maybe Bool)
-  | I (((,) Int) String)
+  | B !(Int)
+  | C !(Bool)
+  | D !(String)
+  | E !([Int])
+  | F !(SumType)
+  | G !([SumType])
+  | H !(Bool) !(Int) !(String) !((Maybe Bool))
+  | I !((((,) Int) String))
   deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -577,14 +577,14 @@ data Param
 
 
 data Param
-  = Limit Int
-  | Offset Int
-  | ByUsersIds [Int64]
-  | ByUserNameText Text
-  | ByUserNameStr String
-  | ByUsersNames [String]
-  | ByUsersEmails [String]
-  | ByUserActive Bool
+  = Limit !(Int)
+  | Offset !(Int)
+  | ByUsersIds !([Int64])
+  | ByUserNameText !(Text)
+  | ByUserNameStr !(String)
+  | ByUsersNames !([String])
+  | ByUsersEmails !([String])
+  | ByUserActive !(Bool)
   deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
@@ -887,7 +887,7 @@ data OneConstructor
 
 
 data OneConstructor
-  = OneConstructor_Test String
+  = OneConstructor_Test !(String)
   deriving (Generic,Typeable,NFData,Show,Read,Eq,Ord,Enum)
 
 
