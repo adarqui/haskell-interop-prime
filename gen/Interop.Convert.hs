@@ -1,3 +1,6 @@
+{-# LANGUAGE BangPatterns         #-}
+{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE RecordWildCards      #-}
@@ -10,14 +13,17 @@ module Interop.Convert where
 
 
 
+import           Control.DeepSeq     (NFData)
 import           Data.Aeson          (FromJSON, ToJSON (), Value (..), parseJSON, toJSON, object, (.=), (.:))
+import           Data.Default
+import           Data.Generics       (Generic)
 import           Data.Int            (Int64)
 import           Data.Text           (Text)
 import qualified Data.Text           as T
 import           Data.Time           (UTCTime)
+import           Data.Typeable       (Typeable)
 import           Data.Monoid         ((<>))
 import           Haskell.Api.Helpers (QueryParam, qp)
-import           Data.Default
 
 userRequestToUserResponse :: Int64 -> String -> String -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
 userRequestToUserResponse userResponseId userResponseName userResponseEmail userResponseActive userResponseCreatedAt userResponseModifiedAt UserRequest{..} =
