@@ -999,12 +999,13 @@ tplHaskellApiImports :: String -> String
 tplHaskellApiImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Data.Int            (Int64)"
-  , "import Data.Monoid         ((<>))"
-  , "import Data.Text           (Text)"
-  , "import qualified Data.Text as T (pack)"
-  , "import Haskell.Api.Helpers (ApiEff, ApiError, QueryParam, qp, handleError, getAt, putAt, postAt, deleteAt)"
-  , "import Data.Default        (Default, def)"
+  , "import Data.Int                   (Int64)"
+  , "import Data.Monoid                ((<>))"
+  , "import Data.Text                  (Text)"
+  , "import qualified Data.Text        as T (pack)"
+  , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
+  , "import Haskell.Api.Helpers        (SpecificApiOptions, handleError, getAt, putAt, postAt, deleteAt)"
+  , "import Data.Default               (Default, def)"
   , ""
   , ""
   ]) <> s
@@ -1036,10 +1037,11 @@ tplHaskellApiStringImports :: String -> String
 tplHaskellApiStringImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Data.Int            (Int64)"
-  , "import Data.Monoid         ((<>))"
-  , "import Data.Text           (Text)"
-  , "import Haskell.Api.Helpers (ApiEff, ApiError, QueryParam, qp, handleError, getAt, putAt, postAt, deleteAt)"
+  , "import Data.Int                   (Int64)"
+  , "import Data.Monoid                ((<>))"
+  , "import Data.Text                  (Text)"
+  , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
+  , "import Haskell.Api.Helpers        (SpecificApiOptions, handleError, getAt, putAt, postAt, deleteAt)"
   , ""
   , ""
   ]) <> s
@@ -1161,7 +1163,7 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method api_err =
     (tplApiParam_TypeSig opts param) <>
     [tplApiParam_ByType opts param] <>
     [tplApiMethod_RequestType opts method] <>
-    [printf "ApiEff (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"]
+    [printf "ApiEff SpecificApiOptions (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"]
   typesig' =
     if simplified
       then typesig
