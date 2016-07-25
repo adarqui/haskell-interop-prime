@@ -26,22 +26,22 @@ import           GHC.Generics                (Generic)
 import           Haskell.Api.Helpers.Shared  (QueryParam, qp)
 
 userRequestToUserResponse :: Int64 -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
-userRequestToUserResponse id active createdAt modifiedAt UserRequest{..} =
+userRequestToUserResponse _1 _2 _3 _4 UserRequest{..} =
   UserResponse {
-    id = id,
-    name = name,
-    email = email,
-    active = active,
-    createdAt = createdAt,
-    modifiedAt = modifiedAt
+    id = _1,
+    active = _2,
+    createdAt = _3,
+    modifiedAt = _4,
+    userResponsename = name,
+    userResponseemail = email
   }
 
 
 userResponseToUserRequest :: UserResponse -> UserRequest
 userResponseToUserRequest  UserResponse{..} =
   UserRequest {
-    name = name,
-    email = email
+    userRequestname = name,
+    userRequestemail = email
   }
 
 -- footer

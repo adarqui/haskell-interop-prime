@@ -25,23 +25,23 @@ import           Data.Monoid                 ((<>))
 import           GHC.Generics                (Generic)
 import           Haskell.Api.Helpers.Shared  (QueryParam, qp)
 
-userRequestToUserResponse :: Int64 -> String -> String -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
-userRequestToUserResponse userResponseId userResponseName userResponseEmail userResponseActive userResponseCreatedAt userResponseModifiedAt UserRequest{..} =
+userRequestToUserResponse :: Int64 -> Bool -> (Maybe FakeUTCTime) -> (Maybe FakeUTCTime) -> UserRequest -> UserResponse
+userRequestToUserResponse _1 _2 _3 _4 UserRequest{..} =
   UserResponse {
-    userResponseId = userResponseId,
-    userResponseName = userResponseName,
-    userResponseEmail = userResponseEmail,
-    userResponseActive = userResponseActive,
-    userResponseCreatedAt = userResponseCreatedAt,
-    userResponseModifiedAt = userResponseModifiedAt
+    userResponseId = _1,
+    userResponseActive = _2,
+    userResponseCreatedAt = _3,
+    userResponseModifiedAt = _4,
+    userResponseName = userRequestName,
+    userResponseEmail = userRequestEmail
   }
 
 
-userResponseToUserRequest :: String -> String -> UserResponse -> UserRequest
-userResponseToUserRequest userRequestName userRequestEmail UserResponse{..} =
+userResponseToUserRequest :: UserResponse -> UserRequest
+userResponseToUserRequest  UserResponse{..} =
   UserRequest {
-    userRequestName = userRequestName,
-    userRequestEmail = userRequestEmail
+    userRequestName = userResponseName,
+    userRequestEmail = userResponseEmail
   }
 
 -- footer
