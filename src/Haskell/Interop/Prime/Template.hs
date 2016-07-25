@@ -172,20 +172,58 @@ tplConvertRecord_Purescript InteropOptions{..} (base1,constr1,fields1) (base2,co
 
 -- | Converts 1 to 2
 --
-tplConvertRecord_Haskell :: InteropOptions -> (String, String, [(String, String)]) -> (String, string, [(String, String)]) -> String
-tplConvertRecord_Haskell InteropOptions{..} (base1,_,fields1) (base2,_,fields2) =
+-- EEEK!!!!
+--
+-- Notes:
+--
+-- userRequestToUserResponse :: Int64 -> Bool -> Maybe FakeUTCTime -> Maybe FakeUTCTime UserRequest -> UserResponse
+-- userRequestToUserResponse _a _b _c _d UserRequest{..} =
+--   UserResponse {
+--     userResponseId = _a,
+--     userResponseName = userRequestName,
+--     userResponseEmail = userRequestEmail,
+--     userResponseActive = _b,
+--     userResponseCreatedAt = _c,
+--     userResponseModifiedAt = _d
+--   }
+--
+-- userResponseToUserRequest :: UserResponse -> UserRequest
+-- userResponseToUserRequest UserResponse{..} =
+--   UserRequest {
+--     userRequestName = userResponseName,
+--     userRequestEmail = userResponseEmail
+--   }
+--
+tplConvertRecord_Haskell :: InteropOptions -> (String, String, [(String, String)]) -> (String, String, [(String, String)]) -> String
+tplConvertRecord_Haskell InteropOptions{..} (base1,constr1,fields1) (base2,constr2,fields2) =
      printf "%s :: %s\n" fn_name (tplArrows arrows)
   <> printf "%s %s %s{..} =\n" fn_name (tplArguments args_diff) base1
   <> spaces spacingIndent <> printf "%s {\n" base2
-  <> intercalateMap ",\n" (\(n,_) -> spaces (spacingIndent*2) <> printf "%s = %s" (fieldNameTransform base2 n) (fieldNameTransform base1 n)) fields2
+  <> intercalateMap ",\n" (\(n1,n2) -> spaces (spacingIndent*2) <> printf "%s = %s" n2 n1) fields
   <> "\n"
   <> spaces spacingIndent <> "}\n"
   where
   fn_name          = firstToLower base1 <> "To" <> base2
-  fields_diff      = fields2 \\ fields1
-  types_diff       = map snd fields_diff
-  args_diff        = map fst fields_diff
+  constr1'         = toLowerString constr1
+  constr2'         = toLowerString constr2
+  stripper c f     = map (\(n,t) -> (stripPrefix c $ toLowerString n, n, t)) f
+  fields1'         = stripper constr1' fields1
+  fields2'         = stripper constr2' fields2
+  fields_diff1     = deleteFirstsBy (\(stripped1,_,t1) (stripped2,_,t2) -> stripped1 == stripped2 && t1 == t2) fields2' fields1'
+  fields_inter     = intersectBy (\(stripped1,_,t1) (stripped2,_,t2) -> stripped1 == stripped2 && t1 == t2) fields1' fields2'
+  fields_diff      = map (\((_,n,_),i) -> ('_' : show i, n)) $ zip fields_diff1 [(1 :: Int) ..]
+  fields_same      = map (\n1 -> (n1, firstToLower constr2 <> stripMaybe (firstToLower constr1) n1)) $ map (\(_,n,_) -> n) fields_inter
+  fields           =
+    map (\(n1,n2) -> ((fieldNameTransform base1 n1), (fieldNameTransform base2 n2))) fields_diff
+    <>
+    fields_same
+  types_diff       = map (\(_,_,t) -> t) fields_diff1
+  args_diff        = map ((:) '_' . show . fst) $ zip [(1 :: Int)..] $ replicate (length fields_diff1) ()
   arrows           = types_diff <> [base1, base2]
+  stripMaybe p s   =
+    case stripPrefix p s of
+      Nothing -> s
+      Just s' -> s'
 
 
 

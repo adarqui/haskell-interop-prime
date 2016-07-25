@@ -1,5 +1,6 @@
 module Haskell.Interop.Prime.Misc (
   firstToLower,
+  toLowerString,
   newlines,
   spaces,
   vars_x,
@@ -21,6 +22,11 @@ import           Data.Monoid ((<>))
 firstToLower :: String -> String
 firstToLower [] = []
 firstToLower (x:xs) = toLower x:xs
+
+
+
+toLowerString :: String -> String
+toLowerString = map toLower
 
 
 
