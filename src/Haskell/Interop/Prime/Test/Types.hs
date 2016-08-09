@@ -150,13 +150,6 @@ data ParamTag
 
 
 
--- Ripped from my haskell-api-helpers library to give an idea of how the query params work
---
-class QueryParam a where
-  qp :: a -> (String, String)
-
-
-
 -- Used by haskell-api-helpers to return JSON errors: FromJSON a, FromJSON b, Default b => Either (ApiError b) a
 --
 data ApplicationError

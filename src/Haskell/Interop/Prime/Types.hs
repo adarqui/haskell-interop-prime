@@ -34,7 +34,6 @@ module Haskell.Interop.Prime.Types (
 
 
 import           Control.Monad.Trans.RWS (RWS)
-import           Data.List               (any)
 import qualified Data.Map                as M
 import           Language.Haskell.TH
 
