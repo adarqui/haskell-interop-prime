@@ -73,10 +73,11 @@ import           Data.List
 import qualified Data.Map                    as M
 import           Data.Maybe                  (catMaybes)
 import           Data.Monoid
-import           Haskell.Interop.Prime.Misc
-import           Haskell.Interop.Prime.Types
+import           Prelude
 import           Text.Printf
 
+import           Haskell.Interop.Prime.Misc
+import           Haskell.Interop.Prime.Types
 
 
 default (String)
@@ -1005,6 +1006,7 @@ tplHaskellImports s = (intercalate "\n"
   , "import           Data.Monoid                 ((<>))"
   , "import           GHC.Generics                (Generic)"
   , "import           Haskell.Api.Helpers.Shared  (QueryParam, qp)"
+  , "import           Prelude"
   , ""
   , ""
   ]) <> s
@@ -1044,6 +1046,7 @@ tplHaskellApiImports s = (intercalate "\n"
   , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
   , "import Haskell.Api.Helpers        (SpecificApiOptions, handleError, getAt, putAt, postAt, deleteAt)"
   , "import Data.Default               (Default, def)"
+  , "import Prelude"
   , ""
   , ""
   ]) <> s
@@ -1080,6 +1083,7 @@ tplHaskellApiStringImports s = (intercalate "\n"
   , "import Data.Text                  (Text)"
   , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
   , "import Haskell.Api.Helpers        (SpecificApiOptions, handleError, getAt, putAt, postAt, deleteAt)"
+  , "import Prelude"
   , ""
   , ""
   ]) <> s
@@ -1113,6 +1117,7 @@ tplHaskellConvertImports s = (intercalate "\n"
   , "import Data.Maybe  (Maybe)"
   , "import Data.Monoid ((<>))"
   , "import Data.Text   (Text)"
+  , "import Prelude"
   , ""
   , ""
   ]) <> s

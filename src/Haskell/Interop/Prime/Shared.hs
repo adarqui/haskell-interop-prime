@@ -23,6 +23,8 @@ import           Data.List                      (intercalate)
 import           Data.Maybe                     (catMaybes)
 import           Data.Monoid                    ((<>))
 import           Language.Haskell.TH
+import           Prelude
+
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
 

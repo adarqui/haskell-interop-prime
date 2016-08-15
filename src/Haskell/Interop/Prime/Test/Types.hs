@@ -22,6 +22,7 @@ module Haskell.Interop.Prime.Test.Types (
 
 
 import           Data.Int
+import           Prelude
 
 
 

@@ -4,6 +4,8 @@ module Haskell.Interop.Prime.Test where
 
 
 
+import           Prelude
+
 import           Haskell.Interop.Prime
 import           Haskell.Interop.Prime.Test.Internal
 import           Haskell.Interop.Prime.Test.Types

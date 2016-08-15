@@ -12,13 +12,15 @@ module Haskell.Interop.Prime.Api (
 
 
 
-import           Control.Monad                  (forM, foldM)
+import           Control.Monad                  (foldM, forM)
 import           Control.Monad.Trans.RWS        (evalRWS)
 import           Data.List                      (intercalate)
+import           Language.Haskell.TH
+import           Prelude
+
 import           Haskell.Interop.Prime.Shared
 import           Haskell.Interop.Prime.Template
 import           Haskell.Interop.Prime.Types
-import           Language.Haskell.TH
 
 
 

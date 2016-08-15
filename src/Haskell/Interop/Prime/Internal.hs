@@ -12,12 +12,14 @@ module Haskell.Interop.Prime.Internal (
 
 
 
-import           Control.Monad                   (forM, foldM)
-import           Control.Monad.Trans.RWS         (evalRWS, asks, gets, put)
-import           Data.List                       (intercalate, nub)
-import           Data.Maybe                      (catMaybes)
+import           Control.Monad                  (foldM, forM)
+import           Control.Monad.Trans.RWS        (asks, evalRWS, gets, put)
+import           Data.List                      (intercalate, nub)
+import           Data.Maybe                     (catMaybes)
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
+import           Prelude
+
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Shared
 import           Haskell.Interop.Prime.Template

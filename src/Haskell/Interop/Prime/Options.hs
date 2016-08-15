@@ -41,6 +41,8 @@ import           Data.Char                   (toLower)
 import           Data.List                   (isPrefixOf, isSuffixOf)
 import qualified Data.Map                    as M
 import           Data.Transform.UnCamel      (unCamelSource)
+import           Prelude
+
 import           Haskell.Interop.Prime.Misc
 import           Haskell.Interop.Prime.Types
 
