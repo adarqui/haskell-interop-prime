@@ -68,8 +68,10 @@ buildParam opts@InteropOptions{..} api_param_th =
 
 
 buildInternalApiRep :: InteropOptions -> ApiEntry_TH -> Q ApiEntry
+buildInternalApiRep opts@InteropOptions{..} (ApiEntry_Name_TH route m_name params methods) =
+  ApiEntry <$> (pure route) <*> (pure m_name) <*> (buildParams opts params) <*> (buildMethods opts methods)
 buildInternalApiRep opts@InteropOptions{..} (ApiEntry_TH route params methods) =
-  ApiEntry <$> (pure route) <*> (buildParams opts params) <*> (buildMethods opts methods)
+  ApiEntry <$> (pure route) <*> (pure Nothing) <*> (buildParams opts params) <*> (buildMethods opts methods)
 
 
 

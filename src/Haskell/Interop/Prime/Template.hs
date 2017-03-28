@@ -105,6 +105,9 @@ tplLensFields InteropOptions{..} fields s =
 
 
 
+-- TODO FIXME: We need this to be %s_%s_ / prefix field
+-- Where prefix is the TYPE of the lens, lower/snake cased
+--
 tplLensField :: String -> String
 tplLensField field =
      printf "%s_ :: forall b a r. Lens { %s :: a | r } { %s :: b | r } a b\n" field field field
@@ -560,7 +563,7 @@ tplRespondable_SumType opts@InteropOptions{..} base vars =
   <> spaces si2 <> "tag <- readProp \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
-  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"Respondable\"\n\n" base
+  <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Respondable\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -578,7 +581,7 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
             spaces si2 <> "r <- readProp \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
          <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
-         <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"Respondable\"\n\n" field)
+         <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Respondable\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
@@ -612,7 +615,7 @@ tplIsForeign_SumType opts@InteropOptions{..} base vars =
   <> spaces si2 <> "tag <- readProp \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
-  <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"IsForeign\"\n\n" base
+  <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"IsForeign\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -630,7 +633,7 @@ tplIsForeign_SumType_Field InteropOptions{..} field vars =
             spaces si2 <> "r <- readProp \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
          <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <>  printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
-         <> spaces si3 <> printf "_ -> Left $ TypeMismatch \"%s\" \"IsForeign\"\n\n" field)
+         <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"IsForeign\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
@@ -973,7 +976,7 @@ tplPurescriptImports s = (intercalate "\n"
   , "import Data.Argonaut.Printer            (printJson)"
   , "import Data.Date.Helpers                (Date)"
   , "import Data.Either                      (Either(..))"
-  , "import Data.Foreign                     (ForeignError(..))"
+  , "import Data.Foreign                     (ForeignError(..), fail)"
   , "import Data.Foreign.NullOrUndefined     (unNullOrUndefined)"
   , "import Data.Foreign.Class               (class IsForeign, read, readProp)"
   , "import Data.Maybe                       (Maybe(..))"
@@ -1175,20 +1178,20 @@ tplApiEntry opts@InteropOptions{..} api_err api_entry =
 
 
 tplApiEntry' :: InteropOptions -> String -> ApiEntry -> String
-tplApiEntry' opts@InteropOptions{..} api_err (ApiEntry route params methods) =
+tplApiEntry' opts@InteropOptions{..} api_err (ApiEntry route m_name params methods) =
   intercalateMap
     "\n"
     (\(param, method) ->
-      tplApiEntry'' opts False route param method api_err
+      tplApiEntry'' opts False route m_name param method api_err
       <> "\n" <>
-      tplApiEntry'' opts True route param method api_err
+      tplApiEntry'' opts True route m_name param method api_err
     )
     [ (param, method) | param <- params, method <- methods ]
 
 
 
-tplApiEntry'' :: InteropOptions -> Bool -> String -> ApiParam -> ApiMethod -> String -> String
-tplApiEntry'' opts@InteropOptions{..} simplified route param method api_err =
+tplApiEntry'' :: InteropOptions -> Bool -> String -> Maybe String -> ApiParam -> ApiMethod -> String -> String
+tplApiEntry'' opts@InteropOptions{..} simplified route m_name param method api_err =
      printf "%s :: %s%s\n"
        fn_name'
        prolog
@@ -1206,7 +1209,11 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method api_err =
     (tplApiParam_TypeSig opts param) <>
     [tplApiParam_ByType opts param] <>
     [tplApiMethod_RequestType opts method] <>
-    [printf "ApiEff SpecificApiOptions (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"]
+    [api_eff]
+  api_eff =
+    case lang of
+      LangPurescript -> printf "ApiEff (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"
+      LangHaskell    -> printf "ApiEff SpecificApiOptions (Either (ApiError %s) " api_err <> tplApiMethod_ResultType opts method <> ")"
   typesig' =
     if simplified
       then typesig
@@ -1225,7 +1232,9 @@ tplApiEntry'' opts@InteropOptions{..} simplified route param method api_err =
       else ["params"] <> args
   method'  = tplApiMethod_Prefix opts method
   byname   = tplApiParam_ByName opts param
-  fn_name  = fieldNameTransform "" (method' <> route <> byname)
+  fn_name  = case m_name of
+                  Nothing   -> fieldNameTransform "" (method' <> route <> byname)
+                  Just name -> fieldNameTransform "" (method' <> name <> byname)
   fn_name' =
     if simplified
       then fn_name <> "'"

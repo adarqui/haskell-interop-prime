@@ -208,7 +208,7 @@ data ApiParam
 
 
 data ApiEntry
-  = ApiEntry String [ApiParam] [ApiMethod]
+  = ApiEntry String (Maybe String) [ApiParam] [ApiMethod]
   deriving (Show)
 
 
@@ -240,6 +240,7 @@ data ApiParam_TH
 
 data ApiEntry_TH
   = ApiEntry_TH String [ApiParam_TH] [ApiMethod_TH]
+  | ApiEntry_Name_TH String (Maybe String) [ApiParam_TH] [ApiMethod_TH]
   deriving (Show)
 
 

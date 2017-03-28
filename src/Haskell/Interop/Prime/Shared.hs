@@ -125,8 +125,8 @@ buildInternalRep opts@InteropOptions{..} dec =
 
   where
 
-  parseInternalRep (NewtypeD _ n _ con _) = mkConNewtypeIR (nameBase n) con
-  parseInternalRep (DataD _ n _ cons _) =
+  parseInternalRep (NewtypeD _ n _ _ con _) = mkConNewtypeIR (nameBase n) con
+  parseInternalRep (DataD _ n _ _ cons _) =
     case (head cons) of
       (RecC n' vars) -> DataRecIR (nameBase n) (nameBase n') (map (mkVarIR (nameBase n)) vars)
       (NormalC _ _)  -> DataNormalIR (nameBase n) (map (mkConDataIR' (nameBase n)) cons)
