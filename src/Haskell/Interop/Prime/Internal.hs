@@ -182,14 +182,14 @@ buildRespondable = do
 
 
 
-buildIsForeign :: ExportT (Maybe String)
-buildIsForeign = do
+buildDecode :: ExportT (Maybe String)
+buildDecode = do
   (opts, ir) <- opts_ir
   pure $
     case ir of
-      NewtypeRecIR base constr fields -> Just $ tplIsForeign_Record opts base constr fields
-      DataRecIR base constr fields    -> Just $ tplIsForeign_Record opts base constr fields
-      DataNormalIR base vars          -> Just $ tplIsForeign_SumType opts base vars
+      NewtypeRecIR base constr fields -> Just $ tplDecode_Record opts base constr fields
+      DataRecIR base constr fields    -> Just $ tplDecode_Record opts base constr fields
+      DataNormalIR base vars          -> Just $ tplDecode_SumType opts base vars
       _                               -> Nothing
 
 
@@ -273,7 +273,7 @@ runMk mk = do
     MkDecodeJson        -> buildDecodeJson
     MkRequestable       -> buildRequestable
     MkRespondable       -> buildRespondable
-    MkIsForeign         -> buildIsForeign
+    MkDecode         -> buildDecode
     MkShow              -> buildShow
     MkRead              -> buildRead
     MkEq                -> buildEq

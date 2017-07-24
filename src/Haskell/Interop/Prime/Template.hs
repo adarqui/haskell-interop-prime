@@ -27,8 +27,8 @@ module Haskell.Interop.Prime.Template (
   tplRequestable,
   tplRespondable_Record,
   tplRespondable_SumType,
-  tplIsForeign_Record,
-  tplIsForeign_SumType,
+  tplDecode_Record,
+  tplDecode_SumType,
   tplShow_Record,
   tplShow_SumType,
   tplRead_SumType,
@@ -526,7 +526,7 @@ tplRequestable :: InteropOptions -> String -> String
 tplRequestable InteropOptions{..} base =
      printf "instance %sRequestable :: Requestable %s where\n" (firstToLower base) base
   <> spaces si1 <> "toRequest s =\n"
-  <> spaces si2 <> "let str = printJson (encodeJson s) :: String\n"
+  <> spaces si2 <> "let str = stringify (encodeJson s) :: String\n"
   <> spaces si2 <> "in toRequest str\n"
   where
   si1 = spacingIndent
@@ -580,7 +580,7 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
        else
             spaces si2 <> "r <- readProp \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
-         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
+         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("decode " <>) vars') <> "\n"
          <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Respondable\"\n\n" field)
   <> "\n"
   where
@@ -591,10 +591,10 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
 
 
 
-tplIsForeign_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplIsForeign_Record InteropOptions{..} base _ fields =
-     printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  <> spaces si1 <> "read json =\n"
+tplDecode_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
+tplDecode_Record InteropOptions{..} base _ fields =
+     printf "instance %sDecode :: Decode %s where\n" (firstToLower base) base
+  <> spaces si1 <> "decode json =\n"
   <> spaces si3 <> printf "mk%s\n" base
   <> spaces si4 <> "<$> " <> intercalateMap (spaces si4 <> "<*> ") (\(n,t) -> readProp n t) fields
   where
@@ -608,14 +608,14 @@ tplIsForeign_Record InteropOptions{..} base _ fields =
 
 
 
-tplIsForeign_SumType :: InteropOptions -> String -> [(String, [String])] -> String
-tplIsForeign_SumType opts@InteropOptions{..} base vars =
-     printf "instance %sIsForeign :: IsForeign %s where\n" (firstToLower base) base
-  <> spaces si1 <> "read json = do\n"
+tplDecode_SumType :: InteropOptions -> String -> [(String, [String])] -> String
+tplDecode_SumType opts@InteropOptions{..} base vars =
+     printf "instance %sDecode :: Decode %s where\n" (firstToLower base) base
+  <> spaces si1 <> "decode json = do\n"
   <> spaces si2 <> "tag <- readProp \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
-  <> concatMap (\(f,vars') -> tplIsForeign_SumType_Field opts f vars') vars
-  <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"IsForeign\"\n\n" base
+  <> concatMap (\(f,vars') -> tplDecode_SumType_Field opts f vars') vars
+  <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Decode\"\n\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -623,8 +623,8 @@ tplIsForeign_SumType opts@InteropOptions{..} base vars =
 
 
 
-tplIsForeign_SumType_Field :: InteropOptions -> String -> [String] -> String
-tplIsForeign_SumType_Field InteropOptions{..} field vars =
+tplDecode_SumType_Field :: InteropOptions -> String -> [String] -> String
+tplDecode_SumType_Field InteropOptions{..} field vars =
      spaces si1 <> printf "\"%s\" -> do\n" field
   <>
      (if null vars
@@ -632,8 +632,8 @@ tplIsForeign_SumType_Field InteropOptions{..} field vars =
        else
             spaces si2 <> "r <- readProp \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
-         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <>  printf "%s <$> %s" field (intercalateMap " <*> " ("read " <>) vars') <> "\n"
-         <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"IsForeign\"\n\n" field)
+         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <>  printf "%s <$> %s" field (intercalateMap " <*> " ("decode " <>) vars') <> "\n"
+         <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Decode\"\n\n" field)
   <> "\n"
   where
   si1 = spacingIndent*3
@@ -968,17 +968,17 @@ tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
-  , "import Data.Argonaut.Core               (jsonEmptyObject)"
+  , "import Data.Argonaut.Core               (jsonEmptyObject, stringify)"
   , "import Data.Argonaut.Decode             (class DecodeJson, decodeJson)"
   , "import Data.Argonaut.Decode.Combinators ((.?))"
   , "import Data.Argonaut.Encode             (class EncodeJson, encodeJson)"
   , "import Data.Argonaut.Encode.Combinators ((~>), (:=))"
-  , "import Data.Argonaut.Printer            (printJson)"
   , "import Data.Date.Helpers                (Date)"
   , "import Data.Either                      (Either(..))"
-  , "import Data.Foreign                     (ForeignError(..), fail)"
+  , "import Data.Foreign                     (ForeignError(..), fail, tagOf)"
   , "import Data.Foreign.NullOrUndefined     (unNullOrUndefined)"
-  , "import Data.Foreign.Class               (class IsForeign, read, readProp)"
+  , "import Data.Foreign.Class               (class Decode, decode)"
+  , "import Data.Foreign.Index               (readProp)"
   , "import Data.Maybe                       (Maybe(..))"
   , "import Data.Tuple                       (Tuple(..))"
   , "import Purescript.Api.Helpers           (class QueryParam, qp)"

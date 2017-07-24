@@ -103,7 +103,7 @@ data Mk
   | MkDecodeJson
   | MkRequestable
   | MkRespondable
-  | MkIsForeign
+  | MkDecode
   | MkShow
   | MkRead
   | MkEq

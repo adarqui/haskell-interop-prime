@@ -218,7 +218,7 @@ defaultPurescriptMks =
   , MkDecodeJson
   , MkRequestable
   , MkRespondable
-  , MkIsForeign
+  , MkDecode
   , MkShow
   , MkRead
   , MkEq
