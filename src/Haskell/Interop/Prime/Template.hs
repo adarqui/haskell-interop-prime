@@ -539,9 +539,10 @@ tplRespondable_Record InteropOptions{..} base constr fields =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
   <> spaces si1 <> "responseType =\n"
   <> spaces si2 <> "Tuple Nothing JSONResponse\n"
-  <> spaces si1 <> "fromResponse json =\n"
-  <> spaces si3 <> printf "mk%s\n" base
-  <> spaces si4 <> "<$> " <> intercalateMap (spaces si4 <> "<*> ") (\(n,t) -> readProp n t) fields
+  <> spaces si1 <> "fromResponse = fromResponseDecodeJson\n"
+  -- <> spaces si1 <> "fromResponse json =\n"
+  -- <> spaces si3 <> printf "mk%s\n" base
+  -- <> spaces si4 <> "<$> " <> intercalateMap (spaces si4 <> "<*> ") (\(n,t) -> readProp n t) fields
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -549,8 +550,8 @@ tplRespondable_Record InteropOptions{..} base constr fields =
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(unNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform constr n)
-      else printf "readProp \"%s\" json\n" (jsonNameTransform constr n)
+      then printf "(unNullOrUndefined <$> readPropUnsafe \"%s\" json)\n" (jsonNameTransform constr n)
+      else printf "readPropUnsafe \"%s\" json\n" (jsonNameTransform constr n)
 
 
 
@@ -560,7 +561,7 @@ tplRespondable_SumType opts@InteropOptions{..} base vars =
   <> spaces si1 <> "responseType =\n"
   <> spaces si2 <> "Tuple Nothing JSONResponse\n"
   <> spaces si1 <> "fromResponse json = do\n"
-  <> spaces si2 <> "tag <- readProp \"tag\" json\n"
+  <> spaces si2 <> "tag <- readPropUnsafe \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplRespondable_SumType_Field opts f vars') vars
   <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Respondable\"\n\n" base
@@ -578,9 +579,9 @@ tplRespondable_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> "r <- readProp \"contents\" json\n"
+            spaces si2 <> "r <- readPropUnsafe \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
-         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("decode " <>) vars') <> "\n"
+         <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <> printf "%s <$> %s" field (intercalateMap " <*> " ("exceptDecodeJsonRespondable " <>) vars') <> "\n"
          <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Respondable\"\n\n" field)
   <> "\n"
   where
@@ -603,8 +604,8 @@ tplDecode_Record InteropOptions{..} base _ fields =
   si4 = spacingIndent*3
   readProp n t =
     if isMaybe t
-      then printf "(unNullOrUndefined <$> readProp \"%s\" json)\n" (jsonNameTransform base n)
-      else printf "readProp \"%s\" json\n" (jsonNameTransform base n)
+      then printf "(unNullOrUndefined <$> readPropUnsafe \"%s\" json)\n" (jsonNameTransform base n)
+      else printf "readPropUnsafe \"%s\" json\n" (jsonNameTransform base n)
 
 
 
@@ -612,7 +613,7 @@ tplDecode_SumType :: InteropOptions -> String -> [(String, [String])] -> String
 tplDecode_SumType opts@InteropOptions{..} base vars =
      printf "instance %sDecode :: Decode %s where\n" (firstToLower base) base
   <> spaces si1 <> "decode json = do\n"
-  <> spaces si2 <> "tag <- readProp \"tag\" json\n"
+  <> spaces si2 <> "tag <- readPropUnsafe \"tag\" json\n"
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars') -> tplDecode_SumType_Field opts f vars') vars
   <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Decode\"\n\n" base
@@ -630,7 +631,7 @@ tplDecode_SumType_Field InteropOptions{..} field vars =
      (if null vars
        then spaces si2 <> printf "pure %s\n" field
        else
-            spaces si2 <> "r <- readProp \"contents\" json\n"
+            spaces si2 <> "r <- readPropUnsafe \"contents\" json\n"
          <> spaces si2 <> "case r of\n"
          <> spaces si3 <> wrapContent' vars (intercalate ", " vars') <> " -> " <>  printf "%s <$> %s" field (intercalateMap " <*> " ("decode " <>) vars') <> "\n"
          <> spaces si3 <> printf "_ -> fail $ TypeMismatch \"%s\" \"Decode\"\n\n" field)
@@ -968,17 +969,18 @@ tplPurescriptImports :: String -> String
 tplPurescriptImports s = (intercalate "\n"
   [ ""
   , ""
+  , "import Control.Monad.Except.Trans       (runExceptT)"
   , "import Data.Argonaut.Core               (jsonEmptyObject, stringify)"
   , "import Data.Argonaut.Decode             (class DecodeJson, decodeJson)"
   , "import Data.Argonaut.Decode.Combinators ((.?))"
   , "import Data.Argonaut.Encode             (class EncodeJson, encodeJson)"
   , "import Data.Argonaut.Encode.Combinators ((~>), (:=))"
   , "import Data.Date.Helpers                (Date)"
-  , "import Data.Either                      (Either(..))"
-  , "import Data.Foreign                     (ForeignError(..), fail, tagOf)"
+  , "import Data.Either                      (Either(..), either)"
+  , "import Data.Foreign                     (ForeignError(..), fail, unsafeFromForeign, toForeign)"
   , "import Data.Foreign.NullOrUndefined     (unNullOrUndefined)"
   , "import Data.Foreign.Class               (class Decode, decode)"
-  , "import Data.Foreign.Index               (readProp)"
+  , "import Data.Foreign.Helpers"
   , "import Data.Maybe                       (Maybe(..))"
   , "import Data.Tuple                       (Tuple(..))"
   , "import Purescript.Api.Helpers           (class QueryParam, qp)"
@@ -986,7 +988,7 @@ tplPurescriptImports s = (intercalate "\n"
   , "import Network.HTTP.Affjax.Response     (class Respondable, ResponseType(..))"
   , "import Optic.Core                       ((^.), (..))"
   , "import Optic.Types                      (Lens, Lens')"
-  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, ($), (<>), (<$>), (<*>), (==), (&&))"
+  , "import Prelude                          (class Show, show, class Eq, eq, pure, bind, const, ($), (<>), (<$>), (<*>), (==), (&&), (<<<))"
   , "import Data.Default"
   , ""
   , ""
