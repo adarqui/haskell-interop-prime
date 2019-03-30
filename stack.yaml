@@ -1,8 +1,5 @@
+resolver: lts-8.5
 flags: {}
 packages:
 - '.'
-- location:
-    git: https://github.com/adarqui/restyle.git
-    commit: 0ce227f4140ccd6e9151847927c6d7ac191aa994
-extra-deps: [restyle-0.1.0]
-resolver: lts-8.5
+- '../restyle'

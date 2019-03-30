@@ -326,7 +326,7 @@ tplFromJSON_Record InteropOptions{..} base constr fields =
   <> spaces si2 <> printf "pure $ %s {\n" constr
   <> intercalateMap ",\n" (\(n,_) -> spaces si3 <> printf "%s %s %s" (fieldNameTransform base n)  eql (fieldNameTransform base n)) fields
   <> "\n" <> spaces si2 <> "}\n"
-  <> spaces spacingIndent <> printf "parseJSON x = fail $ \"Could not parse object: \" <> show x\n"
+  <> spaces spacingIndent <> (printf "parseJSON x = fail $ \"%s: Could not parse object: \" <> show x\n" base)
   where
   si1 = spacingIndent*1
   si2 = spacingIndent*2
@@ -382,7 +382,7 @@ tplFromJSON_SumType opts@InteropOptions{..} base fields =
   <> spaces si2 <> "case tag of\n"
   <> concatMap (\(f,vars) -> tplFromJSON_SumType_Field opts f vars) fields
   <> spaces si3 <> printf "_ -> fail \"Could not parse %s\"\n\n" base
-  <> spaces si1 <> printf "parseJSON x = fail $ \"Could not parse object: \" <> show x\n"
+  <> spaces si1 <> printf "parseJSON x = fail $ \"%s: Could not parse object: \" <> show x\n" base
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
@@ -535,7 +535,7 @@ tplRequestable InteropOptions{..} base =
 
 
 tplRespondable_Record :: InteropOptions -> String -> String -> [(String, String)] -> String
-tplRespondable_Record InteropOptions{..} base constr fields =
+tplRespondable_Record InteropOptions{..} base _ _ =
      printf "instance %sRespondable :: Respondable %s where\n" (firstToLower base) base
   <> spaces si1 <> "responseType =\n"
   <> spaces si2 <> "Tuple Nothing JSONResponse\n"
@@ -546,12 +546,12 @@ tplRespondable_Record InteropOptions{..} base constr fields =
   where
   si1 = spacingIndent
   si2 = spacingIndent*2
-  si3 = spacingIndent*3
-  si4 = spacingIndent*3
-  readProp n t =
+  -- si3 = spacingIndent*3
+  -- si4 = spacingIndent*3
+  {- readProp n t =
     if isMaybe t
       then printf "(unNullOrUndefined <$> readPropUnsafe \"%s\" json)\n" (jsonNameTransform constr n)
-      else printf "readPropUnsafe \"%s\" json\n" (jsonNameTransform constr n)
+      else printf "readPropUnsafe \"%s\" json\n" (jsonNameTransform constr n) -}
 
 
 
