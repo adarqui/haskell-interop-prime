@@ -72,7 +72,6 @@ module Haskell.Interop.Prime.Template (
 import           Data.List
 import qualified Data.Map                    as M
 import           Data.Maybe                  (catMaybes)
-import           Data.Monoid
 import           Prelude
 import           Text.Printf
 
@@ -85,7 +84,7 @@ default (String)
 
 
 tplType :: InteropOptions -> String -> [String] -> String -> String
-tplType InteropOptions{..} base vars type_ =
+tplType _ base vars type_ =
   printf "type %s %s = %s\n" base (intercalate " " vars) type_
 
 
@@ -681,7 +680,7 @@ tplShow_SumType opts@InteropOptions{..} base fields =
 
 
 tplShow_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
-tplShow_SumType_Purescript opts@InteropOptions{..} base fields =
+tplShow_SumType_Purescript opts base fields =
      printf "instance %sShow :: Show %s where\n" (firstToLower base) base
   <> concatMap (\(f,vars) -> tplShow_SumType_Field_Purescript opts base f vars) fields
 
@@ -702,7 +701,7 @@ tplShow_SumType_Field_Purescript InteropOptions{..} base field vars =
 
 
 tplShow_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
-tplShow_SumType_Haskell opts@InteropOptions{..} base fields =
+tplShow_SumType_Haskell opts base fields =
      printf "instance Show %s where\n" base
   <> concatMap (\(f,vars) -> tplShow_SumType_Field_Haskell opts base f vars) fields
 
@@ -731,7 +730,7 @@ tplRead_SumType opts@InteropOptions{..} base fields =
 
 
 tplRead_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
-tplRead_SumType_Purescript opts@InteropOptions{..} base fields =
+tplRead_SumType_Purescript opts base fields =
      printf "read%s :: String -> Maybe %s\n" base base
   <> concatMap (\(f,vars) -> tplRead_SumType_Field_Purescript opts base f vars) fields
   <> if length fields > 1
@@ -892,7 +891,7 @@ tplQueryParam_SumType opts@InteropOptions{..} base fields =
 
 
 tplQueryParam_SumType_Purescript :: InteropOptions -> String -> [(String, [String])] -> String
-tplQueryParam_SumType_Purescript opts@InteropOptions{..} base fields =
+tplQueryParam_SumType_Purescript opts base fields =
      printf "instance %sQueryParam :: QueryParam %s where\n" (firstToLower base) base
   <> concatMap (\(f,vars) -> tplQueryParam_SumType_Field_Purescript opts f vars) fields
 
@@ -912,7 +911,7 @@ tplQueryParam_SumType_Field_Purescript _ _ _ = error "tplQueryParam_SumType_Fiel
 
 
 tplQueryParam_SumType_Haskell :: InteropOptions -> String -> [(String, [String])] -> String
-tplQueryParam_SumType_Haskell opts@InteropOptions{..} base fields =
+tplQueryParam_SumType_Haskell opts base fields =
      printf "instance QueryParam %s where\n" base
   <> concatMap (\(f,vars) -> tplQueryParam_SumType_Field_Haskell opts f vars) fields
 
@@ -1008,7 +1007,6 @@ tplHaskellImports s = (intercalate "\n"
   , "import qualified Data.Text                   as T"
   , "import           Data.Time                   (UTCTime)"
   , "import           Data.Typeable               (Typeable)"
-  , "import           Data.Monoid                 ((<>))"
   , "import           GHC.Generics                (Generic)"
   , "import           Haskell.Api.Helpers.Shared  (QueryParam, qp)"
   , "import           Prelude"
@@ -1045,7 +1043,6 @@ tplHaskellApiImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Data.Int                   (Int64)"
-  , "import Data.Monoid                ((<>))"
   , "import Data.Text                  (Text)"
   , "import qualified Data.Text        as T (pack)"
   , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
@@ -1084,7 +1081,6 @@ tplHaskellApiStringImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Data.Int                   (Int64)"
-  , "import Data.Monoid                ((<>))"
   , "import Data.Text                  (Text)"
   , "import Haskell.Api.Helpers.Shared (ApiEff, ApiError, QueryParam, qp)"
   , "import Haskell.Api.Helpers        (SpecificApiOptions, handleError, getAt, putAt, postAt, deleteAt)"
@@ -1120,7 +1116,6 @@ tplHaskellConvertImports s = (intercalate "\n"
   [ ""
   , ""
   , "import Data.Maybe  (Maybe)"
-  , "import Data.Monoid ((<>))"
   , "import Data.Text   (Text)"
   , "import Prelude"
   , ""
@@ -1180,7 +1175,7 @@ tplApiEntry opts@InteropOptions{..} api_err api_entry =
 
 
 tplApiEntry' :: InteropOptions -> String -> ApiEntry -> String
-tplApiEntry' opts@InteropOptions{..} api_err (ApiEntry route m_name params methods) =
+tplApiEntry' opts api_err (ApiEntry route m_name params methods) =
   intercalateMap
     "\n"
     (\(param, method) ->
@@ -1305,7 +1300,7 @@ tplApiMethod_RequestType _ (ApiDELETE _) = ""
 
 
 tplApiParam_TypeSig :: InteropOptions -> ApiParam -> [String]
-tplApiParam_TypeSig opts@InteropOptions{..} param =
+tplApiParam_TypeSig opts param =
   case param of
     Par params       -> map (tplBuildType opts . snd) params
     ParBy _ _        -> []
@@ -1353,7 +1348,7 @@ tplApiParam_ByName _ param =
 
 
 tplApiParam_ByType :: InteropOptions -> ApiParam -> String
-tplApiParam_ByType opts@InteropOptions{..} param =
+tplApiParam_ByType opts param =
   case param of
     Par _               -> ""
     ParBy    _ type_    -> tplBuildType opts type_
@@ -1363,7 +1358,7 @@ tplApiParam_ByType opts@InteropOptions{..} param =
 
 
 tplApiParam_By :: InteropOptions -> ApiParam -> String
-tplApiParam_By opts@InteropOptions{..} param =
+tplApiParam_By opts param =
   case param of
     Par _              -> ""
     ParBy name _       -> printf "%s %s" name (tplApiParam_ByName opts param)
@@ -1373,7 +1368,7 @@ tplApiParam_By opts@InteropOptions{..} param =
 
 
 tplBuildFields :: InteropOptions -> [InternalRep] -> [String]
-tplBuildFields opts@InteropOptions{..} ir =
+tplBuildFields opts ir =
   nub $ sort $ concat $ map go ir
   where
   go (NewtypeRecIR _ constr fields) = map (\(field,_) -> tplBuildField opts constr field) fields

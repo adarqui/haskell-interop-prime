@@ -21,7 +21,6 @@ import           Control.Monad                  (void)
 import           Control.Monad.Trans.RWS        (asks)
 import           Data.List                      (intercalate)
 import           Data.Maybe                     (catMaybes)
-import           Data.Monoid                    ((<>))
 import           Language.Haskell.TH
 import           Prelude
 
@@ -119,7 +118,7 @@ runDebug InteropOptions{..} f = do
 -- | Build the internel representation of a type
 --
 buildInternalRep :: InteropOptions -> Dec -> InternalRep
-buildInternalRep opts@InteropOptions{..} dec =
+buildInternalRep opts dec =
 
   parseInternalRep dec
 
@@ -147,5 +146,5 @@ buildInternalRep opts@InteropOptions{..} dec =
 
   tyVarBndrToList vars = catMaybes $ map (\var -> go var) vars
     where
-    go (PlainTV n)    = Just $ nameBase n
-    go (KindedTV n _) = Just $ nameBase n
+    go (PlainTV n _)    = Just $ nameBase n
+    go (KindedTV n _ _) = Just $ nameBase n

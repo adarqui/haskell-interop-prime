@@ -10,7 +10,6 @@ module Haskell.Interop.Prime.Test.Internal (
 
 
 import           Data.Int
-import           Data.Monoid                      ((<>))
 import           Prelude
 
 import           Haskell.Interop.Prime

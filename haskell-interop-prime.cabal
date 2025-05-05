@@ -1,3 +1,4 @@
+cabal-version:       2.2
 name:                haskell-interop-prime
 version:             0.1.4.0
 synopsis:            Experimental tool to help me serialize data types between haskell and other languages
@@ -16,7 +17,6 @@ author:              Andrew Darqui
 maintainer:          andrew.darqui@gmail.com
 category:            Language
 build-type:          Simple
-cabal-version:       >=1.10
 
 library
   exposed-modules:     Haskell.Interop.Prime
